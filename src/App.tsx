@@ -5,6 +5,9 @@ import GiftToss from './components/GiftToss'
 import GameSettings from './components/GameSettings'
 import GameCard from './components/GameCard'
 import Leaderboard from './components/Leaderboard'
+import { Button } from './components/ui/Button'
+import { Modal } from './components/ui/Modal'
+import { Card } from './components/ui/Card'
 import { GAME_CONFIG } from './constants/gameConfig'
 import { useHighScores } from './hooks/useHighScores'
 
@@ -68,9 +71,9 @@ function App() {
                         />
                     </div>
 
-                    <button className="btn-small" onClick={() => setShowSettings(true)} style={{ marginTop: '1rem' }}>
+                    <Button variant="icon" onClick={() => setShowSettings(true)} style={{ marginTop: '1rem' }}>
                         ⚙️ EINSTELLUNGEN
-                    </button>
+                    </Button>
 
                     {showSettings && (
                         <GameSettings
@@ -103,61 +106,61 @@ function App() {
             )}
 
             {gameState === 'name-entry' && (
-                <div style={{ textAlign: 'center', zIndex: 10, width: '90%' }}>
-                    <h1 className="glow-text">NEUER HIGHSCORE! 🎮</h1>
-                    <p style={{ fontSize: '1.5rem' }}>Dein Score: {score}</p>
-                    {error && (
-                        <div style={{
-                            background: 'rgba(255, 107, 107, 0.2)',
-                            border: '2px solid #ff6b6b',
-                            borderRadius: '8px',
-                            padding: '1rem',
-                            marginBottom: '1rem',
-                            color: '#ff6b6b'
-                        }}>
-                            {error}
-                        </div>
-                    )}
-                    <input
-                        className="arcade-input"
-                        maxLength={15}
-                        placeholder="NAME EINGEBEN"
-                        value={playerName}
-                        onChange={(e) => {
-                            const val = e.target.value.toUpperCase().replace(/[^A-Z0-9\s._-]/g, "");
-                            setPlayerName(val);
-                        }}
-                        autoFocus
-                        disabled={isSubmitting}
-                    />
-                    <br />
-                    <button
-                        className="btn-start"
-                        onPointerDown={submitScore}
-                        disabled={!playerName.trim() || isSubmitting}
-                        style={{ opacity: isSubmitting ? 0.6 : 1 }}
-                    >
-                        {isSubmitting ? 'WIRD GESPEICHERT...' : 'EINTRAGEN'}
-                    </button>
-                </div>
+                <Modal isOpen={true} title="NEUER HIGHSCORE! 🎮">
+                    <div style={{ textAlign: 'center', width: '100%' }}>
+                        <p style={{ fontSize: '1.5rem', margin: '1rem 0' }}>Dein Score: {score}</p>
+                        {error && (
+                            <div style={{
+                                background: 'rgba(255, 107, 107, 0.2)',
+                                border: '2px solid #ff6b6b',
+                                borderRadius: '8px',
+                                padding: '1rem',
+                                marginBottom: '1rem',
+                                color: '#ff6b6b'
+                            }}>
+                                {error}
+                            </div>
+                        )}
+                        <input
+                            className="arcade-input"
+                            maxLength={15}
+                            placeholder="NAME EINGEBEN"
+                            value={playerName}
+                            onChange={(e) => {
+                                const val = e.target.value.toUpperCase().replace(/[^A-Z0-9\s._-]/g, "");
+                                setPlayerName(val);
+                            }}
+                            autoFocus
+                            disabled={isSubmitting}
+                        />
+                        <br />
+                        <Button
+                            onPointerDown={submitScore}
+                            disabled={!playerName.trim() || isSubmitting}
+                            style={{ opacity: isSubmitting ? 0.6 : 1, marginTop: '1rem' }}
+                        >
+                            {isSubmitting ? 'WIRD GESPEICHERT...' : 'EINTRAGEN'}
+                        </Button>
+                    </div>
+                </Modal>
             )}
 
             {gameState === 'gameover' && (
-                <div style={{ textAlign: 'center', zIndex: 10, padding: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
-                    <h1 style={{ fontSize: window.innerWidth < 768 ? '3rem' : '4rem', marginBottom: '0.5rem' }}>FERTIG! 🎁</h1>
+                <Modal isOpen={true} title="FERTIG! 🎁">
+                    <div style={{ textAlign: 'center', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
+                        <Leaderboard
+                            scores={highScores}
+                            isLoading={isLoading}
+                        />
 
-                    <Leaderboard
-                        scores={highScores}
-                        isLoading={isLoading}
-                    />
+                        <Card className="joke-card" style={{ width: '100%' }}>
+                            <h2 style={{ fontFamily: 'var(--font-festive)', color: 'var(--warm-gold)', margin: '0', fontSize: '1.5rem' }}>Weihnachtswitz:</h2>
+                            <p style={{ fontSize: '1rem', fontStyle: 'italic' }}>"{currentJoke}"</p>
+                        </Card>
 
-                    <div className="joke-card frost-card">
-                        <h2 style={{ fontFamily: 'var(--font-festive)', color: 'var(--warm-gold)', margin: '0', fontSize: '1.5rem' }}>Weihnachtswitz:</h2>
-                        <p style={{ fontSize: '1rem', fontStyle: 'italic' }}>"{currentJoke}"</p>
+                        <Button onPointerDown={() => setGameState('menu')}>ZUM HAUPTMENÜ</Button>
                     </div>
-
-                    <button className="btn-start" onPointerDown={() => setGameState('menu')}>ZUM HAUPTMENÜ</button>
-                </div>
+                </Modal>
             )}
         </div>
     )

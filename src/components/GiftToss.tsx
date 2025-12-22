@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { GAME_CONFIG } from '../constants/gameConfig'
+import { HUD } from './ui/HUD'
 
 interface Gift {
     id: number;
@@ -204,8 +205,7 @@ export default function GiftToss({ onGameOver, settings }: GiftTossProps) {
 
     return (
         <div className="game-area gift-toss" onPointerDown={handleTap} style={{ cursor: 'pointer' }}>
-            <div className="score-display">Punkte: {score}</div>
-            <div className={`timer-display ${timeLeft < 10 ? 'timer-pulse' : ''}`}>⏳ {timeLeft}</div>
+            <HUD score={score} timeLeft={timeLeft} />
 
             <div className="santa-hand-top" style={{ left: santaX }}>🎅</div>
 

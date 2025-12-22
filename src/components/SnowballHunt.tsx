@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { GAME_CONFIG } from '../constants/gameConfig'
 import { WEIHNACHTS_WITZE, SPRUECHE } from '../constants/gameTexts'
+import { HUD } from './ui/HUD'
 
 // --- Audio Manager ---
 class SoundManager {
@@ -390,11 +391,7 @@ export default function SnowballHunt({ onGameOver, settings }: SnowballHuntProps
                 </div>
             ))}
 
-            <div className="score-display">Punkte: {score}</div>
-            <div className={`timer-display ${timeLeft < 10 ? 'timer-pulse' : ''}`}>
-                {frozen ? '❄️' : '⏳'} {timeLeft}
-            </div>
-            {combo > 1 && <div className={`combo-display ${combo > 5 ? 'combo-shake' : ''}`}>COMBO x{combo} 🔥</div>}
+            <HUD score={score} timeLeft={timeLeft} frozen={frozen} combo={combo} />
 
             {targets.map(target => (
                 <div

@@ -1,4 +1,6 @@
 import { GAME_CONFIG } from '../constants/gameConfig'
+import { Modal } from './ui/Modal'
+import { Button } from './ui/Button'
 
 interface GameSettingsProps {
     settings: typeof GAME_CONFIG;
@@ -23,23 +25,7 @@ export default function GameSettings({ settings, onUpdate, onClose }: GameSettin
     const presets = [30, 60, 90, 120];
 
     return (
-        <div className="settings-overlay frost-card" style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            zIndex: 100,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '1rem',
-            textAlign: 'center',
-            width: '90%',
-            maxWidth: '400px'
-        }}>
-            <h2 style={{ fontFamily: 'var(--font-festive)', color: 'var(--warm-gold)', fontSize: '2.5rem', margin: 0 }}>
-                Einstellungen ⚙️
-            </h2>
-
+        <Modal isOpen={true} onClose={onClose} title="Einstellungen ⚙️">
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'center', width: '100%' }}>
                 <label style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>
                     Spieldauer: <span style={{ color: 'var(--warm-gold)', fontSize: '1.4rem' }}>{formatTime(settings.TIMER)}</span>
@@ -57,22 +43,27 @@ export default function GameSettings({ settings, onUpdate, onClose }: GameSettin
 
                 <div className="preset-container">
                     {presets.map(p => (
-                        <button
+                        <Button
                             key={p}
-                            className={`btn-preset ${settings.TIMER === p ? 'active' : ''}`}
+                            variant="secondary"
+                            size="small"
                             onClick={() => handleTimerChange(p)}
+                            style={{
+                                opacity: settings.TIMER === p ? 1 : 0.6,
+                                border: settings.TIMER === p ? '2px solid var(--warm-gold)' : '1px solid var(--antique-gold)'
+                            }}
                         >
                             {p}s
-                        </button>
+                        </Button>
                     ))}
                 </div>
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '1rem' }}>
-                <button className="btn-start" onClick={onClose} style={{ fontSize: '1.2rem', padding: '0.5rem 2rem' }}>
+                <Button onClick={onClose} size="small">
                     FERTIG
-                </button>
+                </Button>
             </div>
-        </div>
+        </Modal>
     );
 }
