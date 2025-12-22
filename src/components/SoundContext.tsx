@@ -1,4 +1,36 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import bgMusic from '../assets/pixel-snowfall-carol.mp3';
+
+// --- Music Player ---
+class MusicPlayer {
+    audio: HTMLAudioElement | null = null;
+    isPlaying: boolean = false;
+    muted: boolean = false;
+
+    constructor() {
+        this.audio = new Audio(bgMusic);
+        this.audio.loop = true;
+        this.audio.volume = 0.4;
+    }
+
+    start() {
+        if (!this.audio || this.isPlaying) return;
+        this.audio.play().then(() => {
+            this.isPlaying = true;
+            this.updateMuted();
+        }).catch(err => console.error("Playback failed", err));
+    }
+
+    setMuted(muted: boolean) {
+        this.muted = muted;
+        this.updateMuted();
+    }
+
+    updateMuted() {
+        if (!this.audio) return;
+        this.audio.muted = this.muted;
+    }
+}
 
 interface SoundContextType {
     isMuted: boolean;
@@ -13,8 +45,25 @@ export const SoundProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         return saved === 'true';
     });
 
+    const player = useRef<MusicPlayer | null>(null);
+
+    useEffect(() => {
+        if (!player.current) {
+            player.current = new MusicPlayer();
+        }
+
+        const handleInteraction = () => {
+            player.current?.start();
+            window.removeEventListener('pointerdown', handleInteraction);
+        };
+
+        window.addEventListener('pointerdown', handleInteraction);
+        return () => window.removeEventListener('pointerdown', handleInteraction);
+    }, []);
+
     useEffect(() => {
         localStorage.setItem('santa-game-muted', String(isMuted));
+        player.current?.setMuted(isMuted);
     }, [isMuted]);
 
     const toggleMute = () => setIsMuted(prev => !prev);

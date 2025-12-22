@@ -9,5 +9,9 @@ services:
     volumes:
       - ./scores.json:/app/scores.json
     restart: unless-stopped
-    # Local environment high score file must be group-writable or owned by container uid 999
-    # On most systems, creating the file before running docker-compose is best
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:3001/api/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s

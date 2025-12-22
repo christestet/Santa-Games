@@ -14,6 +14,8 @@ const PORT = process.env.PORT || 3001;
 const MAX_SCORES = parseInt(process.env.MAX_SCORES) || 50;
 const SCORES_FILE = path.join(__dirname, "scores.json");
 
+let isHealthy = true;
+
 // Middleware
 app.use(
   cors({
@@ -110,6 +112,14 @@ app.get("/api/", (req, res) => {
 });
 
 app.get("/api/health", (req, res) => {
+  if (!isHealthy) {
+    return res.status(500).json({
+      status: "unhealthy",
+      message: "🎅 Santa's workshop is closed for repairs!",
+      timestamp: new Date().toISOString(),
+    });
+  }
+
   res.json({
     status: "healthy",
     message: "🎅 Santa's workshop is running smoothly!",
@@ -117,6 +127,12 @@ app.get("/api/health", (req, res) => {
     uptime: process.uptime(),
     hint: "Looking for the root of all presents? Try /api/",
   });
+});
+
+app.post("/api/toggle-health", (req, res) => {
+  isHealthy = !isHealthy;
+  console.log(`🔧 Health status toggled to: ${isHealthy ? "HEALTHY" : "UNHEALTHY"}`);
+  res.json({ success: true, isHealthy });
 });
 
 app.get("/api/scores", async (req, res) => {
