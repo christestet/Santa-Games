@@ -1,11 +1,12 @@
-import { useState, useEffect } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import Snow from './components/Snow'
 import SnowballHunt from './components/SnowballHunt'
 import GiftToss from './components/GiftToss'
 import GameSettings from './components/GameSettings'
 import GameCard from './components/GameCard'
-import { config } from './config';
+import Leaderboard from './components/Leaderboard'
 import { GAME_CONFIG } from './constants/gameConfig'
+import { useHighScores } from './hooks/useHighScores'
 
 type GameType = 'snowball' | 'gift-toss' | 'none';
 
@@ -14,73 +15,35 @@ function App() {
     const [currentGame, setCurrentGame] = useState<GameType>('none')
     const [score, setScore] = useState(0)
     const [currentJoke, setCurrentJoke] = useState("")
-    const [highScores, setHighScores] = useState<{ name: string; score: number }[]>([])
     const [playerName, setPlayerName] = useState("")
-    const [isLoadingScores, setIsLoadingScores] = useState(false)
-    const [apiError, setApiError] = useState<string | null>(null)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [settings, setSettings] = useState(GAME_CONFIG)
     const [showSettings, setShowSettings] = useState(false)
 
-    const fetchScores = async () => {
-        setIsLoadingScores(true);
-        setApiError(null);
-        try {
-            const res = await fetch(config.apiUrl);
-            if (!res.ok) throw new Error(`Server returned ${res.status}`);
-            const data = await res.json();
-            if (Array.isArray(data)) {
-                setHighScores(data);
-            } else {
-                setHighScores([]);
-            }
-        } catch (e) {
-            console.error("Failed to fetch scores", e);
-            setApiError("Bestenliste konnte nicht geladen werden");
-            setHighScores([]);
-        } finally {
-            setIsLoadingScores(false);
-        }
-    };
+    const { highScores, isLoading, error, fetchScores, submitScore: apiSubmitScore } = useHighScores();
 
-    useEffect(() => {
-        fetchScores();
-    }, []);
-
-    const handleGameOver = (finalScore: number, joke: string) => {
+    const handleGameOver = useCallback((finalScore: number, joke: string) => {
         setScore(finalScore)
         setCurrentJoke(joke)
         setGameState('name-entry')
-    }
+    }, [])
 
     const submitScore = async () => {
         if (!playerName.trim() || isSubmitting) return;
         setIsSubmitting(true);
-        setApiError(null);
-        try {
-            const res = await fetch(config.apiUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: playerName, score })
-            });
-            if (!res.ok) throw new Error(`Server returned ${res.status}`);
-            await fetchScores();
+        const success = await apiSubmitScore(playerName, score);
+        if (success) {
             setGameState('gameover');
-        } catch (e) {
-            console.error("Submission failed", e);
-            setApiError("Score konnte nicht gespeichert werden. Versuche es erneut.");
-            setIsSubmitting(false);
-            return;
         }
         setIsSubmitting(false);
     };
 
-    const startGame = (game: GameType) => {
+    const startGame = useCallback((game: GameType) => {
         setCurrentGame(game)
         setScore(0)
         setPlayerName("")
         setGameState('playing')
-    }
+    }, [])
 
     return (
         <div className="game-container">
@@ -117,30 +80,13 @@ function App() {
                         />
                     )}
 
-                    <div className="leaderboard frost-card" style={{ marginTop: '2rem' }}>
-                        <h2>🏆 Bestenliste</h2>
-                        {isLoadingScores ? (
-                            <div style={{ padding: '2rem', textAlign: 'center' }}>
-                                <div className="spinner">⏳</div>
-                                <p>Laden...</p>
-                            </div>
-                        ) : apiError ? (
-                            <div style={{ padding: '1rem', color: '#ff6b6b' }}>
-                                <p>{apiError}</p>
-                                <button className="btn-small" onClick={fetchScores} style={{ marginTop: '0.5rem' }}>
-                                    Erneut versuchen
-                                </button>
-                            </div>
-                        ) : highScores.length === 0 ? (
-                            <p style={{ padding: '1rem', opacity: 0.7 }}>Noch keine Scores</p>
-                        ) : (
-                            highScores.slice(0, 5).map((s, i) => (
-                                <div key={i} className="score-row">
-                                    <span>{i + 1}. {s.name}</span>
-                                    <span style={{ color: 'var(--christmas-gold)' }}>{s.score}</span>
-                                </div>
-                            ))
-                        )}
+                    <div style={{ marginTop: '2rem' }}>
+                        <Leaderboard
+                            scores={highScores}
+                            isLoading={isLoading}
+                            error={error}
+                            onRetry={fetchScores}
+                        />
                     </div>
                 </div>
             )}
@@ -160,7 +106,7 @@ function App() {
                 <div style={{ textAlign: 'center', zIndex: 10, width: '90%' }}>
                     <h1 className="glow-text">NEUER HIGHSCORE! 🎮</h1>
                     <p style={{ fontSize: '1.5rem' }}>Dein Score: {score}</p>
-                    {apiError && (
+                    {error && (
                         <div style={{
                             background: 'rgba(255, 107, 107, 0.2)',
                             border: '2px solid #ff6b6b',
@@ -169,7 +115,7 @@ function App() {
                             marginBottom: '1rem',
                             color: '#ff6b6b'
                         }}>
-                            {apiError}
+                            {error}
                         </div>
                     )}
                     <input
@@ -197,24 +143,10 @@ function App() {
                 <div style={{ textAlign: 'center', zIndex: 10, padding: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
                     <h1 style={{ fontSize: window.innerWidth < 768 ? '3rem' : '4rem', marginBottom: '0.5rem' }}>FERTIG! 🎁</h1>
 
-                    <div className="leaderboard frost-card">
-                        <h2>🏆 Bestenliste</h2>
-                        {isLoadingScores ? (
-                            <div style={{ padding: '2rem', textAlign: 'center' }}>
-                                <div className="spinner">⏳</div>
-                                <p>Laden...</p>
-                            </div>
-                        ) : highScores.length === 0 ? (
-                            <p style={{ padding: '1rem', opacity: 0.7 }}>Noch keine Scores</p>
-                        ) : (
-                            highScores.slice(0, 5).map((s, i) => (
-                                <div key={i} className="score-row">
-                                    <span>{i + 1}. {s.name}</span>
-                                    <span style={{ color: 'var(--christmas-gold)' }}>{s.score}</span>
-                                </div>
-                            ))
-                        )}
-                    </div>
+                    <Leaderboard
+                        scores={highScores}
+                        isLoading={isLoading}
+                    />
 
                     <div className="joke-card frost-card">
                         <h2 style={{ fontFamily: 'var(--font-festive)', color: 'var(--warm-gold)', margin: '0', fontSize: '1.5rem' }}>Weihnachtswitz:</h2>

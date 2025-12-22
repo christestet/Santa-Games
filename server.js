@@ -39,7 +39,7 @@ const readScores = () => {
     const data = fs.readFileSync(SCORES_FILE, "utf8");
     if (!data.trim()) return [];
     return JSON.parse(data);
-  } catch (e) {
+  } catch {
     console.warn(
       "Warning: Could not parse scores.json (empty or corrupt). Returning empty list."
     );
