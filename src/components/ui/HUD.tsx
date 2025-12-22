@@ -2,6 +2,8 @@ import React from 'react';
 import { Button } from './Button';
 import { useLanguage } from '../LanguageContext';
 import { useSound } from '../SoundContext';
+import { useTheme } from '../ThemeContext';
+import grinchIcon from '../../assets/grinch.png';
 
 interface HUDProps {
     score: number;
@@ -15,6 +17,7 @@ interface HUDProps {
 export const HUD: React.FC<HUDProps> = ({ score, timeLeft, frozen = false, combo = 0, className = '', onPause }) => {
     const { t } = useLanguage();
     const { isMuted, toggleMute } = useSound();
+    const { theme, toggleTheme } = useTheme();
 
     return (
         <>
@@ -31,6 +34,14 @@ export const HUD: React.FC<HUDProps> = ({ score, timeLeft, frozen = false, combo
                     >
                         {isMuted ? '🔇' : '🔊'}
                     </Button>
+                    <Button
+                        variant="icon"
+                        size="small"
+                        onClick={toggleTheme}
+                        style={{ padding: '0.2rem 0.6rem', fontSize: '1.2rem', minHeight: 'auto', background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center' }}
+                    >
+                        {theme === 'classic' ? '🎅' : <img src={grinchIcon} alt="Grinch" style={{ width: '1.2em', height: '1.2em' }} />}
+                    </Button>
                     {onPause && (
                         <Button
                             variant="icon"
@@ -42,13 +53,14 @@ export const HUD: React.FC<HUDProps> = ({ score, timeLeft, frozen = false, combo
                         </Button>
                     )}
                 </div>
-            </div>
+            </div >
 
             {combo > 1 && (
                 <div className={`combo-display ${combo > 5 ? 'combo-shake' : ''}`}>
                     COMBO x{combo} 🔥
                 </div>
-            )}
+            )
+            }
         </>
     );
 };

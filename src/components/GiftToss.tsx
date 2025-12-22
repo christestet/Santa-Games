@@ -137,7 +137,7 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
     const addFloatingText = useCallback((x: number, y: number, text: string, color: string = 'white') => {
         const now = Date.now();
         const id = nextId.current++
-        setFloatingTexts(prev => [...prev.filter(t => t.expiry > now), { id, x, y, text, color, expiry: now + 800 }])
+        setFloatingTexts(prev => [...prev.filter(t => t.expiry > now), { id, x, y, text, color, expiry: now + 2000 }])
     }, [])
 
     const spawnChimney = useCallback(() => {

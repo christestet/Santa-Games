@@ -120,6 +120,8 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
         isPaused: false
     })
 
+    const processedHits = useRef(new Set<number>()); // Track hit IDs to prevent double-processing
+
     const soundManager = useRef<SoundManager | null>(null)
     const nextId = useRef(0)
     const requestRef = useRef<number>(0)
@@ -180,7 +182,7 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
     const addFloatingText = useCallback((x: number, y: number, text: string, color: string = 'white') => {
         const now = Date.now();
         const id = nextId.current++
-        setFloatingTexts(prev => [...prev.filter(t => t.expiry > now), { id, x, y, text, color, expiry: now + 800 }])
+        setFloatingTexts(prev => [...prev.filter(t => t.expiry > now), { id, x, y, text, color, expiry: now + 2000 }])
     }, [])
 
     const spawnTarget = useCallback(() => {
@@ -213,6 +215,9 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
     }, [targetSize])
 
     const handleHitSuccess = useCallback((id: number, type: 'gift' | 'coal' | 'gold' | 'time' | 'ice', x: number, y: number) => {
+        if (processedHits.current.has(id)) return;
+        processedHits.current.add(id);
+
         soundManager.current?.playHit(type);
         setTargets(prev => prev.filter(t => t.id !== id));
         spawnParticles(x, y, `particle-${type}`);
@@ -226,7 +231,7 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
             newCombo = 0;
             points = settings.POINTS.COAL;
             text = getSpruch();
-            color = "#555";
+            color = "#cccccc";
             triggerShake();
             if (navigator.vibrate) navigator.vibrate(200);
         } else {
@@ -326,7 +331,10 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
 
             return prev.filter(t => {
                 const age = now - t.createdAt;
-                if (age > maxAge) return false;
+                if (age > maxAge) {
+                    processedHits.current.delete(t.id); // Cleanup
+                    return false;
+                }
                 t.x += t.vx;
                 t.y += t.vy;
                 if (t.x < 0 || t.x > window.innerWidth - targetSize) t.vx *= -1;
@@ -420,7 +428,7 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
             {targets.map(target => (
                 <div
                     key={target.id}
-                    className="target target-moving"
+                    className={`target target-moving target-${target.type}`}
                     style={{
                         left: target.x,
                         top: target.y,

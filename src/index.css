@@ -1,6 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Mountains+of+Christmas:wght@400;700&family=Outfit:wght@400;700;900&display=swap');
 
 :root {
+  --font-festive: 'Mountains of Christmas', cursive;
+  --font-main: 'Outfit', sans-serif;
+  transition: all 0.3s ease;
+}
+
+.classic-theme {
   --cozy-red: #8b0000;
   --velvet-red: #580000;
   --warm-gold: #ffb700;
@@ -8,14 +14,38 @@
   --cream-white: #fffdd0;
   --fireplace-glow: rgba(255, 140, 0, 0.4);
   --christmas-gold: #ffb700;
-  --font-festive: 'Mountains of Christmas', cursive;
-  --font-main: 'Outfit', sans-serif;
+  --bg-gradient: radial-gradient(circle at center, var(--cozy-red), #2a0000);
+  --card-bg: rgba(40, 0, 0, 0.95);
+  --card-bg-glass: rgba(40, 0, 0, 0.85);
+  --game-card-front: rgba(88, 0, 0, 0.8);
+  --game-card-back: rgba(40, 0, 0, 1);
+  --btn-text: #2a0000;
+  --input-bg: rgba(0, 0, 0, 0.4);
+}
+
+.grinch-theme {
+  --cozy-red: #000000; /* Pure Black Background */
+  --velvet-red: #050505; /* Very Dark Grey */
+  --warm-gold: #00ff00; /* Terminal Green */
+  --antique-gold: #00cc00; /* Darker Terminal Green */
+  --cream-white: #ccffcc; /* Pale Terminal Green Text */
+  --fireplace-glow: rgba(0, 255, 0, 0.2);
+  --christmas-gold: #00ff00;
+  --bg-gradient: linear-gradient(to bottom, #001100, #000000);
+  --card-bg: rgba(0, 20, 0, 0.95);
+  --card-bg-glass: rgba(0, 20, 0, 0.9);
+  --game-card-front: rgba(0, 30, 0, 0.95);
+  --game-card-back: #000000;
+  --btn-text: #000000;
+  --input-bg: #001100;
+  --accent-purple: #00ff00;
 }
 
 body {
   margin: 0;
   padding: 0;
-  background: radial-gradient(circle at center, var(--cozy-red), #2a0000);
+  background-color: var(--velvet-red);
+  background-image: var(--bg-gradient);
   color: var(--cream-white);
   font-family: var(--font-main);
   height: 100vh;
@@ -96,7 +126,7 @@ body::before {
 }
 
 .frost-card, .leaderboard {
-  background: rgba(40, 0, 0, 0.95);
+  background: var(--card-bg);
   border: 2px solid var(--antique-gold);
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
   border-radius: 12px;
@@ -108,7 +138,7 @@ body::before {
 
 @media (min-width: 1024px) {
   .frost-card, .leaderboard {
-    background: rgba(40, 0, 0, 0.85);
+    background: var(--card-bg-glass);
     backdrop-filter: blur(8px);
   }
 }
@@ -127,7 +157,7 @@ h1 {
 .btn-start {
   font-family: var(--font-main);
   background: linear-gradient(to bottom, var(--warm-gold), var(--antique-gold));
-  color: #2a0000;
+  color: var(--btn-text);
   border: 1px solid #ffd700;
   border-radius: 8px;
   padding: clamp(0.8rem, 2vw, 1rem) clamp(1.5rem, 4vw, 3rem);
@@ -323,7 +353,7 @@ h1 {
 /* Varied Particles */
 .particle-gift { background: #ff4d4d; box-shadow: 0 0 5px #ff4d4d; }
 .particle-gold { background: var(--warm-gold); box-shadow: 0 0 8px var(--warm-gold); }
-.particle-coal { background: #333; box-shadow: none; border-radius: 2px; }
+.particle-coal { background: #333; box-shadow: 0 0 2px #888; border: 1px solid #555; border-radius: 2px; }
 .particle-ice { background: #a5f2f3; box-shadow: 0 0 5px #fff; }
 .particle-time { background: #4caf50; }
 
@@ -348,7 +378,7 @@ h1 {
 }
 
 .arcade-input {
-  background: rgba(0,0,0,0.4);
+  background: var(--input-bg);
   border: 2px solid var(--antique-gold);
   border-radius: 8px;
   color: var(--warm-gold);
@@ -368,8 +398,9 @@ h1 {
 /* Animations */
 @keyframes floatUp {
   0% { transform: translateY(0) scale(0.8); opacity: 0; }
-  20% { transform: translateY(-10px) scale(1.1); opacity: 1; }
-  100% { transform: translateY(-60px) scale(1); opacity: 0; }
+  10% { transform: translateY(-10px) scale(1.1); opacity: 1; }
+  80% { opacity: 1; }
+  100% { transform: translateY(-80px) scale(1); opacity: 0; }
 }
 
 .floating-text {
@@ -378,9 +409,13 @@ h1 {
   font-weight: 900;
   pointer-events: none;
   z-index: 30;
-  animation: floatUp 0.8s ease-out forwards;
+  animation: floatUp 2s ease-out forwards;
   text-shadow: 0 2px 5px rgba(0,0,0,0.5);
   will-change: transform, opacity;
+}
+
+.target-coal .target-inner {
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.4)) brightness(1.2);
 }
 
 .particle {
@@ -422,7 +457,7 @@ h1 {
   gap: 1rem;
   transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s;
   cursor: pointer;
-  background: rgba(88, 0, 0, 0.6);
+  background: var(--game-card-front);
   border: 3px solid var(--antique-gold);
   position: relative;
   overflow: hidden;
@@ -431,7 +466,7 @@ h1 {
 .game-card:hover {
   transform: translateY(-10px) scale(1.05);
   box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6), 0 0 20px var(--fireplace-glow);
-  background: rgba(139, 0, 0, 0.8);
+  background: var(--cozy-red);
 }
 
 .game-card:active {
@@ -479,11 +514,11 @@ h1 {
 }
 
 .game-card-front {
-  background: rgba(88, 0, 0, 0.8);
+  background: var(--game-card-front);
 }
 
 .game-card-back {
-  background: rgba(40, 0, 0, 1);
+  background: var(--game-card-back);
   transform: rotateY(180deg);
   justify-content: space-between;
 }
@@ -772,6 +807,7 @@ input[type=range]::-webkit-slider-thumb {
   background: var(--warm-gold);
   cursor: pointer;
   -webkit-appearance: none;
+  appearance: none;
   margin-top: -9px;
   box-shadow: 0 0 10px rgba(255, 183, 0, 0.5), inset 0 2px 2px rgba(255, 255, 255, 0.5);
   border: 2px solid var(--antique-gold);

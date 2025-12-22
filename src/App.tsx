@@ -11,12 +11,15 @@ import { Card } from './components/ui/Card'
 import { GAME_CONFIG } from './constants/gameConfig'
 import { useHighScores } from './hooks/useHighScores'
 import { useLanguage } from './components/LanguageContext'
+import { useTheme } from './components/ThemeContext'
+import grinchIcon from './assets/grinch.png'
 
 type GameType = 'snowball' | 'gift-toss' | 'none';
 type GameState = 'menu' | 'playing' | 'name-entry' | 'gameover';
 
 const App: React.FC = () => {
     const { t, language, setLanguage } = useLanguage()
+    const { theme, toggleTheme } = useTheme()
     const [gameState, setGameState] = useState<GameState>('menu')
     const [currentGame, setCurrentGame] = useState<GameType>('none')
     const [score, setScore] = useState(0)
@@ -80,9 +83,22 @@ const App: React.FC = () => {
                         >
                             {language === 'de' ? '🇺🇸' : '🇩🇪'}
                         </Button>
+                        <Button
+                            variant="icon"
+                            onClick={toggleTheme}
+                            style={{ fontSize: '1.5rem', background: 'rgba(255,255,255,0.1)', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                        >
+                            {theme === 'classic' ? '🎅' : <img src={grinchIcon} alt="Grinch" style={{ width: '1.5em', height: '1.5em' }} />}
+                        </Button>
                     </div>
 
-                    <h1>{t('menu.title')}</h1>
+                    <h1>
+                        {theme === 'grinch' ? (
+                            <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+                                {t('menu.grinchTitle')} <img src={grinchIcon} alt="Grinch" style={{ width: '0.8em', height: '0.8em' }} />
+                            </span>
+                        ) : t('menu.title')}
+                    </h1>
 
                     <div className="game-selection">
                         <GameCard
