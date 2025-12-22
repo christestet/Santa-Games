@@ -1,7 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 
-const API_URL = 'http://localhost:3001/api/scores';
-
 const WEIHNACHTS_WITZE = [
     "Warum hat der Schneemann keine Beine? Weil er sonst weglaufen würde, wenn er gelbe Flecken sieht!",
     "Was ist das Lieblingsessen von Rentieren? Rentier-Gulasch... oh warte, nein!",

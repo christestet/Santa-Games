@@ -14,7 +14,7 @@
 
 body {
   margin: 0;
-  padding: 0;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   background: radial-gradient(circle at center, var(--cozy-red), #2a0000);
   color: var(--cream-white);
   font-family: var(--font-main);
@@ -66,8 +66,7 @@ body::before {
 }
 
 .frost-card, .leaderboard {
-  background: rgba(40, 0, 0, 0.85);
-  backdrop-filter: blur(8px);
+  background: rgba(40, 0, 0, 0.95);
   border: 2px solid var(--antique-gold);
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
   border-radius: 12px;
@@ -77,9 +76,16 @@ body::before {
   z-index: 10;
 }
 
+@media (min-width: 1024px) {
+  .frost-card, .leaderboard {
+    background: rgba(40, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+  }
+}
+
 h1 {
   font-family: var(--font-festive);
-  font-size: 5rem;
+  font-size: clamp(2.5rem, 8vw, 5rem);
   color: var(--warm-gold);
   text-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
   margin-bottom: 0.5rem;
@@ -94,11 +100,12 @@ h1 {
   color: #2a0000;
   border: 1px solid #ffd700;
   border-radius: 8px;
-  padding: 1rem 3rem;
-  font-size: 2rem;
+  padding: clamp(0.8rem, 2vw, 1rem) clamp(1.5rem, 4vw, 3rem);
+  font-size: clamp(1.2rem, 4vw, 2rem);
   font-weight: 800;
   cursor: pointer;
-  transition: all 0.2s ease;
+  min-height: 44px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
   box-shadow: 0 5px 15px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.4);
   z-index: 10;
   user-select: none;
@@ -113,10 +120,16 @@ h1 {
   filter: brightness(1.1);
 }
 
+.btn-start:active {
+  transform: scale(0.95);
+  filter: brightness(0.85);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
 .score-display, .timer-display {
   position: absolute;
   top: 1.5rem;
-  font-size: 2.2rem;
+  font-size: clamp(1rem, 3vw, 2.2rem);
   font-weight: 900;
   z-index: 20;
   padding: 0.5rem 1.2rem;
@@ -127,12 +140,14 @@ h1 {
 }
 
 .score-display {
-  right: 1.5rem;
+  top: calc(1.5rem + env(safe-area-inset-top));
+  right: calc(1.5rem + env(safe-area-inset-right));
   color: var(--warm-gold);
 }
 
 .timer-display {
-  left: 1.5rem;
+  top: calc(1.5rem + env(safe-area-inset-top));
+  left: calc(1.5rem + env(safe-area-inset-left));
   color: var(--cream-white);
 }
 
@@ -154,16 +169,7 @@ h1 {
   z-index: 15;
   touch-action: none;
   user-select: none;
-}
-
-.target-inner {
-  font-size: 4rem;
-  filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5));
-  transition: transform 0.1s;
-}
-
-    transform: scale(0.9);
-    filter: brightness(0.9);
+  will-change: transform, opacity;
 }
 
 .target-bubble {
@@ -171,9 +177,8 @@ h1 {
     height: 100%;
     border-radius: 50%;
     background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.1));
-    backdrop-filter: blur(5px);
     border: 2px solid rgba(255, 255, 255, 0.5);
-    box-shadow: 
+    box-shadow:
         inset 0 0 10px rgba(255, 255, 255, 0.3),
         0 4px 10px rgba(0, 0, 0, 0.2);
     display: flex;
@@ -209,6 +214,11 @@ h1 {
   z-index: 2;
 }
 
+.target-inner:active {
+  transform: scale(0.9);
+  filter: brightness(0.9);
+}
+
 .combo-container {
     position: absolute;
     bottom: 2rem;
@@ -230,6 +240,32 @@ h1 {
     box-shadow: 0 0 10px var(--warm-gold);
 }
 
+.combo-display {
+    position: absolute;
+    top: calc(6rem + env(safe-area-inset-top));
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: var(--warm-gold);
+    z-index: 20;
+    padding: 0.5rem 1rem;
+    background: rgba(0, 0, 0, 0.6);
+    border: 2px solid var(--warm-gold);
+    border-radius: 8px;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.combo-shake {
+    animation: shake-combo 0.3s ease-in-out;
+}
+
+@keyframes shake-combo {
+    0%, 100% { transform: translateX(-50%) rotate(0deg); }
+    25% { transform: translateX(-50%) rotate(-5deg); }
+    75% { transform: translateX(-50%) rotate(5deg); }
+}
+
 .frozen-overlay {
     position: absolute;
     top: 0;
@@ -240,8 +276,13 @@ h1 {
     z-index: 100;
     box-shadow: inset 0 0 100px #a5f2f3;
     border: 20px solid rgba(165, 242, 243, 0.3);
-    backdrop-filter: blur(2px);
     animation: freeze-in 0.5s ease-out;
+}
+
+@media (min-width: 1024px) {
+    .frozen-overlay {
+        backdrop-filter: blur(2px);
+    }
 }
 
 @keyframes freeze-in {
@@ -254,7 +295,10 @@ h1 {
 .particle-gold { background: var(--warm-gold); box-shadow: 0 0 8px var(--warm-gold); }
 .particle-coal { background: #333; box-shadow: none; border-radius: 2px; }
 .particle-ice { background: #a5f2f3; box-shadow: 0 0 5px #fff; }
-.particle-time { background: #4caf50; }  font-family: var(--font-festive);
+.particle-time { background: #4caf50; }
+
+.leaderboard h2 {
+  font-family: var(--font-festive);
   margin: 0;
   border-bottom: 2px solid var(--antique-gold);
   padding-bottom: 0.5rem;
@@ -288,7 +332,7 @@ h1 {
   margin: 1.5rem 0;
   text-transform: uppercase;
   letter-spacing: 3px;
-  transition: all 0.2s;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 /* Animations */
@@ -306,6 +350,7 @@ h1 {
   z-index: 30;
   animation: floatUp 0.8s ease-out forwards;
   text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+  will-change: transform, opacity;
 }
 
 .particle {
@@ -318,6 +363,7 @@ h1 {
   z-index: 25;
   box-shadow: 0 0 5px var(--warm-gold);
   animation: pop-particle 0.6s ease-out forwards;
+  will-change: transform, opacity;
 }
 
 @keyframes pop-particle {
@@ -358,6 +404,11 @@ h1 {
   background: rgba(139, 0, 0, 0.8);
 }
 
+.game-card:active {
+  transform: translateY(-5px) scale(1.02);
+  filter: brightness(0.9);
+}
+
 .game-icon {
   font-size: 4.5rem;
   filter: drop-shadow(0 5px 15px rgba(0,0,0,0.4));
@@ -374,11 +425,20 @@ h1 {
   background: var(--antique-gold);
   color: var(--velvet-red);
   border: none;
-  padding: 0.5rem 1.5rem;
+  padding: 0.75rem 1.5rem;
   border-radius: 20px;
   font-weight: 900;
-  font-size: 1rem;
+  font-size: 1.1rem;
   letter-spacing: 1px;
+  min-width: 44px;
+  min-height: 44px;
+  cursor: pointer;
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.btn-small:active {
+  transform: scale(0.95);
+  filter: brightness(0.85);
 }
 
 /* Common Game Area */
@@ -401,6 +461,7 @@ h1 {
   border: 4px solid #331a1a;
   border-top: none;
   z-index: 5;
+  will-change: transform;
 }
 
 .chimney-top {
@@ -442,6 +503,7 @@ h1 {
   align-items: center;
   justify-content: center;
   filter: drop-shadow(0 5px 10px rgba(0,0,0,0.3));
+  will-change: transform;
 }
 
 .santa-hand {
@@ -470,27 +532,47 @@ h1 {
   background: rgba(0,0,0,0.3);
 }
 
+/* Add smooth fade-in animation for all states */
+.game-container > div {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 /* Media Queries */
+@media (max-width: 480px) {
+  /* Extra small phones */
+  .frost-card { padding: 1rem; max-width: 100%; }
+  .game-container { border-width: 0; }
+  .target-inner { font-size: 2.5rem; }
+}
+
 @media (max-width: 768px) {
-  h1 { font-size: 2.5rem; margin-top: 1rem; }
-  .btn-start { font-size: 1.5rem; padding: 0.8rem 1.5rem; width: 90%; }
-  .game-container { border-width: 0; } 
+  /* Small tablets and large phones */
+  .game-container { border-width: 0; }
   .target-inner { font-size: 3rem; }
-  .score-display, .timer-display { font-size: 1.2rem; top: 0.5rem; padding: 0.3rem 0.8rem; }
-  .combo-display { top: 3.5rem; font-size: 1rem; }
   .leaderboard { width: 95%; padding: 0.8rem; margin: 1rem 0; }
   .leaderboard h2 { font-size: 1.8rem; }
   .score-row { font-size: 1rem; padding: 0.5rem 0; }
   .arcade-input { font-size: 2rem; width: 100%; }
-  
+
   .game-selection { gap: 1rem; margin-top: 1rem; }
   .game-card { min-width: 140px; padding: 1rem; }
   .game-icon { font-size: 3rem; }
   .game-card h3 { font-size: 1.2rem; }
-  
-  /* Adjust for very small screens */
-  @media (max-height: 700px) {
-    h1 { display: none; } /* Hide title on landscape/small height to save space */
-    .leaderboard { max-height: 200px; overflow-y: auto; }
-  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  /* Tablets */
+  .game-selection { max-width: 700px; }
+  .frost-card, .leaderboard { max-width: 500px; }
+}
+
+@media (max-height: 700px) {
+  /* Landscape/small height - save vertical space */
+  h1 { display: none; }
+  .leaderboard { max-height: 200px; overflow-y: auto; }
 }
