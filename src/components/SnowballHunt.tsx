@@ -64,6 +64,8 @@ interface SnowballHuntProps {
     onGameOver: (score: number, joke: string) => void;
     highScores: { name: string; score: number }[];
     settings: typeof GAME_CONFIG;
+    isPaused: boolean;
+    onPause: () => void;
 }
 
 interface Target {
@@ -89,7 +91,7 @@ interface Splat { id: number; x: number; y: number; expiry: number; }
 interface FloatingText { id: number; x: number; y: number; text: string; color: string; expiry: number; }
 interface Particle { id: number; x: number; y: number; tx: string; ty: string; type: string; expiry: number; }
 
-export default function SnowballHunt({ onGameOver, settings }: SnowballHuntProps) {
+export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }: SnowballHuntProps) {
     const [score, setScore] = useState(0)
     const [timeLeft, setTimeLeft] = useState(settings.TIMER)
     const [targets, setTargets] = useState<Target[]>([])
@@ -109,7 +111,8 @@ export default function SnowballHunt({ onGameOver, settings }: SnowballHuntProps
         frozen: false,
         timeLeft: settings.TIMER,
         isPlaying: true,
-        combo: 0
+        combo: 0,
+        isPaused: false
     })
 
     const soundManager = useRef<SoundManager | null>(null)
@@ -143,6 +146,7 @@ export default function SnowballHunt({ onGameOver, settings }: SnowballHuntProps
     useEffect(() => { stateRef.current.targets = targets }, [targets])
     useEffect(() => { stateRef.current.projectiles = projectiles }, [projectiles])
     useEffect(() => { stateRef.current.combo = combo }, [combo])
+    useEffect(() => { stateRef.current.isPaused = isPaused }, [isPaused])
 
     const triggerShake = () => {
         setShake(true)
@@ -169,7 +173,7 @@ export default function SnowballHunt({ onGameOver, settings }: SnowballHuntProps
     }, [])
 
     const spawnTarget = useCallback(() => {
-        if (!stateRef.current.isPlaying) return;
+        if (!stateRef.current.isPlaying || stateRef.current.isPaused) return;
 
         const padding = 50
         const x = Math.random() * (window.innerWidth - targetSize - padding * 2) + padding
@@ -280,6 +284,14 @@ export default function SnowballHunt({ onGameOver, settings }: SnowballHuntProps
 
     const animate = useCallback((time: number) => {
         if (!lastTimeRef.current) lastTimeRef.current = time;
+        // Don't update lastTimeRef if paused to prevent huge dt jumps
+
+        if (stateRef.current.isPaused) {
+            lastTimeRef.current = time; // Keep updating time to avoid jumps on resume
+            requestRef.current = requestAnimationFrame(animate);
+            return;
+        }
+
         lastTimeRef.current = time;
 
         if (!stateRef.current.isPlaying) return;
@@ -322,7 +334,7 @@ export default function SnowballHunt({ onGameOver, settings }: SnowballHuntProps
     }, [targetSize, handleProjectileImpact]);
 
     const handlePointerDown = (e: React.PointerEvent) => {
-        if (!stateRef.current.isPlaying) return;
+        if (!stateRef.current.isPlaying || stateRef.current.isPaused) return;
         soundManager.current?.playThrow();
         const startX = window.innerWidth / 2;
         const startY = window.innerHeight;
@@ -337,17 +349,17 @@ export default function SnowballHunt({ onGameOver, settings }: SnowballHuntProps
     };
 
     useEffect(() => {
+        // ... (spawn interval logic) ...
         const difficultyMod = Math.min(settings.SNOWBALL_HUNT.SPAWN_RATE_BASE - settings.SNOWBALL_HUNT.SPAWN_RATE_MIN, Math.floor(score / 5));
         const spawnRate = Math.max(settings.SNOWBALL_HUNT.SPAWN_RATE_MIN, settings.SNOWBALL_HUNT.SPAWN_RATE_BASE - difficultyMod);
         const spawnInterval = setInterval(spawnTarget, spawnRate);
-
         return () => clearInterval(spawnInterval);
     }, [spawnTarget, score]);
 
     useEffect(() => {
         requestRef.current = requestAnimationFrame(animate);
         const timerInterval = setInterval(() => {
-            if (!stateRef.current.frozen && stateRef.current.isPlaying) {
+            if (!stateRef.current.frozen && stateRef.current.isPlaying && !stateRef.current.isPaused) {
                 setTimeLeft(t => {
                     if (t <= 1) {
                         stateRef.current.isPlaying = false;
@@ -364,6 +376,7 @@ export default function SnowballHunt({ onGameOver, settings }: SnowballHuntProps
             clearInterval(timerInterval);
         }
     }, [animate, onGameOver]);
+
 
     return (
         <div className={`game-area cursor-crosshair ${shake ? 'shake' : ''}`} onPointerDown={handlePointerDown}>
@@ -391,7 +404,7 @@ export default function SnowballHunt({ onGameOver, settings }: SnowballHuntProps
                 </div>
             ))}
 
-            <HUD score={score} timeLeft={timeLeft} frozen={frozen} combo={combo} />
+            <HUD score={score} timeLeft={timeLeft} frozen={frozen} combo={combo} onPause={onPause} />
 
             {targets.map(target => (
                 <div

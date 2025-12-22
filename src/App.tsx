@@ -25,10 +25,13 @@ function App() {
 
     const { highScores, isLoading, error, fetchScores, submitScore: apiSubmitScore } = useHighScores();
 
+    const [isPaused, setIsPaused] = useState(false)
+
     const handleGameOver = useCallback((finalScore: number, joke: string) => {
         setScore(finalScore)
         setCurrentJoke(joke)
         setGameState('name-entry')
+        setIsPaused(false)
     }, [])
 
     const submitScore = async () => {
@@ -46,7 +49,19 @@ function App() {
         setScore(0)
         setPlayerName("")
         setGameState('playing')
+        setIsPaused(false)
     }, [])
+
+    const handlePause = useCallback(() => setIsPaused(true), [])
+    const handleResume = useCallback(() => setIsPaused(false), [])
+    const handleQuit = useCallback(() => {
+        setIsPaused(false)
+        setGameState('menu')
+    }, [])
+    const handleRestart = useCallback(() => {
+        setIsPaused(false)
+        startGame(currentGame)
+    }, [currentGame, startGame])
 
     return (
         <div className="game-container">
@@ -97,10 +112,31 @@ function App() {
             {gameState === 'playing' && (
                 <>
                     {currentGame === 'snowball' && (
-                        <SnowballHunt onGameOver={handleGameOver} highScores={highScores} settings={settings} />
+                        <SnowballHunt
+                            onGameOver={handleGameOver}
+                            highScores={highScores}
+                            settings={settings}
+                            isPaused={isPaused}
+                            onPause={handlePause}
+                        />
                     )}
                     {currentGame === 'gift-toss' && (
-                        <GiftToss onGameOver={handleGameOver} settings={settings} />
+                        <GiftToss
+                            onGameOver={handleGameOver}
+                            settings={settings}
+                            isPaused={isPaused}
+                            onPause={handlePause}
+                        />
+                    )}
+
+                    {isPaused && (
+                        <Modal isOpen={true} title="PAUSE ⏸️">
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%', alignItems: 'center' }}>
+                                <Button onClick={handleResume} style={{ width: '100%' }}>WEITER</Button>
+                                <Button variant="secondary" onClick={handleRestart} style={{ width: '100%' }}>NEUSTART</Button>
+                                <Button variant="secondary" onClick={handleQuit} style={{ width: '100%', border: '2px solid #ff6b6b', color: '#ff6b6b' }}>BEENDEN</Button>
+                            </div>
+                        </Modal>
                     )}
                 </>
             )}

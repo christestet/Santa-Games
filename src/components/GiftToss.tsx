@@ -20,9 +20,11 @@ interface FloatingText { id: number; x: number; y: number; text: string; color: 
 interface GiftTossProps {
     onGameOver: (score: number, joke: string) => void;
     settings: typeof GAME_CONFIG;
+    isPaused: boolean;
+    onPause: () => void;
 }
 
-export default function GiftToss({ onGameOver, settings }: GiftTossProps) {
+export default function GiftToss({ onGameOver, settings, isPaused, onPause }: GiftTossProps) {
     const [score, setScore] = useState(0)
     const [timeLeft, setTimeLeft] = useState(settings.TIMER)
     const [gifts, setGifts] = useState<Gift[]>([])
@@ -48,7 +50,8 @@ export default function GiftToss({ onGameOver, settings }: GiftTossProps) {
         chimneys: [] as Chimney[],
         obstacles: [] as Obstacle[],
         score: 0,
-        isPlaying: true
+        isPlaying: true,
+        isPaused: false
     })
 
     // Sync refs for collision detection
@@ -56,6 +59,7 @@ export default function GiftToss({ onGameOver, settings }: GiftTossProps) {
     useEffect(() => { stateRef.current.chimneys = chimneys }, [chimneys])
     useEffect(() => { stateRef.current.obstacles = obstacles }, [obstacles])
     useEffect(() => { stateRef.current.score = score }, [score])
+    useEffect(() => { stateRef.current.isPaused = isPaused }, [isPaused])
 
     const addFloatingText = useCallback((x: number, y: number, text: string, color: string = 'white') => {
         const now = Date.now();
@@ -64,6 +68,7 @@ export default function GiftToss({ onGameOver, settings }: GiftTossProps) {
     }, [])
 
     const spawnChimney = useCallback(() => {
+        if (!stateRef.current.isPlaying || stateRef.current.isPaused) return;
         const id = nextId.current++
         const width = 80 + Math.random() * 40
         const speed = -1.5 - Math.random() * 1.5;
@@ -71,6 +76,7 @@ export default function GiftToss({ onGameOver, settings }: GiftTossProps) {
     }, [])
 
     const spawnObstacle = useCallback(() => {
+        if (!stateRef.current.isPlaying || stateRef.current.isPaused) return;
         const id = nextId.current++
         const type = Math.random() > 0.7 ? 'plane' : 'cloud'
         const width = type === 'cloud' ? 120 : 60
@@ -84,6 +90,13 @@ export default function GiftToss({ onGameOver, settings }: GiftTossProps) {
 
     const update = useCallback((time: number) => {
         if (!stateRef.current.isPlaying) return;
+
+        if (stateRef.current.isPaused) {
+            lastTimeRef.current = time;
+            requestRef.current = requestAnimationFrame(update);
+            return;
+        }
+
         lastTimeRef.current = time;
 
         // 1. Update Santa
@@ -160,14 +173,16 @@ export default function GiftToss({ onGameOver, settings }: GiftTossProps) {
         const chimneyInterval = setInterval(spawnChimney, settings.GIFT_TOSS.SPAWN_RATE_CHIMNEY);
         const obstacleInterval = setInterval(spawnObstacle, settings.GIFT_TOSS.SPAWN_RATE_OBSTACLE);
         const timerInterval = setInterval(() => {
-            setTimeLeft(t => {
-                if (t <= 1) {
-                    stateRef.current.isPlaying = false;
-                    onGameOver(stateRef.current.score, "Danke für deine Hilfe, Santa!");
-                    return 0;
-                }
-                return t - 1;
-            });
+            if (!stateRef.current.isPaused && stateRef.current.isPlaying) {
+                setTimeLeft(t => {
+                    if (t <= 1) {
+                        stateRef.current.isPlaying = false;
+                        onGameOver(stateRef.current.score, "Danke für deine Hilfe, Santa!");
+                        return 0;
+                    }
+                    return t - 1;
+                });
+            }
         }, 1000);
 
         spawnChimney();
@@ -182,6 +197,7 @@ export default function GiftToss({ onGameOver, settings }: GiftTossProps) {
     }, [update, spawnChimney, spawnObstacle, onGameOver]);
 
     const handleTap = (e: React.PointerEvent) => {
+        if (!stateRef.current.isPlaying || stateRef.current.isPaused) return;
         if (Date.now() - lastThrowTime.current < COOLDOWN) return;
         lastThrowTime.current = Date.now();
 
@@ -205,7 +221,7 @@ export default function GiftToss({ onGameOver, settings }: GiftTossProps) {
 
     return (
         <div className="game-area gift-toss" onPointerDown={handleTap} style={{ cursor: 'pointer' }}>
-            <HUD score={score} timeLeft={timeLeft} />
+            <HUD score={score} timeLeft={timeLeft} onPause={onPause} />
 
             <div className="santa-hand-top" style={{ left: santaX }}>🎅</div>
 
