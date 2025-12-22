@@ -14,18 +14,18 @@
 
 body {
   margin: 0;
-  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  padding: 0;
   background: radial-gradient(circle at center, var(--cozy-red), #2a0000);
   color: var(--cream-white);
   font-family: var(--font-main);
-  min-height: 100vh;
+  height: 100vh;
+  width: 100vw;
   overflow: hidden;
   display: flex;
   justify-content: center;
   align-items: center;
   touch-action: none;
   position: fixed;
-  width: 100%;
 }
 
 body::before {
@@ -50,8 +50,8 @@ body::before {
 }
 
 .game-container {
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   position: relative;
   overflow: hidden;
   display: flex;
@@ -63,6 +63,36 @@ body::before {
     inset 0 0 100px var(--velvet-red),
     0 0 30px var(--fireplace-glow);
   box-sizing: border-box;
+  z-index: 1;
+}
+
+.snow-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 5;
+  overflow: hidden;
+}
+
+.snowflake {
+  position: absolute;
+  top: -2rem;
+  color: white;
+  user-select: none;
+  pointer-events: none;
+  animation: fall linear infinite;
+}
+
+@keyframes fall {
+  0% {
+    transform: translateY(0) rotate(0deg);
+  }
+  100% {
+    transform: translateY(110vh) rotate(360deg);
+  }
 }
 
 .frost-card, .leaderboard {
