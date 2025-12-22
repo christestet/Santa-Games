@@ -34,14 +34,15 @@ interface GiftTossProps {
 
 export default function GiftToss({ onGameOver }: GiftTossProps) {
     const [score, setScore] = useState(0)
-    const [timeLeft, setTimeLeft] = useState(60) // More time for strategy
+    const [timeLeft, setTimeLeft] = useState(60)
     const [gifts, setGifts] = useState<Gift[]>([])
     const [chimneys, setChimneys] = useState<Chimney[]>([])
     const [obstacles, setObstacles] = useState<Obstacle[]>([])
-    const [isDragging, setIsDragging] = useState(false)
-    const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
-    const [dragCurrent, setDragCurrent] = useState({ x: 0, y: 0 })
     const [floatingTexts, setFloatingTexts] = useState<{ id: number; x: number; y: number; text: string; color: string }[]>([])
+
+    // Santa State
+    const santaRef = useRef({ x: window.innerWidth / 2, speed: 3 })
+    const [santaX, setSantaX] = useState(window.innerWidth / 2)
 
     const nextId = useRef(0)
     const requestRef = useRef<number>(0)
@@ -50,8 +51,8 @@ export default function GiftToss({ onGameOver }: GiftTossProps) {
     // Game constants
     const GRAVITY = 0.4
     const GIFT_SIZE = 40
-    const CHIMNEY_HEIGHT = 80 // Reduced height since they are targets now
-    const COOLDOWN = 600
+    const CHIMNEY_HEIGHT = 80
+    const COOLDOWN = 400 // Faster cooldown for tapping
     const lastThrowTime = useRef(0)
 
     const addFloatingText = (x: number, y: number, text: string, color: string = 'white') => {
@@ -65,9 +66,8 @@ export default function GiftToss({ onGameOver }: GiftTossProps) {
     const spawnChimney = useCallback(() => {
         const id = nextId.current++
         const width = 80 + Math.random() * 40
-        // Spawn from right
         const x = window.innerWidth
-        const speed = -1.5 - Math.random() * 1.5; // Move left
+        const speed = -1.5 - Math.random() * 1.5;
         const newChimney = { id, x, speed, width }
         setChimneys(prev => [...prev, newChimney])
     }, [])
@@ -77,9 +77,8 @@ export default function GiftToss({ onGameOver }: GiftTossProps) {
         const type = Math.random() > 0.7 ? 'plane' : 'cloud'
         const width = type === 'cloud' ? 120 : 60
         const height = type === 'cloud' ? 60 : 30
-        const y = 150 + Math.random() * (window.innerHeight - 350) // Middle area
+        const y = 150 + Math.random() * (window.innerHeight - 350)
 
-        // Random direction
         const fromLeft = Math.random() > 0.5;
         const x = fromLeft ? -width : window.innerWidth;
         const speed = (1 + Math.random() * 2) * (fromLeft ? 1 : -1);
@@ -90,7 +89,8 @@ export default function GiftToss({ onGameOver }: GiftTossProps) {
     // Game Loop Setup
     useEffect(() => {
         const chimneyInterval = setInterval(spawnChimney, 2500)
-        const obstacleInterval = setInterval(spawnObstacle, 1800)
+        // Reduced frequency from 1800 to 3500 to make it easier
+        const obstacleInterval = setInterval(spawnObstacle, 3500)
 
         const timerInterval = setInterval(() => {
             setTimeLeft(t => {
@@ -102,7 +102,6 @@ export default function GiftToss({ onGameOver }: GiftTossProps) {
             })
         }, 1000)
 
-        // Initial Entities
         spawnChimney()
         spawnObstacle()
 
@@ -117,6 +116,16 @@ export default function GiftToss({ onGameOver }: GiftTossProps) {
     const update = (time: number) => {
         if (lastTimeRef.current !== undefined) {
 
+            // 1. Update Santa
+            const s = santaRef.current;
+            s.x += s.speed;
+            // Bounce Santa off walls
+            if (s.x > window.innerWidth - 80 || s.x < 80) {
+                s.speed *= -1;
+            }
+            setSantaX(s.x);
+
+            // 2. Update Gifts
             setGifts(prev => prev.map(gift => {
                 if (!gift.active || gift.landed) return gift
 
@@ -124,7 +133,7 @@ export default function GiftToss({ onGameOver }: GiftTossProps) {
                 const nextX = gift.x + gift.vx
                 const nextVy = gift.vy + GRAVITY
 
-                // 1. Check Obstacle Collision
+                // Obstacle Collision
                 const hitObstacle = obstacles.find(obs =>
                     nextX + GIFT_SIZE > obs.x &&
                     nextX < obs.x + obs.width &&
@@ -133,17 +142,14 @@ export default function GiftToss({ onGameOver }: GiftTossProps) {
                 );
 
                 if (hitObstacle) {
-                    // Poof!
                     addFloatingText(nextX, nextY, "POOF!", "#fff");
                     return { ...gift, active: false };
                 }
 
-                // 2. Check Chimney Collision (Target)
-                // Chimneys are at BOTTOM. y coordinate is window.innerHeight - CHIMNEY_HEIGHT
+                // Chimney Collision
                 const chimneyY = window.innerHeight - CHIMNEY_HEIGHT;
 
-                // If gift passes the top of the chimney AND is within X bounds
-                if (nextY >= chimneyY && gift.y < chimneyY) { // Just crossed the threshold
+                if (nextY >= chimneyY && gift.y < chimneyY) {
                     const hitChimney = chimneys.find(c =>
                         nextX + GIFT_SIZE / 2 > c.x &&
                         nextX + GIFT_SIZE / 2 < c.x + c.width
@@ -159,17 +165,14 @@ export default function GiftToss({ onGameOver }: GiftTossProps) {
                     }
                 }
 
-                // 3. Ground Collision (Miss)
+                // Ground Collision
                 if (nextY > window.innerHeight - 20) {
-                    // Missed chimney, hit ground
                     if (!gift.landed) {
-                        // SoundManager.playSplat() // if we had it here
                         addFloatingText(nextX, nextY, "Miss", "#aaa");
                     }
                     return { ...gift, landed: true, active: false }
                 }
 
-                // Remove if out of bounds (only X now, Y handled above)
                 if (nextX < -100 || nextX > window.innerWidth + 100) {
                     return { ...gift, active: false }
                 }
@@ -177,7 +180,7 @@ export default function GiftToss({ onGameOver }: GiftTossProps) {
                 return { ...gift, x: nextX, y: nextY, vy: nextVy }
             }).filter(g => g.active))
 
-            // Move Entities
+            // 3. Move Entities
             setChimneys(prev => prev.map(c => ({
                 ...c,
                 x: c.x + c.speed
@@ -199,68 +202,50 @@ export default function GiftToss({ onGameOver }: GiftTossProps) {
 
 
     // Handlers
-    const handlePointerDown = (e: React.PointerEvent) => {
+    const handleTap = (e: React.PointerEvent) => {
         if (Date.now() - lastThrowTime.current < COOLDOWN) return
-        setIsDragging(true)
-        setDragStart({ x: e.clientX, y: e.clientY })
-        setDragCurrent({ x: e.clientX, y: e.clientY })
-    }
 
-    const handlePointerMove = (e: React.PointerEvent) => {
-        if (!isDragging) return
-        setDragCurrent({ x: e.clientX, y: e.clientY })
-    }
-
-    const handlePointerUp = (e: React.PointerEvent) => {
-        if (!isDragging) return
-        setIsDragging(false)
-
-        // Vector calculated from START to END (drag down to throw down? Or drag back like slingshot?)
-        // Standard slingshot: Pull BACK (Up) to shoot FORWARD (Down).
-        // Let's assume Drag UP = Throw DOWN.
-        const dx = dragStart.x - e.clientX // Pulling left shoots right
-        const dy = dragStart.y - e.clientY // Pulling up shoots down
-
-        if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return
-
-        const vx = dx * 0.15
-        const vy = dy * 0.15 // Positive Y is down
-
-        // Enforce downward velocity for intuition if user drags wrong way? 
-        // No, let physics allow upward throws (gravity will pull them down).
+        lastThrowTime.current = Date.now()
 
         const rand = Math.random()
         const type = rand > 0.9 ? 'blue' : (rand > 0.8 ? 'coal' : 'red')
 
+        // Inherit Velocity (Inertia)
+        // Add a slight boost to make it feel like a "throw"
+        const initialVx = santaRef.current.speed * 0.8;
+
         const newGift: Gift = {
             id: nextId.current++,
-            x: window.innerWidth / 2 - GIFT_SIZE / 2,
-            y: 80, // Start from Santa's hand at TOP
-            vx,
-            vy,
+            x: santaRef.current.x,
+            y: 80, // Start from Santa
+            vx: initialVx,
+            vy: 4, // Stronger initial downward throw
             type,
             active: true,
             landed: false
         }
 
         setGifts(prev => [...prev, newGift])
-        lastThrowTime.current = Date.now()
     }
 
     return (
         <div
             className="game-area gift-toss"
-            onPointerDown={handlePointerDown}
-            onPointerMove={handlePointerMove}
-            onPointerUp={handlePointerUp}
+            onPointerDown={handleTap}
+            style={{ cursor: 'pointer' }}
         >
             <div className="score-display">Punkte: {score}</div>
             <div className={`timer-display ${timeLeft < 10 ? 'timer-pulse' : ''}`}>
                 ⏳ {timeLeft}
             </div>
 
-            {/* Santa at Top */}
-            <div className="santa-hand-top">🎅</div>
+            {/* Santa at Top (Moving) */}
+            <div
+                className="santa-hand-top"
+                style={{ left: santaX }}
+            >
+                🎅
+            </div>
 
             {/* Obstacles */}
             {obstacles.map(o => (
@@ -314,22 +299,6 @@ export default function GiftToss({ onGameOver }: GiftTossProps) {
                     {t.text}
                 </div>
             ))}
-
-            {/* Sling Guide (Attached to Santa) */}
-            {isDragging && (
-                <svg className="sling-guide">
-                    <line
-                        x1={window.innerWidth / 2}
-                        y1={100} // Start at Santa
-                        x2={window.innerWidth / 2 + (dragStart.x - dragCurrent.x)}
-                        y2={100 + (dragStart.y - dragCurrent.y)}
-                        stroke="var(--warm-gold)"
-                        strokeWidth="4"
-                        strokeDasharray="5,5"
-                    />
-                </svg>
-            )}
         </div>
     )
 }
-
