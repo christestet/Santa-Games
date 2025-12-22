@@ -1,0 +1,11 @@
+services:
+  santa-game:
+    build: .
+    container_name: santa-game
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./scores.json:/app/scores.json
+    restart: unless-stopped
+    # Local environment high score file must be group-writable or owned by container uid 999
+    # On most systems, creating the file before running docker-compose is best
