@@ -3,10 +3,12 @@ import { GAME_CONFIG } from '../constants/gameConfig'
 import { WEIHNACHTS_WITZE, SPRUECHE } from '../constants/gameTexts'
 import { HUD } from './ui/HUD'
 import { useLanguage } from './LanguageContext'
+import { useSound } from './SoundContext'
 
 // --- Audio Manager ---
 class SoundManager {
     ctx: AudioContext | null = null;
+    muted: boolean = false;
 
     constructor() {
         try {
@@ -19,7 +21,7 @@ class SoundManager {
     }
 
     playTone(freq: number, type: OscillatorType, duration: number, vol: number = 0.1) {
-        if (!this.ctx) return;
+        if (!this.ctx || this.muted) return;
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
         osc.type = type;
@@ -33,7 +35,7 @@ class SoundManager {
     }
 
     playThrow() {
-        if (!this.ctx) return;
+        if (!this.ctx || this.muted) return;
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
         osc.frequency.setValueAtTime(200, this.ctx.currentTime);
@@ -94,6 +96,7 @@ interface Particle { id: number; x: number; y: number; tx: string; ty: string; t
 
 export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }: SnowballHuntProps) {
     const { t, getJoke, getSpruch } = useLanguage();
+    const { isMuted } = useSound();
     const [score, setScore] = useState(0)
     const [timeLeft, setTimeLeft] = useState(settings.TIMER)
     const [targets, setTargets] = useState<Target[]>([])
@@ -149,6 +152,12 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
     useEffect(() => { stateRef.current.projectiles = projectiles }, [projectiles])
     useEffect(() => { stateRef.current.combo = combo }, [combo])
     useEffect(() => { stateRef.current.isPaused = isPaused }, [isPaused])
+
+    useEffect(() => {
+        if (soundManager.current) {
+            soundManager.current.muted = isMuted;
+        }
+    }, [isMuted]);
 
     const triggerShake = () => {
         setShake(true)

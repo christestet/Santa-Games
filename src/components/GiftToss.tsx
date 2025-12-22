@@ -2,6 +2,59 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { GAME_CONFIG } from '../constants/gameConfig'
 import { HUD } from './ui/HUD'
 import { useLanguage } from './LanguageContext';
+import { useSound } from './SoundContext';
+
+// --- Audio Manager ---
+class SoundManager {
+    ctx: AudioContext | null = null;
+    muted: boolean = false;
+
+    constructor() {
+        try {
+            // @ts-ignore
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            this.ctx = new AudioContext();
+        } catch (e) {
+            console.error("Web Audio API not supported", e);
+        }
+    }
+
+    playTone(freq: number, type: OscillatorType, duration: number, vol: number = 0.1) {
+        if (!this.ctx || this.muted) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+        gain.gain.setValueAtTime(vol, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + duration);
+    }
+
+    playThrow() {
+        if (!this.ctx || this.muted) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.frequency.setValueAtTime(150, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(50, this.ctx.currentTime + 0.2);
+        gain.gain.setValueAtTime(0.05, this.ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 0.2);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.2);
+    }
+
+    playHit() {
+        this.playTone(400, 'sine', 0.1, 0.1);
+    }
+
+    playPoof() {
+        this.playTone(80, 'sawtooth', 0.1, 0.1);
+    }
+}
 
 interface Gift {
     id: number;
@@ -27,6 +80,7 @@ interface GiftTossProps {
 
 export default function GiftToss({ onGameOver, settings, isPaused, onPause }: GiftTossProps) {
     const { t, getJoke } = useLanguage();
+    const { isMuted } = useSound();
     const [score, setScore] = useState(0)
     const [timeLeft, setTimeLeft] = useState(settings.TIMER)
     const [gifts, setGifts] = useState<Gift[]>([])
@@ -36,6 +90,7 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
     const [santaX, setSantaX] = useState(window.innerWidth / 2)
 
     const santaRef = useRef({ x: window.innerWidth / 2, speed: 3 })
+    const soundManager = useRef<SoundManager | null>(null)
     const nextId = useRef(0)
     const requestRef = useRef<number>(0)
     const lastTimeRef = useRef<number>(0)
@@ -62,6 +117,22 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
     useEffect(() => { stateRef.current.obstacles = obstacles }, [obstacles])
     useEffect(() => { stateRef.current.score = score }, [score])
     useEffect(() => { stateRef.current.isPaused = isPaused }, [isPaused])
+
+    useEffect(() => {
+        soundManager.current = new SoundManager();
+        const resumeAudio = () => {
+            soundManager.current?.ctx?.resume();
+            window.removeEventListener('pointerdown', resumeAudio);
+        }
+        window.addEventListener('pointerdown', resumeAudio);
+        return () => window.removeEventListener('pointerdown', resumeAudio);
+    }, []);
+
+    useEffect(() => {
+        if (soundManager.current) {
+            soundManager.current.muted = isMuted;
+        }
+    }, [isMuted]);
 
     const addFloatingText = useCallback((x: number, y: number, text: string, color: string = 'white') => {
         const now = Date.now();
@@ -131,6 +202,7 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
                 );
 
                 if (hitObstacle) {
+                    soundManager.current?.playPoof();
                     addFloatingText(nextX, nextY, t("game.poof"), "#fff");
                     return { ...gift, active: false };
                 }
@@ -142,6 +214,7 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
                     );
 
                     if (hitChimney) {
+                        soundManager.current?.playHit();
                         const pts = Math.max(10, Math.floor(50 - Math.abs(nextX - hitChimney.x) / 2));
                         stateRef.current.score += pts;
                         addFloatingText(nextX, nextY, pts > 40 ? `${t("game.perfect")} +${pts}` : `+${pts}`, pts > 40 ? '#4caf50' : '#ffd700');
@@ -203,6 +276,7 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
     const handleTap = (e: React.PointerEvent) => {
         if (!stateRef.current.isPlaying || stateRef.current.isPaused) return;
         if (Date.now() - lastThrowTime.current < COOLDOWN) return;
+        soundManager.current?.playThrow();
         lastThrowTime.current = Date.now();
 
         const rand = Math.random();

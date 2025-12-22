@@ -115,6 +115,7 @@ app.get("/api/health", (req, res) => {
     message: "🎅 Santa's workshop is running smoothly!",
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
+    hint: "Looking for the root of all presents? Try /api/",
   });
 });
 
@@ -229,7 +230,7 @@ app.use((req, res) => {
 });
 
 // Error handling middleware
-app.use((err, req, res, next) => {
+app.use((err, req, res) => {
   console.error("🔥 Santa's workshop caught fire:", err);
   res
     .status(500)

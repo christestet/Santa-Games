@@ -19,7 +19,7 @@ const GameCard: React.FC<GameCardProps> = ({ title, icon, instructions, onPlay }
     };
 
     return (
-        <div className={`game-card ${isFlipped ? 'flipped' : ''}`} onClick={onPlay}>
+        <div className={`game-card-container ${isFlipped ? 'is-flipped' : ''}`} onClick={onPlay}>
             <div className="game-card-inner">
                 {/* Front Side */}
                 <div className="game-card-front">

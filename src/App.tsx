@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback } from 'react'
 import Snow from './components/Snow'
 import SnowballHunt from './components/SnowballHunt'
 import GiftToss from './components/GiftToss'
@@ -11,7 +11,6 @@ import { Card } from './components/ui/Card'
 import { GAME_CONFIG } from './constants/gameConfig'
 import { useHighScores } from './hooks/useHighScores'
 import { useLanguage } from './components/LanguageContext'
-import './App.css'
 
 type GameType = 'snowball' | 'gift-toss' | 'none';
 type GameState = 'menu' | 'playing' | 'name-entry' | 'gameover';

@@ -2,6 +2,7 @@ import { GAME_CONFIG } from '../constants/gameConfig'
 import { Modal } from './ui/Modal'
 import { Button } from './ui/Button'
 import { useLanguage } from './LanguageContext'
+import { useSound } from './SoundContext'
 
 interface GameSettingsProps {
     settings: typeof GAME_CONFIG;
@@ -11,6 +12,7 @@ interface GameSettingsProps {
 
 export default function GameSettings({ settings, onUpdate, onClose }: GameSettingsProps) {
     const { t } = useLanguage();
+    const { isMuted, toggleMute } = useSound();
     const handleTimerChange = (val: number) => {
         onUpdate({
             ...settings,
@@ -58,6 +60,20 @@ export default function GameSettings({ settings, onUpdate, onClose }: GameSettin
                             {p}s
                         </Button>
                     ))}
+                </div>
+
+                <div style={{ width: '100%', height: '1px', background: 'var(--antique-gold)', opacity: 0.3, margin: '1rem 0' }} />
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', padding: '0 1rem' }}>
+                    <label style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>{t('settings.sound')}</label>
+                    <Button
+                        variant={isMuted ? 'secondary' : 'primary'}
+                        size="small"
+                        onClick={toggleMute}
+                        style={{ minWidth: '100px' }}
+                    >
+                        {isMuted ? `🔇 ${t('settings.soundOff')}` : `🔊 ${t('settings.soundOn')}`}
+                    </Button>
                 </div>
             </div>
 

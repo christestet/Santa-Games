@@ -29,7 +29,10 @@ export const TRANSLATIONS = {
         },
         settings: {
             title: "Einstellungen ⚙️",
-            duration: "Spieldauer",
+            duration: "Spieldauer:",
+            sound: "Sound Effekte:",
+            soundOn: "An",
+            soundOff: "Aus",
             min: "Min",
             sec: "Sek",
         },
@@ -81,7 +84,10 @@ export const TRANSLATIONS = {
         },
         settings: {
             title: "Settings ⚙️",
-            duration: "Game Duration",
+            duration: "Game Duration:",
+            sound: "Sound Effects:",
+            soundOn: "On",
+            soundOff: "Off",
             min: "Min",
             sec: "Sec",
         },
