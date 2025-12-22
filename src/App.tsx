@@ -1,18 +1,19 @@
 import { useState, useCallback } from 'react'
-import Snow from './components/Snow'
-import SnowballHunt from './components/SnowballHunt'
-import GiftToss from './components/GiftToss'
-import GameSettings from './components/GameSettings'
-import GameCard from './components/GameCard'
-import Leaderboard from './components/Leaderboard'
-import { Button } from './components/ui/Button'
-import { Modal } from './components/ui/Modal'
-import { Card } from './components/ui/Card'
-import { GAME_CONFIG } from './constants/gameConfig'
-import { useHighScores } from './hooks/useHighScores'
-import { useLanguage } from './components/LanguageContext'
-import { useTheme } from './components/ThemeContext'
-import grinchIcon from './assets/grinch.png'
+import Snow from '@components/Snow'
+import SnowballHunt from '@components/SnowballHunt'
+import GiftToss from '@components/GiftToss'
+import GameSettings from '@components/GameSettings'
+import GameCard from '@components/GameCard'
+import Leaderboard from '@components/Leaderboard'
+import { Button } from '@components/ui/Button'
+import { Modal } from '@components/ui/Modal'
+import { Card } from '@components/ui/Card'
+import { GAME_CONFIG } from '@constants/gameConfig'
+import { useHighScores } from '@hooks/useHighScores'
+import { useLanguage } from '@components/LanguageContext'
+import { useTheme } from '@components/ThemeContext'
+import grinchIcon from '@assets/grinch.png'
+import pkg from '@/../package.json'
 
 type GameType = 'snowball' | 'gift-toss' | 'none';
 type GameState = 'menu' | 'playing' | 'name-entry' | 'gameover';
@@ -134,6 +135,15 @@ const App: React.FC = () => {
                             error={error}
                             onRetry={fetchScores}
                         />
+                    </div>
+
+                    <div style={{
+                        marginTop: '2rem',
+                        opacity: 0.5,
+                        fontSize: '0.8rem',
+                        fontFamily: 'monospace'
+                    }}>
+                        v{pkg.version}
                     </div>
                 </div>
             )}
