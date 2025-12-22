@@ -18,29 +18,40 @@ interface Chimney {
     width: number;
 }
 
+interface Obstacle {
+    id: number;
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    speed: number;
+    type: 'cloud' | 'plane';
+}
+
 interface GiftTossProps {
     onGameOver: (score: number, joke: string) => void;
 }
 
 export default function GiftToss({ onGameOver }: GiftTossProps) {
     const [score, setScore] = useState(0)
-    const [timeLeft, setTimeLeft] = useState(30)
+    const [timeLeft, setTimeLeft] = useState(60) // More time for strategy
     const [gifts, setGifts] = useState<Gift[]>([])
     const [chimneys, setChimneys] = useState<Chimney[]>([])
+    const [obstacles, setObstacles] = useState<Obstacle[]>([])
     const [isDragging, setIsDragging] = useState(false)
     const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
     const [dragCurrent, setDragCurrent] = useState({ x: 0, y: 0 })
     const [floatingTexts, setFloatingTexts] = useState<{ id: number; x: number; y: number; text: string; color: string }[]>([])
 
     const nextId = useRef(0)
-    const requestRef = useRef<number | null>(null)
-    const lastTimeRef = useRef<number | null>(null)
+    const requestRef = useRef<number>(0)
+    const lastTimeRef = useRef<number>(0)
 
     // Game constants
-    const GRAVITY = 0.5
-    const GIFT_SIZE = 50
-    const CHIMNEY_HEIGHT = 100
-    const COOLDOWN = 500
+    const GRAVITY = 0.4
+    const GIFT_SIZE = 40
+    const CHIMNEY_HEIGHT = 80 // Reduced height since they are targets now
+    const COOLDOWN = 600
     const lastThrowTime = useRef(0)
 
     const addFloatingText = (x: number, y: number, text: string, color: string = 'white') => {
@@ -54,37 +65,57 @@ export default function GiftToss({ onGameOver }: GiftTossProps) {
     const spawnChimney = useCallback(() => {
         const id = nextId.current++
         const width = 80 + Math.random() * 40
-        const x = Math.random() > 0.5 ? -width : window.innerWidth
-        const speed = (2 + Math.random() * 3) * (x < 0 ? 1 : -1)
-
+        // Spawn from right
+        const x = window.innerWidth
+        const speed = -1.5 - Math.random() * 1.5; // Move left
         const newChimney = { id, x, speed, width }
         setChimneys(prev => [...prev, newChimney])
     }, [])
 
+    const spawnObstacle = useCallback(() => {
+        const id = nextId.current++
+        const type = Math.random() > 0.7 ? 'plane' : 'cloud'
+        const width = type === 'cloud' ? 120 : 60
+        const height = type === 'cloud' ? 60 : 30
+        const y = 150 + Math.random() * (window.innerHeight - 350) // Middle area
+
+        // Random direction
+        const fromLeft = Math.random() > 0.5;
+        const x = fromLeft ? -width : window.innerWidth;
+        const speed = (1 + Math.random() * 2) * (fromLeft ? 1 : -1);
+
+        setObstacles(prev => [...prev, { id, x, y, width, height, speed, type }])
+    }, [])
+
+    // Game Loop Setup
     useEffect(() => {
-        const chimneyInterval = setInterval(spawnChimney, 2000)
+        const chimneyInterval = setInterval(spawnChimney, 2500)
+        const obstacleInterval = setInterval(spawnObstacle, 1800)
+
         const timerInterval = setInterval(() => {
             setTimeLeft(t => {
                 if (t <= 1) {
-                    onGameOver(score, "Super Wurf! Du hast fast alle Schornsteine getroffen!")
+                    onGameOver(score, "Danke für deine Hilfe, Santa!")
                     return 0
                 }
                 return t - 1
             })
         }, 1000)
 
-        // Initial chimney
+        // Initial Entities
         spawnChimney()
+        spawnObstacle()
 
         return () => {
             clearInterval(chimneyInterval)
+            clearInterval(obstacleInterval)
             clearInterval(timerInterval)
         }
-    }, [spawnChimney, onGameOver, score])
+    }, [spawnChimney, spawnObstacle, onGameOver, score])
 
+    // Physics Loop
     const update = (time: number) => {
         if (lastTimeRef.current !== undefined) {
-            const dt = 1 // Simplified delta
 
             setGifts(prev => prev.map(gift => {
                 if (!gift.active || gift.landed) return gift
@@ -93,35 +124,69 @@ export default function GiftToss({ onGameOver }: GiftTossProps) {
                 const nextX = gift.x + gift.vx
                 const nextVy = gift.vy + GRAVITY
 
-                // Check collision with chimneys
-                const hitChimney = chimneys.find(c =>
-                    nextY < CHIMNEY_HEIGHT + 20 &&
-                    gift.y >= CHIMNEY_HEIGHT + 20 &&
-                    nextX + GIFT_SIZE / 2 > c.x &&
-                    nextX + GIFT_SIZE / 2 < c.x + c.width
-                )
+                // 1. Check Obstacle Collision
+                const hitObstacle = obstacles.find(obs =>
+                    nextX + GIFT_SIZE > obs.x &&
+                    nextX < obs.x + obs.width &&
+                    nextY + GIFT_SIZE > obs.y &&
+                    nextY < obs.y + obs.height
+                );
 
-                if (hitChimney) {
-                    let pts = gift.type === 'coal' ? -20 : 15
-                    if (gift.type === 'blue') pts = 30
-                    setScore(s => Math.max(0, s + pts))
-                    addFloatingText(nextX, nextY, pts > 0 ? `+${pts}` : pts.toString(), pts > 0 ? 'var(--warm-gold)' : '#555')
-                    if (navigator.vibrate) navigator.vibrate(20);
+                if (hitObstacle) {
+                    // Poof!
+                    addFloatingText(nextX, nextY, "POOF!", "#fff");
+                    return { ...gift, active: false };
+                }
+
+                // 2. Check Chimney Collision (Target)
+                // Chimneys are at BOTTOM. y coordinate is window.innerHeight - CHIMNEY_HEIGHT
+                const chimneyY = window.innerHeight - CHIMNEY_HEIGHT;
+
+                // If gift passes the top of the chimney AND is within X bounds
+                if (nextY >= chimneyY && gift.y < chimneyY) { // Just crossed the threshold
+                    const hitChimney = chimneys.find(c =>
+                        nextX + GIFT_SIZE / 2 > c.x &&
+                        nextX + GIFT_SIZE / 2 < c.x + c.width
+                    );
+
+                    if (hitChimney) {
+                        let pts = gift.type === 'coal' ? -50 : 100
+                        if (gift.type === 'blue') pts = 200
+                        setScore(s => Math.max(0, s + pts))
+                        addFloatingText(nextX, nextY, pts > 0 ? `PERFECT +${pts}` : "OH NO!", pts > 0 ? '#4caf50' : '#555')
+                        if (navigator.vibrate) navigator.vibrate(20);
+                        return { ...gift, landed: true, active: false }
+                    }
+                }
+
+                // 3. Ground Collision (Miss)
+                if (nextY > window.innerHeight - 20) {
+                    // Missed chimney, hit ground
+                    if (!gift.landed) {
+                        // SoundManager.playSplat() // if we had it here
+                        addFloatingText(nextX, nextY, "Miss", "#aaa");
+                    }
                     return { ...gift, landed: true, active: false }
                 }
 
-                // Remove if out of bounds
-                if (nextY > window.innerHeight || nextX < -100 || nextX > window.innerWidth + 100) {
+                // Remove if out of bounds (only X now, Y handled above)
+                if (nextX < -100 || nextX > window.innerWidth + 100) {
                     return { ...gift, active: false }
                 }
 
                 return { ...gift, x: nextX, y: nextY, vy: nextVy }
             }).filter(g => g.active))
 
+            // Move Entities
             setChimneys(prev => prev.map(c => ({
                 ...c,
                 x: c.x + c.speed
             })).filter(c => c.x > -200 && c.x < window.innerWidth + 200))
+
+            setObstacles(prev => prev.map(o => ({
+                ...o,
+                x: o.x + o.speed
+            })).filter(o => o.x > -200 && o.x < window.innerWidth + 200))
         }
         lastTimeRef.current = time
         requestRef.current = requestAnimationFrame(update)
@@ -130,8 +195,10 @@ export default function GiftToss({ onGameOver }: GiftTossProps) {
     useEffect(() => {
         requestRef.current = requestAnimationFrame(update)
         return () => cancelAnimationFrame(requestRef.current!)
-    }, [chimneys])
+    }, [chimneys, obstacles])
 
+
+    // Handlers
     const handlePointerDown = (e: React.PointerEvent) => {
         if (Date.now() - lastThrowTime.current < COOLDOWN) return
         setIsDragging(true)
@@ -148,22 +215,27 @@ export default function GiftToss({ onGameOver }: GiftTossProps) {
         if (!isDragging) return
         setIsDragging(false)
 
-        const dx = dragStart.x - e.clientX
-        const dy = dragStart.y - e.clientY
+        // Vector calculated from START to END (drag down to throw down? Or drag back like slingshot?)
+        // Standard slingshot: Pull BACK (Up) to shoot FORWARD (Down).
+        // Let's assume Drag UP = Throw DOWN.
+        const dx = dragStart.x - e.clientX // Pulling left shoots right
+        const dy = dragStart.y - e.clientY // Pulling up shoots down
 
-        // Only throw if there's enough pull
         if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return
 
         const vx = dx * 0.15
-        const vy = dy * 0.15
+        const vy = dy * 0.15 // Positive Y is down
+
+        // Enforce downward velocity for intuition if user drags wrong way? 
+        // No, let physics allow upward throws (gravity will pull them down).
 
         const rand = Math.random()
-        const type = rand > 0.9 ? 'blue' : (rand > 0.7 ? 'coal' : 'red')
+        const type = rand > 0.9 ? 'blue' : (rand > 0.8 ? 'coal' : 'red')
 
         const newGift: Gift = {
             id: nextId.current++,
             x: window.innerWidth / 2 - GIFT_SIZE / 2,
-            y: window.innerHeight - 100,
+            y: 80, // Start from Santa's hand at TOP
             vx,
             vy,
             type,
@@ -187,15 +259,25 @@ export default function GiftToss({ onGameOver }: GiftTossProps) {
                 ⏳ {timeLeft}
             </div>
 
-            {/* Chimneys */}
-            {chimneys.map(c => (
+            {/* Santa at Top */}
+            <div className="santa-hand-top">🎅</div>
+
+            {/* Obstacles */}
+            {obstacles.map(o => (
                 <div
-                    key={c.id}
-                    className="chimney"
-                    style={{ left: c.x, width: c.width, height: CHIMNEY_HEIGHT }}
+                    key={o.id}
+                    className="obstacle"
+                    style={{
+                        left: o.x,
+                        top: o.y,
+                        width: o.width,
+                        height: o.height,
+                        // Visual box removed
+                    }}
                 >
-                    <div className="chimney-top"></div>
-                    <div className="chimney-smoke"></div>
+                    <span style={{ fontSize: o.type === 'cloud' ? '5rem' : '4rem', filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))' }}>
+                        {o.type === 'cloud' ? '☁️' : '✈️'}
+                    </span>
                 </div>
             ))}
 
@@ -212,6 +294,17 @@ export default function GiftToss({ onGameOver }: GiftTossProps) {
                 </div>
             ))}
 
+            {/* Chimneys at Bottom */}
+            {chimneys.map(c => (
+                <div
+                    key={c.id}
+                    className="chimney"
+                    style={{ left: c.x, width: c.width, height: CHIMNEY_HEIGHT, bottom: 0, top: 'auto', borderTop: '4px solid #331a1a', borderBottom: 'none' }}
+                >
+                    <div className="chimney-smoke"></div>
+                </div>
+            ))}
+
             {floatingTexts.map(t => (
                 <div
                     key={t.id}
@@ -222,22 +315,21 @@ export default function GiftToss({ onGameOver }: GiftTossProps) {
                 </div>
             ))}
 
-            {/* Sling Guide */}
+            {/* Sling Guide (Attached to Santa) */}
             {isDragging && (
                 <svg className="sling-guide">
                     <line
                         x1={window.innerWidth / 2}
-                        y1={window.innerHeight - 80}
+                        y1={100} // Start at Santa
                         x2={window.innerWidth / 2 + (dragStart.x - dragCurrent.x)}
-                        y2={window.innerHeight - 80 + (dragStart.y - dragCurrent.y)}
+                        y2={100 + (dragStart.y - dragCurrent.y)}
                         stroke="var(--warm-gold)"
                         strokeWidth="4"
                         strokeDasharray="5,5"
                     />
                 </svg>
             )}
-
-            <div className="santa-hand">🎅</div>
         </div>
     )
 }
+
