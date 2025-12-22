@@ -209,8 +209,8 @@ export default function SnowballHunt({ onGameOver, highScores }: SnowballHuntPro
         const rand = Math.random()
         let type: 'gift' | 'coal' | 'gold' | 'time' | 'ice' = 'gift'
 
-        if (rand > 0.96) type = 'ice'
-        else if (rand > 0.92) type = 'time'
+        if (rand > 0.97) type = 'ice'
+        else if (rand > 0.95) type = 'time'
         else if (rand > 0.85) type = 'gold'
         else if (rand > 0.70) type = 'coal'
 
