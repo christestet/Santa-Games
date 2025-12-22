@@ -1,6 +1,7 @@
 import { GAME_CONFIG } from '../constants/gameConfig'
 import { Modal } from './ui/Modal'
 import { Button } from './ui/Button'
+import { useLanguage } from './LanguageContext'
 
 interface GameSettingsProps {
     settings: typeof GAME_CONFIG;
@@ -9,6 +10,7 @@ interface GameSettingsProps {
 }
 
 export default function GameSettings({ settings, onUpdate, onClose }: GameSettingsProps) {
+    const { t } = useLanguage();
     const handleTimerChange = (val: number) => {
         onUpdate({
             ...settings,
@@ -19,16 +21,16 @@ export default function GameSettings({ settings, onUpdate, onClose }: GameSettin
     const formatTime = (seconds: number) => {
         const mins = Math.floor(seconds / 60);
         const secs = seconds % 60;
-        return mins > 0 ? `${mins}:${secs.toString().padStart(2, '0')} Min` : `${secs} Sek`;
+        return mins > 0 ? `${mins}:${secs.toString().padStart(2, '0')} ${t('settings.min')}` : `${secs} ${t('settings.sec')}`;
     };
 
     const presets = [30, 60, 90, 120];
 
     return (
-        <Modal isOpen={true} onClose={onClose} title="Einstellungen ⚙️">
+        <Modal isOpen={true} onClose={onClose} title={t('settings.title')}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'center', width: '100%' }}>
                 <label style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>
-                    Spieldauer: <span style={{ color: 'var(--warm-gold)', fontSize: '1.4rem' }}>{formatTime(settings.TIMER)}</span>
+                    {t('settings.duration')}: <span style={{ color: 'var(--warm-gold)', fontSize: '1.4rem' }}>{formatTime(settings.TIMER)}</span>
                 </label>
 
                 <input
@@ -61,7 +63,7 @@ export default function GameSettings({ settings, onUpdate, onClose }: GameSettin
 
             <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '1rem' }}>
                 <Button onClick={onClose} size="small">
-                    FERTIG
+                    {t('common.done')}
                 </Button>
             </div>
         </Modal>

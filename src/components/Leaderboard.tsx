@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLanguage } from '../components/LanguageContext';
 
 interface Score {
     name: string;
@@ -20,25 +21,26 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
     onRetry,
     limit = 5
 }) => {
+    const { t } = useLanguage();
     return (
         <div className="leaderboard frost-card">
-            <h2>🏆 Bestenliste</h2>
+            <h2>🏆 {t('game.leaderboard')}</h2>
             {isLoading ? (
                 <div style={{ padding: '2rem', textAlign: 'center' }}>
                     <div className="spinner">⏳</div>
-                    <p>Laden...</p>
+                    <p>{t('common.loading')}</p>
                 </div>
             ) : error ? (
                 <div style={{ padding: '1rem', color: '#ff6b6b' }}>
                     <p>{error}</p>
                     {onRetry && (
                         <button className="btn-small" onClick={onRetry} style={{ marginTop: '0.5rem' }}>
-                            Erneut versuchen
+                            {t('common.retry')}
                         </button>
                     )}
                 </div>
             ) : scores.length === 0 ? (
-                <p style={{ padding: '1rem', opacity: 0.7 }}>Noch keine Scores</p>
+                <p style={{ padding: '1rem', opacity: 0.7 }}>{t('game.noScores')}</p>
             ) : (
                 scores.slice(0, limit).map((s, i) => (
                     <div key={i} className="score-row">

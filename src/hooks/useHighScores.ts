@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { config } from '../config';
+import { useLanguage } from '../components/LanguageContext';
 
 export interface Score {
     name: string;
@@ -7,6 +8,7 @@ export interface Score {
 }
 
 export const useHighScores = () => {
+    const { t } = useLanguage();
     const [highScores, setHighScores] = useState<Score[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -25,12 +27,12 @@ export const useHighScores = () => {
             }
         } catch (e) {
             console.error("Failed to fetch scores", e);
-            setError("Bestenliste konnte nicht geladen werden");
+            setError(t('hooks.fetchError'));
             setHighScores([]);
         } finally {
             setIsLoading(false);
         }
-    }, []);
+    }, [t]);
 
     const submitScore = async (name: string, score: number) => {
         setError(null);
@@ -45,7 +47,7 @@ export const useHighScores = () => {
             return true;
         } catch (e) {
             console.error("Submission failed", e);
-            setError("Score konnte nicht gespeichert werden. Versuche es erneut.");
+            setError(t('hooks.submitError'));
             return false;
         }
     };

@@ -1,4 +1,6 @@
+import React from 'react';
 import { Button } from './Button';
+import { useLanguage } from '../LanguageContext';
 
 interface HUDProps {
     score: number;
@@ -10,9 +12,10 @@ interface HUDProps {
 }
 
 export const HUD: React.FC<HUDProps> = ({ score, timeLeft, frozen = false, combo = 0, className = '', onPause }) => {
+    const { t } = useLanguage();
     return (
         <>
-            <div className={`score-display ${className}`}>Punkte: {score}</div>
+            <div className={`score-display ${className}`}>{t('common.score')}: {score}</div>
 
             <div className={`timer-display ${timeLeft < 10 ? 'timer-pulse' : ''} ${className}`} style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                 <span>{frozen ? '❄️' : '⏳'} {timeLeft}</span>

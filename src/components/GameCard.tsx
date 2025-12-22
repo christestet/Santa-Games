@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { useLanguage } from './LanguageContext';
+import { Card } from './ui/Card';
 
 interface GameCardProps {
     title: string;
@@ -7,7 +9,8 @@ interface GameCardProps {
     onPlay: () => void;
 }
 
-export default function GameCard({ title, icon, instructions, onPlay }: GameCardProps) {
+const GameCard: React.FC<GameCardProps> = ({ title, icon, instructions, onPlay }) => {
+    const { t } = useLanguage();
     const [isFlipped, setIsFlipped] = useState(false);
 
     const handleFlip = (e: React.MouseEvent) => {
@@ -16,20 +19,20 @@ export default function GameCard({ title, icon, instructions, onPlay }: GameCard
     };
 
     return (
-        <div className={`game-card-container ${isFlipped ? 'is-flipped' : ''}`}>
+        <div className={`game-card ${isFlipped ? 'flipped' : ''}`} onClick={onPlay}>
             <div className="game-card-inner">
                 {/* Front Side */}
-                <div className="game-card-front" onClick={onPlay}>
+                <div className="game-card-front">
                     <span className="game-icon">{icon}</span>
                     <h3>{title}</h3>
                     <div style={{ display: 'flex', gap: '0.5rem', width: '100%', justifyContent: 'center' }}>
-                        <button className="btn-small">SPIELEN</button>
+                        <button className="btn-small">{t('menu.play')}</button>
                         <button
                             className="btn-small"
                             style={{ background: 'transparent', border: '1px solid var(--antique-gold)', color: 'var(--antique-gold)' }}
                             onClick={handleFlip}
                         >
-                            INFO
+                            {t('menu.info')}
                         </button>
                     </div>
                 </div>
@@ -39,10 +42,12 @@ export default function GameCard({ title, icon, instructions, onPlay }: GameCard
                     <h3 style={{ fontFamily: 'var(--font-festive)', color: 'var(--warm-gold)', margin: 0 }}>{title}</h3>
                     <p className="instruction-text">{instructions}</p>
                     <button className="btn-small" onClick={handleFlip}>
-                        ZURÜCK
+                        {t('common.back')}
                     </button>
                 </div>
             </div>
         </div>
     );
-}
+};
+
+export default GameCard;

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { GAME_CONFIG } from '../constants/gameConfig'
 import { HUD } from './ui/HUD'
+import { useLanguage } from './LanguageContext';
 
 interface Gift {
     id: number;
@@ -25,6 +26,7 @@ interface GiftTossProps {
 }
 
 export default function GiftToss({ onGameOver, settings, isPaused, onPause }: GiftTossProps) {
+    const { t, getJoke } = useLanguage();
     const [score, setScore] = useState(0)
     const [timeLeft, setTimeLeft] = useState(settings.TIMER)
     const [gifts, setGifts] = useState<Gift[]>([])
@@ -129,7 +131,7 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
                 );
 
                 if (hitObstacle) {
-                    addFloatingText(nextX, nextY, "POOF!", "#fff");
+                    addFloatingText(nextX, nextY, t("game.poof"), "#fff");
                     return { ...gift, active: false };
                 }
 
@@ -140,17 +142,19 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
                     );
 
                     if (hitChimney) {
-                        let pts = gift.type === 'coal' ? settings.POINTS.COAL : (gift.type === 'blue' ? settings.POINTS.BONUS : settings.POINTS.REGULAR);
-                        setScore(s => Math.max(0, s + pts));
-                        addFloatingText(nextX, nextY, pts > 0 ? `PERFECT +${pts}` : "OH NO!", pts > 0 ? '#4caf50' : '#555');
+                        const pts = Math.max(10, Math.floor(50 - Math.abs(nextX - hitChimney.x) / 2));
+                        stateRef.current.score += pts;
+                        addFloatingText(nextX, nextY, pts > 40 ? `${t("game.perfect")} +${pts}` : `+${pts}`, pts > 40 ? '#4caf50' : '#ffd700');
                         if (navigator.vibrate) navigator.vibrate(20);
-                        return { ...gift, landed: true, active: false };
+                    } else {
+                        addFloatingText(nextX, nextY, t('game.miss'), '#aaa');
                     }
+                    return { ...gift, landed: true, active: false };
                 }
 
                 // Ground Collision
                 if (nextY > window.innerHeight - 20) {
-                    addFloatingText(nextX, nextY, "Miss", "#aaa");
+                    addFloatingText(nextX, nextY, t("game.miss"), "#aaa");
                     return { ...gift, landed: true, active: false };
                 }
 
@@ -166,7 +170,7 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
         setFloatingTexts(prev => prev.some(t => t.expiry <= now) ? prev.filter(t => t.expiry > now) : prev);
 
         requestRef.current = requestAnimationFrame(update);
-    }, [addFloatingText, settings.POINTS]);
+    }, [addFloatingText, settings.POINTS, t]);
 
     useEffect(() => {
         requestRef.current = requestAnimationFrame(update);
@@ -177,7 +181,7 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
                 setTimeLeft(t => {
                     if (t <= 1) {
                         stateRef.current.isPlaying = false;
-                        onGameOver(stateRef.current.score, "Danke für deine Hilfe, Santa!");
+                        onGameOver(stateRef.current.score, getJoke());
                         return 0;
                     }
                     return t - 1;

@@ -10,11 +10,15 @@ import { Modal } from './components/ui/Modal'
 import { Card } from './components/ui/Card'
 import { GAME_CONFIG } from './constants/gameConfig'
 import { useHighScores } from './hooks/useHighScores'
+import { useLanguage } from './components/LanguageContext'
+import './App.css'
 
 type GameType = 'snowball' | 'gift-toss' | 'none';
+type GameState = 'menu' | 'playing' | 'name-entry' | 'gameover';
 
-function App() {
-    const [gameState, setGameState] = useState<'menu' | 'playing' | 'name-entry' | 'gameover'>('menu')
+const App: React.FC = () => {
+    const { t, language, setLanguage } = useLanguage()
+    const [gameState, setGameState] = useState<GameState>('menu')
     const [currentGame, setCurrentGame] = useState<GameType>('none')
     const [score, setScore] = useState(0)
     const [currentJoke, setCurrentJoke] = useState("")
@@ -69,25 +73,35 @@ function App() {
 
             {gameState === 'menu' && (
                 <div style={{ textAlign: 'center', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', width: '90%' }}>
-                    <h1>Fröhliche Spiele 🎅</h1>
+                    <div style={{ position: 'absolute', top: '1rem', right: '1rem', display: 'flex', gap: '0.5rem' }}>
+                        <Button
+                            variant="icon"
+                            onClick={() => setLanguage(language === 'de' ? 'en' : 'de')}
+                            style={{ fontSize: '1.5rem', background: 'rgba(255,255,255,0.1)', padding: '0.5rem' }}
+                        >
+                            {language === 'de' ? '🇺🇸' : '🇩🇪'}
+                        </Button>
+                    </div>
+
+                    <h1>{t('menu.title')}</h1>
 
                     <div className="game-selection">
                         <GameCard
-                            title="Schneeball-Jagd"
+                            title={t('menu.snowballTitle')}
                             icon="❄️"
-                            instructions="Tippe auf Geschenke und Sterne, um Punkte zu sammeln. Vermeide die Kohle! Nutze Eis für einen Freeze oder Uhren für mehr Zeit."
+                            instructions={t('menu.snowballDesc')}
                             onPlay={() => startGame('snowball')}
                         />
                         <GameCard
-                            title="Geschenke Weitwurf"
+                            title={t('menu.giftTitle')}
                             icon="🎁"
-                            instructions="Tippe, um Geschenke abzuwerfen. Ziele genau in die Schornsteine! Achte auf Hindernisse wie Flugzeuge und Wolken."
+                            instructions={t('menu.giftDesc')}
                             onPlay={() => startGame('gift-toss')}
                         />
                     </div>
 
                     <Button variant="icon" onClick={() => setShowSettings(true)} style={{ marginTop: '1rem' }}>
-                        ⚙️ EINSTELLUNGEN
+                        ⚙️ {t('menu.settings')}
                     </Button>
 
                     {showSettings && (
@@ -130,11 +144,11 @@ function App() {
                     )}
 
                     {isPaused && (
-                        <Modal isOpen={true} title="PAUSE ⏸️">
+                        <Modal isOpen={true} title={t('common.pause')}>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%', alignItems: 'center' }}>
-                                <Button onClick={handleResume} style={{ width: '100%' }}>WEITER</Button>
-                                <Button variant="secondary" onClick={handleRestart} style={{ width: '100%' }}>NEUSTART</Button>
-                                <Button variant="secondary" onClick={handleQuit} style={{ width: '100%', border: '2px solid #ff6b6b', color: '#ff6b6b' }}>BEENDEN</Button>
+                                <Button onClick={handleResume} style={{ width: '100%' }}>{t('common.continue')}</Button>
+                                <Button variant="secondary" onClick={handleRestart} style={{ width: '100%' }}>{t('common.restart')}</Button>
+                                <Button variant="secondary" onClick={handleQuit} style={{ width: '100%', border: '2px solid #ff6b6b', color: '#ff6b6b' }}>{t('common.exit')}</Button>
                             </div>
                         </Modal>
                     )}
@@ -142,9 +156,9 @@ function App() {
             )}
 
             {gameState === 'name-entry' && (
-                <Modal isOpen={true} title="NEUER HIGHSCORE! 🎮">
+                <Modal isOpen={true} title={t('game.newHighScore')}>
                     <div style={{ textAlign: 'center', width: '100%' }}>
-                        <p style={{ fontSize: '1.5rem', margin: '1rem 0' }}>Dein Score: {score}</p>
+                        <p style={{ fontSize: '1.5rem', margin: '1rem 0' }}>{t('game.yourScore')}: {score}</p>
                         {error && (
                             <div style={{
                                 background: 'rgba(255, 107, 107, 0.2)',
@@ -160,7 +174,7 @@ function App() {
                         <input
                             className="arcade-input"
                             maxLength={15}
-                            placeholder="NAME EINGEBEN"
+                            placeholder={t('game.enterName')}
                             value={playerName}
                             onChange={(e) => {
                                 const val = e.target.value.toUpperCase().replace(/[^A-Z0-9\s._-]/g, "");
@@ -175,14 +189,14 @@ function App() {
                             disabled={!playerName.trim() || isSubmitting}
                             style={{ opacity: isSubmitting ? 0.6 : 1, marginTop: '1rem' }}
                         >
-                            {isSubmitting ? 'WIRD GESPEICHERT...' : 'EINTRAGEN'}
+                            {isSubmitting ? t('common.saving') : t('common.submit')}
                         </Button>
                     </div>
                 </Modal>
             )}
 
             {gameState === 'gameover' && (
-                <Modal isOpen={true} title="FERTIG! 🎁">
+                <Modal isOpen={true} title={t('game.finished')}>
                     <div style={{ textAlign: 'center', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
                         <Leaderboard
                             scores={highScores}
@@ -190,11 +204,11 @@ function App() {
                         />
 
                         <Card className="joke-card" style={{ width: '100%' }}>
-                            <h2 style={{ fontFamily: 'var(--font-festive)', color: 'var(--warm-gold)', margin: '0', fontSize: '1.5rem' }}>Weihnachtswitz:</h2>
+                            <h2 style={{ fontFamily: 'var(--font-festive)', color: 'var(--warm-gold)', margin: '0', fontSize: '1.5rem' }}>{t('game.jokeTitle')}</h2>
                             <p style={{ fontSize: '1rem', fontStyle: 'italic' }}>"{currentJoke}"</p>
                         </Card>
 
-                        <Button onPointerDown={() => setGameState('menu')}>ZUM HAUPTMENÜ</Button>
+                        <Button onPointerDown={() => setGameState('menu')}>{t('game.toMenu')}</Button>
                     </div>
                 </Modal>
             )}

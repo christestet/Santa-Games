@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { GAME_CONFIG } from '../constants/gameConfig'
 import { WEIHNACHTS_WITZE, SPRUECHE } from '../constants/gameTexts'
 import { HUD } from './ui/HUD'
+import { useLanguage } from './LanguageContext'
 
 // --- Audio Manager ---
 class SoundManager {
@@ -92,6 +93,7 @@ interface FloatingText { id: number; x: number; y: number; text: string; color: 
 interface Particle { id: number; x: number; y: number; tx: string; ty: string; type: string; expiry: number; }
 
 export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }: SnowballHuntProps) {
+    const { t, getJoke, getSpruch } = useLanguage();
     const [score, setScore] = useState(0)
     const [timeLeft, setTimeLeft] = useState(settings.TIMER)
     const [targets, setTargets] = useState<Target[]>([])
@@ -214,7 +216,7 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
         if (type === 'coal') {
             newCombo = 0;
             points = settings.POINTS.COAL;
-            text = SPRUECHE[Math.floor(Math.random() * SPRUECHE.length)];
+            text = getSpruch();
             color = "#555";
             triggerShake();
             if (navigator.vibrate) navigator.vibrate(200);
@@ -241,7 +243,7 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
                 break
             case 'ice':
                 setFrozen(true)
-                text = "❄️ FREEZE! ❄️"
+                text = t('game.freeze_text');
                 color = '#a5f2f3'
                 setTimeout(() => setFrozen(false), settings.SNOWBALL_HUNT.FREEZE_DURATION)
                 break
@@ -249,7 +251,7 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
 
         if (points !== 0) setScore(s => Math.max(0, s + points));
         addFloatingText(x, y, text, color);
-    }, [settings.POINTS, spawnParticles, addFloatingText]);
+    }, [settings.POINTS, spawnParticles, addFloatingText, getSpruch, t]);
 
     const handleHitMiss = useCallback((x: number, y: number) => {
         soundManager.current?.playSplat();
@@ -331,7 +333,7 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
         setSplats(prev => prev.some(s => s.expiry <= now) ? prev.filter(s => s.expiry > now) : prev);
 
         requestRef.current = requestAnimationFrame(animate);
-    }, [targetSize, handleProjectileImpact]);
+    }, [targetSize, handleProjectileImpact, settings.PHYSICS.PROJECTILE_SPEED, settings.SNOWBALL_HUNT.TARGET_MAX_AGE_BASE, settings.SNOWBALL_HUNT.TARGET_MAX_AGE_MIN]);
 
     const handlePointerDown = (e: React.PointerEvent) => {
         if (!stateRef.current.isPlaying || stateRef.current.isPaused) return;
@@ -354,7 +356,7 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
         const spawnRate = Math.max(settings.SNOWBALL_HUNT.SPAWN_RATE_MIN, settings.SNOWBALL_HUNT.SPAWN_RATE_BASE - difficultyMod);
         const spawnInterval = setInterval(spawnTarget, spawnRate);
         return () => clearInterval(spawnInterval);
-    }, [spawnTarget, score]);
+    }, [spawnTarget, score, settings.SNOWBALL_HUNT.SPAWN_RATE_BASE, settings.SNOWBALL_HUNT.SPAWN_RATE_MIN]);
 
     useEffect(() => {
         requestRef.current = requestAnimationFrame(animate);
@@ -363,7 +365,7 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
                 setTimeLeft(t => {
                     if (t <= 1) {
                         stateRef.current.isPlaying = false;
-                        onGameOver(stateRef.current.score, WEIHNACHTS_WITZE[Math.floor(Math.random() * WEIHNACHTS_WITZE.length)]);
+                        onGameOver(stateRef.current.score, getJoke());
                         return 0;
                     }
                     return t - 1;
@@ -375,7 +377,7 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
             if (requestRef.current) cancelAnimationFrame(requestRef.current);
             clearInterval(timerInterval);
         }
-    }, [animate, onGameOver]);
+    }, [animate, onGameOver, getJoke]);
 
 
     return (
