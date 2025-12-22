@@ -120,10 +120,13 @@ function App() {
                     )}
                     <input
                         className="arcade-input"
-                        maxLength={10}
+                        maxLength={15}
                         placeholder="NAME EINGEBEN"
                         value={playerName}
-                        onChange={(e) => setPlayerName(e.target.value.toUpperCase())}
+                        onChange={(e) => {
+                            const val = e.target.value.toUpperCase().replace(/[^A-Z0-9\s._-]/g, "");
+                            setPlayerName(val);
+                        }}
                         autoFocus
                         disabled={isSubmitting}
                     />

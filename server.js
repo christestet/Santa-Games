@@ -59,11 +59,29 @@ app.get("/api/scores", (req, res) => {
 });
 
 app.post("/api/scores", (req, res) => {
-  const { name, score } = req.body;
+  let { name, score } = req.body;
   console.log(`POST /api/scores - Entry: ${name} (${score})`);
   try {
     if (!name || score === undefined) {
       return res.status(400).json({ error: "Name and score are required" });
+    }
+
+    // Sanitization & Validation
+    // 1. Name: limit length, strip HTML, allow only safe characters
+    name = String(name)
+      .trim()
+      .replace(/<[^>]*>?/gm, "") // Strip HTML
+      .replace(/[^a-zA-Z0-9\s._-]/g, "") // Allow only alphanumeric, space, dot, underscore, hyphen
+      .substring(0, 15); // Max 15 chars
+
+    if (!name) {
+      return res.status(400).json({ error: "Invalid name" });
+    }
+
+    // 2. Score: ensure number, max value, integer
+    score = parseInt(score, 10);
+    if (isNaN(score) || score < 0 || score > 1000000) {
+      return res.status(400).json({ error: "Invalid score value" });
     }
 
     let scores = readScores();
@@ -73,7 +91,7 @@ app.post("/api/scores", (req, res) => {
 
     fs.writeFileSync(SCORES_FILE, JSON.stringify(topScores, null, 2));
 
-    console.log("Score saved successfully");
+    console.log(`Score saved successfully: ${name} - ${score}`);
     res.json({ success: true });
   } catch (err) {
     console.error("Error saving score:", err);
