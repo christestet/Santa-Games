@@ -2,7 +2,10 @@ import { useState, useEffect } from 'react'
 import Snow from './components/Snow'
 import SnowballHunt from './components/SnowballHunt'
 import GiftToss from './components/GiftToss'
+import GameSettings from './components/GameSettings'
+import GameCard from './components/GameCard'
 import { config } from './config';
+import { GAME_CONFIG } from './constants/gameConfig'
 
 type GameType = 'snowball' | 'gift-toss' | 'none';
 
@@ -16,6 +19,8 @@ function App() {
     const [isLoadingScores, setIsLoadingScores] = useState(false)
     const [apiError, setApiError] = useState<string | null>(null)
     const [isSubmitting, setIsSubmitting] = useState(false)
+    const [settings, setSettings] = useState(GAME_CONFIG)
+    const [showSettings, setShowSettings] = useState(false)
 
     const fetchScores = async () => {
         setIsLoadingScores(true);
@@ -86,17 +91,31 @@ function App() {
                     <h1>Fröhliche Spiele 🎅</h1>
 
                     <div className="game-selection">
-                        <div className="game-card frost-card" onClick={() => startGame('snowball')}>
-                            <span className="game-icon">❄️</span>
-                            <h3>Schneeball-Jagd</h3>
-                            <button className="btn-small">SPIELEN</button>
-                        </div>
-                        <div className="game-card frost-card" onClick={() => startGame('gift-toss')}>
-                            <span className="game-icon">🎁</span>
-                            <h3>Geschenke Weitwurf</h3>
-                            <button className="btn-small">SPIELEN</button>
-                        </div>
+                        <GameCard
+                            title="Schneeball-Jagd"
+                            icon="❄️"
+                            instructions="Tippe auf Geschenke und Sterne, um Punkte zu sammeln. Vermeide die Kohle! Nutze Eis für einen Freeze oder Uhren für mehr Zeit."
+                            onPlay={() => startGame('snowball')}
+                        />
+                        <GameCard
+                            title="Geschenke Weitwurf"
+                            icon="🎁"
+                            instructions="Tippe, um Geschenke abzuwerfen. Ziele genau in die Schornsteine! Achte auf Hindernisse wie Flugzeuge und Wolken."
+                            onPlay={() => startGame('gift-toss')}
+                        />
                     </div>
+
+                    <button className="btn-small" onClick={() => setShowSettings(true)} style={{ marginTop: '1rem' }}>
+                        ⚙️ EINSTELLUNGEN
+                    </button>
+
+                    {showSettings && (
+                        <GameSettings
+                            settings={settings}
+                            onUpdate={setSettings}
+                            onClose={() => setShowSettings(false)}
+                        />
+                    )}
 
                     <div className="leaderboard frost-card" style={{ marginTop: '2rem' }}>
                         <h2>🏆 Bestenliste</h2>
@@ -129,10 +148,10 @@ function App() {
             {gameState === 'playing' && (
                 <>
                     {currentGame === 'snowball' && (
-                        <SnowballHunt onGameOver={handleGameOver} highScores={highScores} />
+                        <SnowballHunt onGameOver={handleGameOver} highScores={highScores} settings={settings} />
                     )}
                     {currentGame === 'gift-toss' && (
-                        <GiftToss onGameOver={handleGameOver} />
+                        <GiftToss onGameOver={handleGameOver} settings={settings} />
                     )}
                 </>
             )}

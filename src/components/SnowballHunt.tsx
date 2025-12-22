@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { GAME_CONFIG } from '../constants/gameConfig'
 
 const WEIHNACHTS_WITZE = [
     "Warum hat der Schneemann keine Beine? Weil er sonst weglaufen würde, wenn er gelbe Flecken sieht!",
@@ -84,6 +85,7 @@ class SoundManager {
 interface SnowballHuntProps {
     onGameOver: (score: number, joke: string) => void;
     highScores: { name: string; score: number }[];
+    settings: typeof GAME_CONFIG;
 }
 
 interface Target {
@@ -111,9 +113,9 @@ interface Splat {
     y: number;
 }
 
-export default function SnowballHunt({ onGameOver, highScores }: SnowballHuntProps) {
+export default function SnowballHunt({ onGameOver, highScores, settings }: SnowballHuntProps) {
     const [score, setScore] = useState(0)
-    const [timeLeft, setTimeLeft] = useState(30)
+    const [timeLeft, setTimeLeft] = useState(settings.TIMER)
     const [targets, setTargets] = useState<Target[]>([])
     const [projectiles, setProjectiles] = useState<Projectile[]>([])
     const [splats, setSplats] = useState<Splat[]>([])
@@ -130,7 +132,7 @@ export default function SnowballHunt({ onGameOver, highScores }: SnowballHuntPro
         projectiles: [] as Projectile[],
         score: 0,
         frozen: false,
-        timeLeft: 30,
+        timeLeft: settings.TIMER,
         isPlaying: true
     })
 
@@ -330,7 +332,7 @@ export default function SnowballHunt({ onGameOver, highScores }: SnowballHuntPro
 
         if (type === 'coal') {
             newCombo = 0;
-            points = -50;
+            points = settings.POINTS.COAL;
             text = SPRUECHE[Math.floor(Math.random() * SPRUECHE.length)];
             color = "#555";
             triggerShake();
@@ -342,12 +344,12 @@ export default function SnowballHunt({ onGameOver, highScores }: SnowballHuntPro
 
         switch (type) {
             case 'gift':
-                points = 10 * (Math.floor(newCombo / 5) + 1)
+                points = settings.POINTS.REGULAR
                 text = `+${points}`
                 color = '#ff4d4d'
                 break
             case 'gold':
-                points = 50 * (Math.floor(newCombo / 5) + 1)
+                points = settings.POINTS.BONUS
                 text = `MEGA +${points}!`
                 color = 'var(--christmas-gold)'
                 break

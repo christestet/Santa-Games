@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { GAME_CONFIG } from '../constants/gameConfig'
 
 interface Gift {
     id: number;
@@ -30,11 +31,12 @@ interface Obstacle {
 
 interface GiftTossProps {
     onGameOver: (score: number, joke: string) => void;
+    settings: typeof GAME_CONFIG;
 }
 
-export default function GiftToss({ onGameOver }: GiftTossProps) {
+export default function GiftToss({ onGameOver, settings }: GiftTossProps) {
     const [score, setScore] = useState(0)
-    const [timeLeft, setTimeLeft] = useState(60)
+    const [timeLeft, setTimeLeft] = useState(settings.TIMER)
     const [gifts, setGifts] = useState<Gift[]>([])
     const [chimneys, setChimneys] = useState<Chimney[]>([])
     const [obstacles, setObstacles] = useState<Obstacle[]>([])
@@ -156,8 +158,8 @@ export default function GiftToss({ onGameOver }: GiftTossProps) {
                     );
 
                     if (hitChimney) {
-                        let pts = gift.type === 'coal' ? -50 : 100
-                        if (gift.type === 'blue') pts = 200
+                        let pts = gift.type === 'coal' ? settings.POINTS.COAL : settings.POINTS.REGULAR
+                        if (gift.type === 'blue') pts = settings.POINTS.BONUS
                         setScore(s => Math.max(0, s + pts))
                         addFloatingText(nextX, nextY, pts > 0 ? `PERFECT +${pts}` : "OH NO!", pts > 0 ? '#4caf50' : '#555')
                         if (navigator.vibrate) navigator.vibrate(20);
