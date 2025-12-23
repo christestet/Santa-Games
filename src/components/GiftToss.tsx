@@ -226,7 +226,7 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
         const chimneyY = window.innerHeight - CHIMNEY_HEIGHT;
 
         const nextGifts: Gift[] = [];
-        const hits: { type: 'obstacle' | 'chimney' | 'ground' | 'miss', x: number, y: number, pts?: number }[] = [];
+        const hits: { type: 'obstacle' | 'chimney' | 'ground' | 'miss', subtype?: 'cloud' | 'plane', x: number, y: number, pts?: number }[] = [];
 
         currentGifts.forEach(gift => {
             if (!gift.active || gift.landed) {
@@ -245,7 +245,7 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
             );
 
             if (hitObstacle) {
-                hits.push({ type: 'obstacle', x: nextX, y: nextY });
+                hits.push({ type: 'obstacle', subtype: hitObstacle.type, x: nextX, y: nextY });
                 nextGifts.push({ ...gift, active: false });
                 return;
             }
@@ -293,11 +293,18 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
         hits.forEach(hit => {
             if (hit.type === 'obstacle') {
                 soundManager.current?.playPoof();
-                const penalty = settings.POINTS.COAL;
-                const newScore = Math.max(0, stateRef.current.score + penalty);
-                stateRef.current.score = newScore;
-                setScore(newScore);
-                addFloatingText(hit.x, hit.y, getSpruch(), "#ff6b6b");
+
+                if (hit.subtype === 'plane') {
+                    const penalty = settings.POINTS.COAL;
+                    const newScore = Math.max(0, stateRef.current.score + penalty);
+                    stateRef.current.score = newScore;
+                    setScore(newScore);
+                    addFloatingText(hit.x, hit.y, getSpruch(), "#ff6b6b");
+                } else {
+                    // Cloud - just poof, no score change
+                    addFloatingText(hit.x, hit.y, t("game.poof"), "#fff");
+                }
+
             } else if (hit.type === 'chimney') {
                 soundManager.current?.playHit();
                 const pts = hit.pts || 10;
