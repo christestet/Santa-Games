@@ -112,6 +112,30 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
         isPaused: false
     })
 
+    // Track pressed keys
+    const keysPressed = useRef<{ [key: string]: boolean }>({});
+
+    // Handle Keyboard Input
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            keysPressed.current[e.code] = true;
+            if (e.code === 'Space') {
+                handleThrow();
+            }
+        };
+        const handleKeyUp = (e: KeyboardEvent) => {
+            keysPressed.current[e.code] = false;
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        window.addEventListener('keyup', handleKeyUp);
+
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+            window.removeEventListener('keyup', handleKeyUp);
+        };
+    }, []); // Empty dependency array as we use refs
+
     // Sync refs for collision detection
     useEffect(() => { stateRef.current.gifts = gifts }, [gifts])
     useEffect(() => { stateRef.current.chimneys = chimneys }, [chimneys])
@@ -173,10 +197,22 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
 
         lastTimeRef.current = time;
 
-        // 1. Update Santa
+        // 1. Update Santa Movement (Manual)
         const s = santaRef.current;
-        s.x += s.speed;
-        if (s.x > window.innerWidth - 80 || s.x < 80) s.speed *= -1;
+        // Increase speed for manual control to make it feel responsive
+        const manualSpeed = 8;
+
+        if (keysPressed.current['ArrowLeft'] || keysPressed.current['KeyA']) {
+            s.x -= manualSpeed;
+        }
+        if (keysPressed.current['ArrowRight'] || keysPressed.current['KeyD']) {
+            s.x += manualSpeed;
+        }
+
+        // Clamp position
+        if (s.x < 20) s.x = 20;
+        if (s.x > window.innerWidth - 60) s.x = window.innerWidth - 60;
+
         setSantaX(s.x);
 
         // 2. Update Entities
@@ -274,7 +310,7 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
         }
     }, [update, spawnChimney, spawnObstacle, onGameOver]);
 
-    const handleTap = (e: React.PointerEvent) => {
+    const handleThrow = () => {
         if (!stateRef.current.isPlaying || stateRef.current.isPaused) return;
         if (Date.now() - lastThrowTime.current < COOLDOWN) return;
         soundManager.current?.playThrow();
@@ -282,13 +318,17 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
 
         const rand = Math.random();
         const type = rand > 0.9 ? 'blue' : (rand > 0.8 ? 'coal' : 'red');
-        const initialVx = santaRef.current.speed * 0.8;
+
+        // Give the gift a little horizontal momentum based on Santa's movement
+        let momentum = 0;
+        if (keysPressed.current['ArrowLeft'] || keysPressed.current['KeyA']) momentum = -2;
+        if (keysPressed.current['ArrowRight'] || keysPressed.current['KeyD']) momentum = 2;
 
         const newGift: Gift = {
             id: nextId.current++,
             x: santaRef.current.x,
             y: 80,
-            vx: initialVx,
+            vx: momentum,
             vy: settings.PHYSICS.THROW_VELOCITY,
             type,
             active: true,
@@ -298,8 +338,14 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
         setGifts(prev => [...prev, newGift]);
     };
 
+    const handleTap = (e: React.PointerEvent) => {
+        // Prevent default to avoid double firing if mixing touch/mouse
+        // e.preventDefault(); 
+        handleThrow();
+    };
+
     return (
-        <div className="game-area gift-toss" onPointerDown={handleTap} style={{ cursor: 'pointer' }}>
+        <div className="game-area gift-toss" onPointerDown={handleTap} style={{ cursor: 'pointer', outline: 'none' }} tabIndex={0}>
             <HUD score={score} timeLeft={timeLeft} onPause={onPause} />
             <div className="santa-hand-top" style={{ left: santaX }}>
                 <GameIcon name="santa" size={40} />
