@@ -426,10 +426,28 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
             {chimneys.map(c => (
                 <div
                     key={c.id}
-                    className="chimney"
-                    style={{ left: c.x, width: c.width, height: CHIMNEY_HEIGHT, bottom: 0, top: 'auto', borderTop: '4px solid #331a1a', borderBottom: 'none' }}
+                    style={{
+                        position: 'absolute',
+                        left: c.x,
+                        width: c.width,
+                        height: CHIMNEY_HEIGHT,
+                        bottom: 0,
+                        pointerEvents: 'none',
+                        display: 'flex',
+                        alignItems: 'flex-end',
+                        justifyContent: 'center'
+                    }}
                 >
-                    <div className="chimney-smoke"></div>
+                    <GameIcon
+                        name="chimney"
+                        size={CHIMNEY_HEIGHT}
+                        style={{
+                            width: '100%',
+                            height: '100%',
+                            filter: 'drop-shadow(4px 4px 0 rgba(0,0,0,0.5))'
+                        }}
+                    />
+                    <div className="chimney-smoke" style={{ bottom: CHIMNEY_HEIGHT - 20, top: 'auto' }}></div>
                 </div>
             ))}
 
