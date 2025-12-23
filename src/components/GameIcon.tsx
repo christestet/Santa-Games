@@ -227,16 +227,51 @@ const SPRITES: Record<GameIconName, SpriteDefinition> = {
     star: {
         content: (
             <>
+                {/* Main star body - base layer */}
                 <rect x="7" y="1" width="2" height="14" fill="#FFEB3B" />
                 <rect x="1" y="7" width="14" height="2" fill="#FFEB3B" />
                 <rect x="3" y="3" width="10" height="10" fill="#FFEB3B" />
                 <rect x="5" y="2" width="6" height="12" fill="#FFEB3B" />
                 <rect x="2" y="5" width="12" height="6" fill="#FFEB3B" />
+
+                {/* Inner glow - brighter center */}
                 <rect x="6" y="6" width="4" height="4" fill="#FFF176" />
+                <rect x="7" y="7" width="2" height="2" fill="#FFFDE7" />
+
+                {/* Highlights - top left quadrant (light source) */}
+                <rect x="6" y="2" width="2" height="1" fill="#FFF9C4" opacity="0.8" />
+                <rect x="5" y="3" width="2" height="2" fill="#FFF176" opacity="0.6" />
+                <rect x="2" y="6" width="2" height="1" fill="#FFF9C4" opacity="0.7" />
+                <rect x="3" y="5" width="1" height="2" fill="#FFF176" opacity="0.5" />
+
+                {/* Shadows - bottom right quadrant (depth) */}
+                <rect x="9" y="13" width="2" height="1" fill="#F9A825" opacity="0.6" />
+                <rect x="10" y="10" width="2" height="2" fill="#FBC02D" opacity="0.5" />
+                <rect x="13" y="9" width="1" height="2" fill="#F9A825" opacity="0.7" />
+                <rect x="11" y="12" width="1" height="1" fill="#F57F17" opacity="0.4" />
+
+                {/* Edge definition - darker tips */}
                 <rect x="7" y="0" width="2" height="1" fill="#FBC02D" />
                 <rect x="1" y="6" width="1" height="4" fill="#FBC02D" />
                 <rect x="14" y="6" width="1" height="4" fill="#FBC02D" />
                 <rect x="7" y="15" width="2" height="1" fill="#FBC02D" />
+
+                {/* Diagonal tip shading */}
+                <rect x="3" y="3" width="1" height="1" fill="#F9A825" />
+                <rect x="12" y="3" width="1" height="1" fill="#F9A825" />
+                <rect x="3" y="12" width="1" height="1" fill="#F57F17" />
+                <rect x="12" y="12" width="1" height="1" fill="#F57F17" />
+
+                {/* Sparkle effects - small bright spots */}
+                <rect x="5" y="5" width="1" height="1" fill="#FFFFFF" opacity="0.9" />
+                <rect x="10" y="6" width="1" height="1" fill="#FFFFFF" opacity="0.8" />
+                <rect x="6" y="9" width="1" height="1" fill="#FFFFFF" opacity="0.7" />
+
+                {/* Subtle glow lines for dimension */}
+                <rect x="7" y="4" width="2" height="1" fill="#FFF9C4" opacity="0.5" />
+                <rect x="7" y="11" width="2" height="1" fill="#FBC02D" opacity="0.4" />
+                <rect x="4" y="7" width="1" height="2" fill="#FFF9C4" opacity="0.5" />
+                <rect x="11" y="7" width="1" height="2" fill="#FBC02D" opacity="0.4" />
             </>
         )
     },

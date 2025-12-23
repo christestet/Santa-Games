@@ -1,16 +1,6 @@
-import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
+import React, { useState, useCallback, ReactNode } from 'react';
 import { Language, TRANSLATIONS, WEIHNACHTS_WITZE, SPRUECHE, PARCEL_TEXTS } from '../constants/gameTexts';
-
-interface LanguageContextType {
-    language: Language;
-    setLanguage: (lang: Language) => void;
-    t: (path: string) => string;
-    getJoke: () => string;
-    getSpruch: () => string;
-    getParcelText: () => string;
-}
-
-const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+import { LanguageContext } from './LanguageContext';
 
 export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     // Try to get language from localStorage or default to German
@@ -60,12 +50,4 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
             {children}
         </LanguageContext.Provider>
     );
-};
-
-export const useLanguage = () => {
-    const context = useContext(LanguageContext);
-    if (context === undefined) {
-        throw new Error('useLanguage must be used within a LanguageProvider');
-    }
-    return context;
 };
