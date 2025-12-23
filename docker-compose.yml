@@ -1,5 +1,6 @@
 services:
   santa-game:
+    image: christmas-santa-game:latest
     build: .
     container_name: santa-game
     ports:
