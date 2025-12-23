@@ -292,10 +292,35 @@ const SPRITES: Record<GameIconName, SpriteDefinition> = {
     settings: {
         content: (
             <>
-                <rect x="6" y="2" width="4" height="12" fill="#616161" />
-                <rect x="2" y="6" width="12" height="4" fill="#616161" />
-                <rect x="4" y="4" width="8" height="8" fill="#757575" />
+                {/* Main Gear Body (Dark Grey) */}
+                <rect x="5" y="4" width="6" height="8" fill="#757575" />
+                <rect x="4" y="5" width="8" height="6" fill="#757575" />
+
+                {/* Teeth (Lighter/Metal Grey) - Cardinal Directions */}
+                <rect x="6" y="1" width="4" height="2" fill="#9E9E9E" /> {/* Top */}
+                <rect x="6" y="13" width="4" height="2" fill="#9E9E9E" /> {/* Bottom */}
+                <rect x="1" y="6" width="2" height="4" fill="#9E9E9E" /> {/* Left */}
+                <rect x="13" y="6" width="2" height="4" fill="#9E9E9E" /> {/* Right */}
+
+                {/* Teeth - Diagonals */}
+                <rect x="3" y="3" width="2" height="2" fill="#9E9E9E" />
+                <rect x="11" y="3" width="2" height="2" fill="#9E9E9E" />
+                <rect x="3" y="11" width="2" height="2" fill="#9E9E9E" />
+                <rect x="11" y="11" width="2" height="2" fill="#9E9E9E" />
+
+                {/* Inner Ring/Depression (Darker) */}
+                <rect x="6" y="6" width="4" height="4" fill="#616161" />
+
+                {/* Center Hole (Very Dark/Black) */}
                 <rect x="7" y="7" width="2" height="2" fill="#212121" />
+
+                {/* Highlights for metallic feel */}
+                <rect x="6" y="1" width="4" height="1" fill="#E0E0E0" opacity="0.5" />
+                <rect x="3" y="3" width="1" height="1" fill="#E0E0E0" opacity="0.5" />
+
+                {/* Shadows for depth */}
+                <rect x="6" y="14" width="4" height="1" fill="#424242" opacity="0.5" />
+                <rect x="7" y="10" width="2" height="1" fill="#424242" opacity="0.5" />
             </>
         )
     },

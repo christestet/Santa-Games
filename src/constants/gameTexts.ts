@@ -94,7 +94,7 @@ export const TRANSLATIONS = {
             soundOn: "On",
             soundOff: "Off",
             theme: "Appearance:",
-            themeClassic: "Classic",
+            themeClassic: "Classic Mode",
             themeGrinch: "Grinch Mode",
             min: "Min",
             sec: "Sec",
