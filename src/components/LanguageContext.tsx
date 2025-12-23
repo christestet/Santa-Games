@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
-import { Language, TRANSLATIONS, WEIHNACHTS_WITZE, SPRUECHE } from '../constants/gameTexts';
+import { Language, TRANSLATIONS, WEIHNACHTS_WITZE, SPRUECHE, PARCEL_TEXTS } from '../constants/gameTexts';
 
 interface LanguageContextType {
     language: Language;
@@ -7,6 +7,7 @@ interface LanguageContextType {
     t: (path: string) => string;
     getJoke: () => string;
     getSpruch: () => string;
+    getParcelText: () => string;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -49,8 +50,13 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
         return sprueche[Math.floor(Math.random() * sprueche.length)];
     }, [language]);
 
+    const getParcelText = useCallback(() => {
+        const texts = PARCEL_TEXTS[language];
+        return texts[Math.floor(Math.random() * texts.length)];
+    }, [language]);
+
     return (
-        <LanguageContext.Provider value={{ language, setLanguage, t, getJoke, getSpruch }}>
+        <LanguageContext.Provider value={{ language, setLanguage, t, getJoke, getSpruch, getParcelText }}>
             {children}
         </LanguageContext.Provider>
     );

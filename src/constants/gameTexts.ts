@@ -182,3 +182,20 @@ export const SPRUECHE = {
         "Whoopsie! Someone's mind is elsewhere!",
     ]
 };
+
+export const PARCEL_TEXTS = {
+    de: [
+        "Sorry, Santa hatte keine Zeit mehr zum Einpacken!",
+        "Das Rentier hat das Geschenkpapier gefressen...",
+        "Nicht schön, aber der Inhalt zählt!",
+        "Express-Lieferung direkt vom Nordpol!",
+        "Ups, das Geschenkpapier ist ausgegangen!"
+    ],
+    en: [
+        "Sorry, Santa didn't manage to wrap your gift!",
+        "The reindeer ate the wrapping paper...",
+        "It's not pretty, but it's what's inside that counts!",
+        "Express delivery straight from the North Pole!",
+        "Oops, ran out of wrapping paper!"
+    ]
+};

@@ -80,7 +80,9 @@ interface GiftTossProps {
 }
 
 export default function GiftToss({ onGameOver, settings, isPaused, onPause }: GiftTossProps) {
-    const { t, getJoke, getSpruch } = useLanguage();
+    const { t, getJoke, getSpruch, getParcelText } = useLanguage();
+
+
     const { isMuted } = useSound();
     const [score, setScore] = useState(0)
     const [timeLeft, setTimeLeft] = useState(settings.TIMER)
@@ -226,7 +228,7 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
         const chimneyY = window.innerHeight - CHIMNEY_HEIGHT;
 
         const nextGifts: Gift[] = [];
-        const hits: { type: 'obstacle' | 'chimney' | 'ground' | 'miss', subtype?: 'cloud' | 'plane', x: number, y: number, pts?: number }[] = [];
+        const hits: { type: 'obstacle' | 'chimney' | 'ground' | 'miss', subtype?: 'cloud' | 'plane', giftType: Gift['type'], x: number, y: number, pts?: number }[] = [];
 
         currentGifts.forEach(gift => {
             if (!gift.active || gift.landed) {
@@ -245,7 +247,7 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
             );
 
             if (hitObstacle) {
-                hits.push({ type: 'obstacle', subtype: hitObstacle.type, x: nextX, y: nextY });
+                hits.push({ type: 'obstacle', subtype: hitObstacle.type, giftType: gift.type, x: nextX, y: nextY });
                 nextGifts.push({ ...gift, active: false });
                 return;
             }
@@ -258,10 +260,10 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
 
                 if (hitChimney) {
                     const pts = Math.max(10, Math.floor(50 - Math.abs(nextX - hitChimney.x) / 2));
-                    hits.push({ type: 'chimney', x: nextX, y: nextY, pts });
+                    hits.push({ type: 'chimney', giftType: gift.type, x: nextX, y: nextY, pts });
                     nextGifts.push({ ...gift, landed: true, active: false });
                 } else {
-                    hits.push({ type: 'miss', x: nextX, y: nextY });
+                    hits.push({ type: 'miss', giftType: gift.type, x: nextX, y: nextY });
                     nextGifts.push({ ...gift, landed: true, active: false });
                 }
                 return;
@@ -269,7 +271,7 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
 
             // Ground Collision
             if (nextY > window.innerHeight - 20) {
-                hits.push({ type: 'ground', x: nextX, y: nextY });
+                hits.push({ type: 'ground', giftType: gift.type, x: nextX, y: nextY });
                 nextGifts.push({ ...gift, landed: true, active: false });
                 return;
             }
@@ -311,7 +313,13 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
                 const newScore = stateRef.current.score + pts;
                 stateRef.current.score = newScore;
                 setScore(newScore);
-                addFloatingText(hit.x, hit.y, pts > 40 ? `${t("game.perfect")} +${pts}` : `+${pts}`, pts > 40 ? '#4caf50' : '#ffd700');
+
+                if (hit.giftType === 'parcel') {
+                    addFloatingText(hit.x, hit.y, getParcelText(), "#8D6E63");
+                } else {
+                    addFloatingText(hit.x, hit.y, pts > 40 ? `${t("game.perfect")} +${pts}` : `+${pts}`, pts > 40 ? '#4caf50' : '#ffd700');
+                }
+
                 if (navigator.vibrate) navigator.vibrate(20);
             } else if (hit.type === 'miss' || hit.type === 'ground') {
                 addFloatingText(hit.x, hit.y, t("game.miss"), "#aaa");
