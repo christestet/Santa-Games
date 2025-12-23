@@ -4,6 +4,7 @@ import { WEIHNACHTS_WITZE, SPRUECHE } from '../constants/gameTexts'
 import { HUD } from './ui/HUD'
 import { useLanguage } from './LanguageContext'
 import { useSound } from './SoundContext'
+import GameIcon from './GameIcon'
 
 // --- Audio Manager ---
 class SoundManager {
@@ -438,11 +439,11 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
                     }}
                 >
                     <div className="target-inner">
-                        {target.type === 'gift' && '🎁'}
-                        {target.type === 'coal' && '🌑'}
-                        {target.type === 'gold' && '⭐'}
-                        {target.type === 'time' && '⏱️'}
-                        {target.type === 'ice' && '❄️'}
+                        {target.type === 'gift' && <GameIcon name="gift" size={targetSize * 0.8} />}
+                        {target.type === 'coal' && <GameIcon name="coal" size={targetSize * 0.8} />}
+                        {target.type === 'gold' && <GameIcon name="star" size={targetSize * 0.8} />}
+                        {target.type === 'time' && <GameIcon name="timer" size={targetSize * 0.8} />}
+                        {target.type === 'ice' && <GameIcon name="snowflake" size={targetSize * 0.8} />}
                     </div>
                 </div>
             ))}

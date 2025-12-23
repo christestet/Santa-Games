@@ -4,7 +4,7 @@ import { Card } from './ui/Card';
 
 interface GameCardProps {
     title: string;
-    icon: string;
+    icon: React.ReactNode;
     instructions: string;
     onPlay: () => void;
 }

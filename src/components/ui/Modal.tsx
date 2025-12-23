@@ -4,7 +4,7 @@ import { Card } from './Card';
 interface ModalProps {
     isOpen: boolean;
     onClose?: () => void; // Optional if we don't want it closable by background click
-    title?: string;
+    title?: React.ReactNode;
     children: React.ReactNode;
     style?: React.CSSProperties; // Pass through style for specific overrides
 }

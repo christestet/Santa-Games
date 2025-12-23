@@ -3,6 +3,7 @@ import { GAME_CONFIG } from '../constants/gameConfig'
 import { HUD } from './ui/HUD'
 import { useLanguage } from './LanguageContext';
 import { useSound } from './SoundContext';
+import GameIcon from './GameIcon';
 
 // --- Audio Manager ---
 class SoundManager {
@@ -300,22 +301,23 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
     return (
         <div className="game-area gift-toss" onPointerDown={handleTap} style={{ cursor: 'pointer' }}>
             <HUD score={score} timeLeft={timeLeft} onPause={onPause} />
-
-            <div className="santa-hand-top" style={{ left: santaX }}>🎅</div>
+            <div className="santa-hand-top" style={{ left: santaX }}>
+                <GameIcon name="santa" size={40} />
+            </div>
 
             {obstacles.map(o => (
                 <div key={o.id} className="obstacle" style={{ left: o.x, top: o.y, width: o.width, height: o.height }}>
-                    <span style={{ fontSize: o.type === 'cloud' ? '5rem' : '4rem', filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))' }}>
-                        {o.type === 'cloud' ? '☁️' : '✈️'}
-                    </span>
+                    <div style={{ fontSize: o.type === 'cloud' ? '5rem' : '4rem', filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))' }}>
+                        {o.type === 'cloud' ? <GameIcon name="cloud" size={80} /> : <GameIcon name="plane" size={60} />}
+                    </div>
                 </div>
             ))}
 
             {gifts.map(g => (
                 <div key={g.id} className={`gift-item ${g.type}`} style={{ left: g.x, top: g.y, width: GIFT_SIZE, height: GIFT_SIZE }}>
-                    {g.type === 'red' && '🎁'}
-                    {g.type === 'blue' && '📦'}
-                    {g.type === 'coal' && '🌑'}
+                    {g.type === 'red' && <GameIcon name="gift" size={GIFT_SIZE} />}
+                    {g.type === 'blue' && <GameIcon name="gift" size={GIFT_SIZE} style={{ filter: 'hue-rotate(220deg)' }} />}
+                    {g.type === 'coal' && <GameIcon name="coal" size={GIFT_SIZE} />}
                 </div>
             ))}
 

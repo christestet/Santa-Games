@@ -10,7 +10,7 @@ import { Card } from '@components/ui/Card'
 import { useLanguage } from '@components/LanguageContext'
 import { useTheme } from '@components/ThemeContext'
 import { useGame } from '@components/GameContext'
-import grinchIcon from '@assets/grinch.png'
+import GameIcon from '@components/GameIcon'
 import pkg from '@/../package.json'
 
 const App: React.FC = () => {
@@ -54,26 +54,26 @@ const App: React.FC = () => {
                             variant="icon"
                             onClick={() => setLanguage(language === 'de' ? 'en' : 'de')}
                         >
-                            {language === 'de' ? '🇺🇸' : '🇩🇪'}
+                            {language === 'de' ? <GameIcon name="flag_us" size={24} /> : <GameIcon name="flag_de" size={24} />}
                         </Button>
                         <Button
                             variant="icon"
                             onClick={() => toggleSettings(true)}
                         >
-                            ⚙️
+                            <GameIcon name="settings" size={24} />
                         </Button>
                         <Button
                             variant="icon"
                             onClick={toggleTheme}
                         >
-                            {theme === 'classic' ? '🎅' : <img src={grinchIcon} alt="Grinch" style={{ width: '1.5em', height: '1.5em' }} />}
+                            {theme === 'classic' ? <GameIcon name="santa" size={24} /> : <GameIcon name="grinch" size={24} />}
                         </Button>
                     </div>
 
                     <h1>
                         {theme === 'grinch' ? (
                             <>
-                                {t('menu.grinchTitle')} <img src={grinchIcon} alt="Grinch" style={{ width: '0.8em', height: '0.8em', verticalAlign: 'middle' }} />
+                                {t('menu.grinchTitle')} <GameIcon name="grinch" size={24} style={{ display: 'inline-block', verticalAlign: 'middle', marginLeft: '8px' }} />
                             </>
                         ) : t('menu.title')}
                     </h1>
@@ -81,13 +81,13 @@ const App: React.FC = () => {
                     <div className="game-selection">
                         <GameCard
                             title={t('menu.snowballTitle')}
-                            icon="❄️"
+                            icon={<GameIcon name="snowflake" size={64} />}
                             instructions={t('menu.snowballDesc')}
                             onPlay={() => startGame('snowball')}
                         />
                         <GameCard
                             title={t('menu.giftTitle')}
-                            icon="🎁"
+                            icon={<GameIcon name="gift" size={64} />}
                             instructions={t('menu.giftDesc')}
                             onPlay={() => startGame('gift-toss')}
                         />
@@ -139,7 +139,7 @@ const App: React.FC = () => {
                     )}
 
                     {isPaused && (
-                        <Modal isOpen={true} title={t('common.pause')}>
+                        <Modal isOpen={true} title={<div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>{t('common.pause')} <GameIcon name="timer" size={24} /></div>}>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%', alignItems: 'center' }}>
                                 <Button onClick={resumeGame} style={{ width: '100%' }}>{t('common.continue')}</Button>
                                 <Button variant="secondary" onClick={restartGame} style={{ width: '100%' }}>{t('common.restart')}</Button>
@@ -151,7 +151,7 @@ const App: React.FC = () => {
             )}
 
             {gameState === 'name-entry' && (
-                <Modal isOpen={true} title={t('game.newHighScore')}>
+                <Modal isOpen={true} title={<div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>{t('game.newHighScore')} <GameIcon name="trophy" size={24} /></div>}>
                     <div style={{ textAlign: 'center', width: '100%' }}>
                         <p style={{ fontSize: '1.5rem', margin: '1rem 0' }}>{t('game.yourScore')}: {score}</p>
                         {scoreError && (
@@ -191,7 +191,7 @@ const App: React.FC = () => {
             )}
 
             {gameState === 'gameover' && (
-                <Modal isOpen={true} title={t('game.finished')}>
+                <Modal isOpen={true} title={<div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>{t('game.finished')} <GameIcon name="gift" size={24} /></div>}>
                     <div style={{ textAlign: 'center', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
                         <Leaderboard
                             scores={highScores}

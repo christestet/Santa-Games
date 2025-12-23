@@ -4,6 +4,7 @@ import { Button } from './ui/Button'
 import { useLanguage } from './LanguageContext'
 import { useSound } from './SoundContext'
 import { useTheme } from './ThemeContext'
+import GameIcon from './GameIcon'
 
 interface GameSettingsProps {
     settings: typeof GAME_CONFIG;
@@ -31,7 +32,7 @@ export default function GameSettings({ settings, onUpdate, onClose }: GameSettin
     const presets = [30, 60, 90, 120];
 
     return (
-        <Modal isOpen={true} onClose={onClose} title={t('settings.title')}>
+        <Modal isOpen={true} onClose={onClose} title={<div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>{t('settings.title')} <GameIcon name="settings" size={24} /></div>}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'center', width: '100%' }}>
                 <label style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>
                     {t('settings.duration')}: <span style={{ color: 'var(--primary-color)', fontSize: '1.4rem' }}>{formatTime(settings.TIMER)}</span>
@@ -74,7 +75,7 @@ export default function GameSettings({ settings, onUpdate, onClose }: GameSettin
                         onClick={toggleMute}
                         style={{ minWidth: '100px' }}
                     >
-                        {isMuted ? `🔇 ${t('settings.soundOff')}` : `🔊 ${t('settings.soundOn')}`}
+                        {isMuted ? <> <GameIcon name="sound_off" size={16} /> {t('settings.soundOff')} </> : <> <GameIcon name="sound_on" size={16} /> {t('settings.soundOn')} </>}
                     </Button>
                 </div>
 
@@ -86,7 +87,7 @@ export default function GameSettings({ settings, onUpdate, onClose }: GameSettin
                         onClick={toggleTheme}
                         style={{ minWidth: '140px' }}
                     >
-                        {theme === 'classic' ? `🎅 ${t('settings.themeClassic')}` : `👹 ${t('settings.themeGrinch')}`}
+                        {theme === 'classic' ? <> <GameIcon name="santa" size={16} /> {t('settings.themeClassic')} </> : <> <GameIcon name="grinch" size={16} /> {t('settings.themeGrinch')} </>}
                     </Button>
                 </div>
             </div>

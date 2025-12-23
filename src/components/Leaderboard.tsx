@@ -1,5 +1,6 @@
 import React from 'react';
 import { useLanguage } from '../components/LanguageContext';
+import GameIcon from './GameIcon';
 
 interface Score {
     name: string;
@@ -26,7 +27,9 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
     const { t } = useLanguage();
     return (
         <div className="leaderboard frost-card">
-            <h2>🏆 {t('game.leaderboard')}</h2>
+            <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center' }}>
+                <GameIcon name="trophy" size={24} /> {t('game.leaderboard')}
+            </h2>
             {isLoading ? (
                 <div style={{ padding: '2rem', textAlign: 'center' }}>
                     <div className="spinner">⏳</div>
