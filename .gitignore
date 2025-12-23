@@ -24,8 +24,6 @@ dist-ssr
 *.sw?
 
 CLAUDE.md
-
-scores.json
 .env
 
 spec/
