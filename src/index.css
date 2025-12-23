@@ -12,20 +12,20 @@
 }
 
 .classic-theme {
-  --cozy-red: #8b0000;
-  --velvet-red: #580000;
-  --warm-gold: #ffb700;
-  --antique-gold: #d4af37;
-  --cream-white: #fffdd0;
-  --fireplace-glow: rgba(255, 140, 0, 0.4);
-  --christmas-gold: #ffb700;
-  --bg-gradient: radial-gradient(circle at center, var(--cozy-red), #2a0000);
-  --card-bg: rgba(40, 0, 0, 0.95);
-  --card-bg-glass: rgba(40, 0, 0, 0.85);
-  --game-card-front: rgba(88, 0, 0, 0.8);
-  --game-card-back: rgba(40, 0, 0, 1);
-  --btn-text: #2a0000;
-  --input-bg: rgba(0, 0, 0, 0.4);
+  --cozy-red: #ffb700; /* Swapped: Was Gold, now Red (Background) - wait, user said background should be gold */
+  --velvet-red: #d4af37; /* Swapped: Was Antique Gold, now Red (Background) */
+  --warm-gold: #8b0000; /* Swapped: Was Red, now Gold (Font) */
+  --antique-gold: #580000; /* Swapped: Was Velvet Red, now Gold (Font) */
+  --cream-white: #ffffff;
+  --fireplace-glow: rgba(139, 0, 0, 0.4);
+  --christmas-gold: #8b0000;
+  --bg-gradient: radial-gradient(circle at center, #ffb700, #b8860b);
+  --card-bg: rgba(255, 253, 208, 0.95);
+  --card-bg-glass: rgba(255, 253, 208, 0.85);
+  --game-card-front: rgba(255, 183, 0, 0.8);
+  --game-card-back: rgba(255, 253, 208, 1);
+  --btn-text: #ffffff;
+  --input-bg: rgba(255, 255, 255, 0.4);
 }
 
 .grinch-theme {
@@ -531,7 +531,7 @@ h1 {
 .instruction-text {
     font-size: 1.1rem;
     line-height: 1.5;
-    color: var(--cream-white);
+    color: var(--warm-gold); /* Using the new red color for readability */
     opacity: 0.9;
     margin: 1rem 0;
 }
@@ -545,7 +545,7 @@ h1 {
   font-family: var(--font-festive);
   font-size: 2.2rem;
   margin: 0;
-  color: var(--warm-gold);
+  color: var(--warm-gold); /* This is now red */
 }
 
 .btn-small {
