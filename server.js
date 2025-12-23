@@ -46,7 +46,22 @@ app.use("/api/", generalLimiter);
 // Serve static frontend files from 'dist' directory
 const DIST_PATH = path.join(__dirname, "dist");
 if (fs.existsSync(DIST_PATH)) {
-  app.use(express.static(DIST_PATH));
+  app.use(
+    express.static(DIST_PATH, {
+      setHeaders: (res, filePath) => {
+        if (filePath.includes("/assets/")) {
+          // Cache hashed assets (JS, CSS, Images, Fonts) for 1 year
+          res.setHeader(
+            "Cache-Control",
+            "public, max-age=31536000, immutable"
+          );
+        } else {
+          // Don't cache index.html so users always get the latest version
+          res.setHeader("Cache-Control", "public, max-age=0, must-revalidate");
+        }
+      },
+    })
+  );
 }
 
 // Initialize scores file
