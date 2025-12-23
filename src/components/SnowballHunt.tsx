@@ -98,7 +98,7 @@ interface FloatingText { id: number; x: number; y: number; text: string; color: 
 interface Particle { id: number; x: number; y: number; tx: string; ty: string; type: string; expiry: number; }
 
 export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }: SnowballHuntProps) {
-    const { t, getJoke, getSpruch } = useLanguage();
+    const { t, getJoke, getSpruch, getParcelText } = useLanguage();
     const { isMuted } = useSound();
     const [score, setScore] = useState(0)
     const [timeLeft, setTimeLeft] = useState(settings.TIMER)
@@ -261,10 +261,14 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
 
         switch (type) {
             case 'gift':
-            case 'parcel':
                 points = settings.POINTS.REGULAR
                 text = `+${points}`
                 color = '#ff4d4d'
+                break
+            case 'parcel':
+                points = settings.POINTS.REGULAR
+                text = getParcelText()
+                color = '#8D6E63'
                 break
             case 'gold':
                 points = settings.POINTS.BONUS

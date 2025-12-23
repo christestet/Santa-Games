@@ -307,7 +307,7 @@ const SPRITES: Record<GameIconName, SpriteDefinition> = {
                 <rect x="3" y="4" width="10" height="9" fill="#8D6E63" />
                 <rect x="3" y="4" width="10" height="2" fill="#A1887F" />
                 <rect x="2" y="5" width="12" height="2" fill="#5D4037" opacity="0.2" />
-                <path d="M 5 9 C 6 11 10 11 11 9" stroke="#212121" strokeWidth="1" fill="none" />
+                <path d="M 5 9 C 6 11 10 11 11 9" stroke="#0859e5ff" strokeWidth="1" fill="none" />
                 <rect x="7" y="4" width="2" height="9" fill="#4E342E" opacity="0.3" />
             </>
         )
