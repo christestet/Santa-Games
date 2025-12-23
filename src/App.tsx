@@ -1,4 +1,3 @@
-import { useState, useCallback } from 'react'
 import Snow from '@components/Snow'
 import SnowballHunt from '@components/SnowballHunt'
 import GiftToss from '@components/GiftToss'
@@ -8,67 +7,41 @@ import Leaderboard from '@components/Leaderboard'
 import { Button } from '@components/ui/Button'
 import { Modal } from '@components/ui/Modal'
 import { Card } from '@components/ui/Card'
-import { GAME_CONFIG } from '@constants/gameConfig'
-import { useHighScores } from '@hooks/useHighScores'
 import { useLanguage } from '@components/LanguageContext'
 import { useTheme } from '@components/ThemeContext'
+import { useGame } from '@components/GameContext'
 import grinchIcon from '@assets/grinch.png'
 import pkg from '@/../package.json'
-
-type GameType = 'snowball' | 'gift-toss' | 'none';
-type GameState = 'menu' | 'playing' | 'name-entry' | 'gameover';
 
 const App: React.FC = () => {
     const { t, language, setLanguage } = useLanguage()
     const { theme, toggleTheme } = useTheme()
-    const [gameState, setGameState] = useState<GameState>('menu')
-    const [currentGame, setCurrentGame] = useState<GameType>('none')
-    const [score, setScore] = useState(0)
-    const [currentJoke, setCurrentJoke] = useState("")
-    const [playerName, setPlayerName] = useState("")
-    const [isSubmitting, setIsSubmitting] = useState(false)
-    const [settings, setSettings] = useState(GAME_CONFIG)
-    const [showSettings, setShowSettings] = useState(false)
 
-    const { highScores, isLoading, error, fetchScores, submitScore: apiSubmitScore } = useHighScores();
-
-    const [isPaused, setIsPaused] = useState(false)
-
-    const handleGameOver = useCallback((finalScore: number, joke: string) => {
-        setScore(finalScore)
-        setCurrentJoke(joke)
-        setGameState('name-entry')
-        setIsPaused(false)
-    }, [])
-
-    const submitScore = async () => {
-        if (!playerName.trim() || isSubmitting) return;
-        setIsSubmitting(true);
-        const success = await apiSubmitScore(playerName, score);
-        if (success) {
-            setGameState('gameover');
-        }
-        setIsSubmitting(false);
-    };
-
-    const startGame = useCallback((game: GameType) => {
-        setCurrentGame(game)
-        setScore(0)
-        setPlayerName("")
-        setGameState('playing')
-        setIsPaused(false)
-    }, [])
-
-    const handlePause = useCallback(() => setIsPaused(true), [])
-    const handleResume = useCallback(() => setIsPaused(false), [])
-    const handleQuit = useCallback(() => {
-        setIsPaused(false)
-        setGameState('menu')
-    }, [])
-    const handleRestart = useCallback(() => {
-        setIsPaused(false)
-        startGame(currentGame)
-    }, [currentGame, startGame])
+    const {
+        gameState,
+        currentGame,
+        score,
+        currentJoke,
+        playerName,
+        isPaused,
+        settings,
+        showSettings,
+        highScores,
+        isLoadingScores,
+        scoreError,
+        isSubmittingScore,
+        startGame,
+        endGame,
+        pauseGame,
+        resumeGame,
+        restartGame,
+        quitGame,
+        updateSettings,
+        toggleSettings,
+        setPlayerName,
+        submitScore,
+        fetchScores
+    } = useGame()
 
     return (
         <div className="game-container">
@@ -116,23 +89,23 @@ const App: React.FC = () => {
                         />
                     </div>
 
-                    <Button variant="icon" onClick={() => setShowSettings(true)} style={{ marginTop: '1rem' }}>
+                    <Button variant="icon" onClick={() => toggleSettings(true)} style={{ marginTop: '1rem' }}>
                         ⚙️ {t('menu.settings')}
                     </Button>
 
                     {showSettings && (
                         <GameSettings
                             settings={settings}
-                            onUpdate={setSettings}
-                            onClose={() => setShowSettings(false)}
+                            onUpdate={updateSettings}
+                            onClose={() => toggleSettings(false)}
                         />
                     )}
 
                     <div style={{ marginTop: '2rem' }}>
                         <Leaderboard
                             scores={highScores}
-                            isLoading={isLoading}
-                            error={error}
+                            isLoading={isLoadingScores}
+                            error={scoreError}
                             onRetry={fetchScores}
                         />
                     </div>
@@ -152,28 +125,28 @@ const App: React.FC = () => {
                 <>
                     {currentGame === 'snowball' && (
                         <SnowballHunt
-                            onGameOver={handleGameOver}
+                            onGameOver={endGame}
                             highScores={highScores}
                             settings={settings}
                             isPaused={isPaused}
-                            onPause={handlePause}
+                            onPause={pauseGame}
                         />
                     )}
                     {currentGame === 'gift-toss' && (
                         <GiftToss
-                            onGameOver={handleGameOver}
+                            onGameOver={endGame}
                             settings={settings}
                             isPaused={isPaused}
-                            onPause={handlePause}
+                            onPause={pauseGame}
                         />
                     )}
 
                     {isPaused && (
                         <Modal isOpen={true} title={t('common.pause')}>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%', alignItems: 'center' }}>
-                                <Button onClick={handleResume} style={{ width: '100%' }}>{t('common.continue')}</Button>
-                                <Button variant="secondary" onClick={handleRestart} style={{ width: '100%' }}>{t('common.restart')}</Button>
-                                <Button variant="secondary" onClick={handleQuit} style={{ width: '100%', border: '2px solid #ff6b6b', color: '#ff6b6b' }}>{t('common.exit')}</Button>
+                                <Button onClick={resumeGame} style={{ width: '100%' }}>{t('common.continue')}</Button>
+                                <Button variant="secondary" onClick={restartGame} style={{ width: '100%' }}>{t('common.restart')}</Button>
+                                <Button variant="secondary" onClick={quitGame} style={{ width: '100%', border: '2px solid #ff6b6b', color: '#ff6b6b' }}>{t('common.exit')}</Button>
                             </div>
                         </Modal>
                     )}
@@ -184,7 +157,7 @@ const App: React.FC = () => {
                 <Modal isOpen={true} title={t('game.newHighScore')}>
                     <div style={{ textAlign: 'center', width: '100%' }}>
                         <p style={{ fontSize: '1.5rem', margin: '1rem 0' }}>{t('game.yourScore')}: {score}</p>
-                        {error && (
+                        {scoreError && (
                             <div style={{
                                 background: 'rgba(255, 107, 107, 0.2)',
                                 border: '2px solid #ff6b6b',
@@ -193,7 +166,7 @@ const App: React.FC = () => {
                                 marginBottom: '1rem',
                                 color: '#ff6b6b'
                             }}>
-                                {error}
+                                {scoreError}
                             </div>
                         )}
                         <input
@@ -206,15 +179,15 @@ const App: React.FC = () => {
                                 setPlayerName(val);
                             }}
                             autoFocus
-                            disabled={isSubmitting}
+                            disabled={isSubmittingScore}
                         />
                         <br />
                         <Button
                             onPointerDown={submitScore}
-                            disabled={!playerName.trim() || isSubmitting}
-                            style={{ opacity: isSubmitting ? 0.6 : 1, marginTop: '1rem' }}
+                            disabled={!playerName.trim() || isSubmittingScore}
+                            style={{ opacity: isSubmittingScore ? 0.6 : 1, marginTop: '1rem' }}
                         >
-                            {isSubmitting ? t('common.saving') : t('common.submit')}
+                            {isSubmittingScore ? t('common.saving') : t('common.submit')}
                         </Button>
                     </div>
                 </Modal>
@@ -225,7 +198,7 @@ const App: React.FC = () => {
                     <div style={{ textAlign: 'center', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
                         <Leaderboard
                             scores={highScores}
-                            isLoading={isLoading}
+                            isLoading={isLoadingScores}
                         />
 
                         <Card className="joke-card" style={{ width: '100%' }}>
@@ -233,7 +206,7 @@ const App: React.FC = () => {
                             <p style={{ fontSize: '1rem', fontStyle: 'italic' }}>"{currentJoke}"</p>
                         </Card>
 
-                        <Button onPointerDown={() => setGameState('menu')}>{t('game.toMenu')}</Button>
+                        <Button onPointerDown={quitGame}>{t('game.toMenu')}</Button>
                     </div>
                 </Modal>
             )}

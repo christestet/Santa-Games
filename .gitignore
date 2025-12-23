@@ -27,3 +27,5 @@ CLAUDE.md
 
 scores.json
 .env
+
+spec/

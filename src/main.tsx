@@ -5,13 +5,16 @@ import App from './App.tsx'
 import { LanguageProvider } from '@components/LanguageContext.tsx'
 import { SoundProvider } from '@components/SoundContext.tsx'
 import { ThemeProvider } from '@components/ThemeContext.tsx'
+import { GameProvider } from '@components/GameContext.tsx'
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
         <ThemeProvider>
             <SoundProvider>
                 <LanguageProvider>
-                    <App />
+                    <GameProvider>
+                        <App />
+                    </GameProvider>
                 </LanguageProvider>
             </SoundProvider>
         </ThemeProvider>
