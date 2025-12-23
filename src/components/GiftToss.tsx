@@ -254,6 +254,7 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
                         soundManager.current?.playHit();
                         const pts = Math.max(10, Math.floor(50 - Math.abs(nextX - hitChimney.x) / 2));
                         stateRef.current.score += pts;
+                        setScore(prev => prev + pts);
                         addFloatingText(nextX, nextY, pts > 40 ? `${t("game.perfect")} +${pts}` : `+${pts}`, pts > 40 ? '#4caf50' : '#ffd700');
                         if (navigator.vibrate) navigator.vibrate(20);
                     } else {
