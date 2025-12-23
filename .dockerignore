@@ -1,0 +1,27 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Testing
+coverage
+spec
+test
+tests
+
+# Production
+dist
+build
+
+# Misc
+.DS_Store
+.env
+.git
+.gitignore
+README.md
+Dockerfile
+docker-compose.yml
+scores.json
+*.log
+.vscode
+.idea
