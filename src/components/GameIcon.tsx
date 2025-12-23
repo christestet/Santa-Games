@@ -57,23 +57,42 @@ const SPRITES: Record<GameIconName, SpriteDefinition> = {
     grinch: {
         content: (
             <>
-                <rect x="6" y="1" width="4" height="1" fill="#76FF03" />
-                <rect x="4" y="2" width="8" height="2" fill="#76FF03" />
-                <rect x="2" y="4" width="12" height="6" fill="#76FF03" />
-                <rect x="3" y="10" width="10" height="3" fill="#76FF03" />
-                <rect x="5" y="13" width="6" height="2" fill="#76FF03" />
+                {/* Base Head Shape & Skin (Lime Green) */}
+                <rect x="5" y="2" width="6" height="11" fill="#76FF03" />
+                <rect x="4" y="3" width="8" height="9" fill="#76FF03" />
+                <rect x="3" y="5" width="10" height="6" fill="#76FF03" />
+
+                {/* Texture/Fur shading (Darker Green) */}
+                <rect x="7" y="1" width="2" height="2" fill="#76FF03" /> {/* Top tuft base */}
+                <rect x="7" y="0" width="1" height="1" fill="#64DD17" /> {/* Tip */}
+
+                <rect x="3" y="7" width="1" height="2" fill="#33691E" opacity="0.3" /> {/* Left cheek shadow */}
+                <rect x="12" y="7" width="1" height="2" fill="#33691E" opacity="0.3" /> {/* Right cheek shadow */}
+                <rect x="5" y="13" width="6" height="1" fill="#33691E" opacity="0.5" /> {/* Chin shadow */}
+
+                {/* Facial Features */}
+                {/* Eyes: Yellow with pupils */}
                 <rect x="4" y="5" width="3" height="2" fill="#FFEB3B" />
                 <rect x="9" y="5" width="3" height="2" fill="#FFEB3B" />
-                <rect x="5" y="6" width="1" height="1" fill="black" />
-                <rect x="10" y="6" width="1" height="1" fill="black" />
+                <rect x="5" y="6" width="1" height="1" fill="#1B5E20" /> {/* Dark pupil */}
+                <rect x="10" y="6" width="1" height="1" fill="#1B5E20" />
+
+                {/* Eyebrows: Angry/Mischievous */}
                 <rect x="4" y="4" width="3" height="1" fill="#33691E" />
                 <rect x="9" y="4" width="3" height="1" fill="#33691E" />
+                <rect x="7" y="5" width="2" height="1" fill="#33691E" opacity="0.7" /> {/* Scowl */}
+
+                {/* Nose */}
                 <rect x="7" y="8" width="2" height="1" fill="#33691E" />
-                <rect x="3" y="11" width="1" height="1" fill="#33691E" />
-                <rect x="4" y="12" width="2" height="1" fill="#33691E" />
-                <rect x="6" y="11" width="4" height="1" fill="#33691E" />
-                <rect x="10" y="12" width="2" height="1" fill="#33691E" />
-                <rect x="12" y="11" width="1" height="1" fill="#33691E" />
+
+                {/* Grin: Wide */}
+                <rect x="4" y="10" width="1" height="1" fill="#33691E" />
+                <rect x="5" y="11" width="6" height="1" fill="#33691E" />
+                <rect x="11" y="10" width="1" height="1" fill="#33691E" />
+
+                {/* Smile lines */}
+                <rect x="3" y="9" width="1" height="1" fill="#33691E" opacity="0.6" />
+                <rect x="12" y="9" width="1" height="1" fill="#33691E" opacity="0.6" />
             </>
         )
     },
