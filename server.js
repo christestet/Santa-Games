@@ -282,11 +282,22 @@ app.use((err, req, res) => {
 const startServer = async () => {
   await initializeScores();
 
+  let version = "unknown";
+  try {
+    const packageJson = JSON.parse(
+      await fsPromises.readFile(path.join(__dirname, "package.json"), "utf8")
+    );
+    version = packageJson.version;
+  } catch (err) {
+    console.warn("⚠️ Could not read package.json version");
+  }
+
   const server = app.listen(PORT, "0.0.0.0", () => {
     console.log(
       `\x1b[32m%s\x1b[0m`,
       `🎅 Ho ho ho! Santa's Score Server is up and running!`
     );
+    console.log(`📦 Version: ${version}`);
     console.log(
       `🎄 Leaderboard available at: http://localhost:${PORT}/api/scores`
     );
