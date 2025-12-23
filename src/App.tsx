@@ -73,7 +73,7 @@ const App: React.FC = () => {
                     <h1>
                         {theme === 'grinch' ? (
                             <>
-                                {t('menu.grinchTitle')} <GameIcon name="grinch" size={24} style={{ display: 'inline-block', verticalAlign: 'middle', marginLeft: '8px' }} />
+                                {t('menu.grinchTitle')}
                             </>
                         ) : t('menu.title')}
                     </h1>

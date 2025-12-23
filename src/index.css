@@ -21,7 +21,7 @@
 
 /* SANTA MODE (Light/Retro) */
 .classic-theme {
-  --bg-color: #f0f0f0;
+  --bg-color: #bbb9b9;
   --bg-pattern: #ffe0e0; /* Faint red pattern */
   --text-main: #2a2a2a;
   --text-accent: #d32f2f; /* Santa Red */
