@@ -305,22 +305,122 @@ const SPRITES: Record<GameIconName, SpriteDefinition> = {
     sound_on: {
         content: (
             <>
+                {/* Speaker cone - dark outline */}
+                <rect x="1" y="5" width="1" height="6" fill="#212121" />
+                <rect x="2" y="5" width="3" height="1" fill="#212121" />
+                <rect x="2" y="10" width="3" height="1" fill="#212121" />
+                <rect x="5" y="3" width="3" height="1" fill="#212121" />
+                <rect x="5" y="12" width="3" height="1" fill="#212121" />
+                <rect x="8" y="4" width="1" height="8" fill="#212121" />
+
+                {/* Speaker cone - main body */}
                 <rect x="2" y="6" width="3" height="4" fill="#757575" />
                 <rect x="5" y="4" width="3" height="8" fill="#757575" />
+
+                {/* Speaker cone - highlights for depth */}
+                <rect x="2" y="6" width="1" height="2" fill="#9E9E9E" opacity="0.8" />
+                <rect x="5" y="4" width="1" height="3" fill="#9E9E9E" opacity="0.6" />
+
+                {/* Speaker cone - shadows */}
+                <rect x="4" y="8" width="1" height="2" fill="#424242" opacity="0.6" />
+                <rect x="7" y="9" width="1" height="3" fill="#424242" opacity="0.5" />
+
+                {/* Sound wave 1 - outline */}
+                <rect x="9" y="4" width="1" height="1" fill="#212121" />
+                <rect x="9" y="11" width="1" height="1" fill="#212121" />
+                <rect x="10" y="5" width="1" height="6" fill="#212121" />
+
+                {/* Sound wave 1 - fill */}
                 <rect x="9" y="5" width="1" height="6" fill="#757575" />
+
+                {/* Sound wave 2 - outline */}
+                <rect x="11" y="2" width="1" height="1" fill="#212121" />
+                <rect x="11" y="13" width="1" height="1" fill="#212121" />
+                <rect x="12" y="3" width="1" height="10" fill="#212121" />
+
+                {/* Sound wave 2 - fill */}
                 <rect x="11" y="3" width="1" height="10" fill="#757575" />
+
+                {/* Sound wave 3 - outline */}
+                <rect x="13" y="0" width="1" height="1" fill="#212121" />
+                <rect x="13" y="15" width="1" height="1" fill="#212121" />
+                <rect x="14" y="1" width="1" height="14" fill="#212121" />
+
+                {/* Sound wave 3 - fill */}
                 <rect x="13" y="1" width="1" height="14" fill="#757575" />
+
+                {/* Wave highlights for dimension */}
+                <rect x="9" y="5" width="1" height="2" fill="#9E9E9E" opacity="0.7" />
+                <rect x="11" y="3" width="1" height="3" fill="#9E9E9E" opacity="0.6" />
+                <rect x="13" y="1" width="1" height="4" fill="#9E9E9E" opacity="0.5" />
             </>
         )
     },
     sound_off: {
         content: (
             <>
+                {/* Speaker cone - dark outline */}
+                <rect x="1" y="5" width="1" height="6" fill="#212121" />
+                <rect x="2" y="5" width="3" height="1" fill="#212121" />
+                <rect x="2" y="10" width="3" height="1" fill="#212121" />
+                <rect x="5" y="3" width="3" height="1" fill="#212121" />
+                <rect x="5" y="12" width="3" height="1" fill="#212121" />
+                <rect x="8" y="4" width="1" height="8" fill="#212121" />
+
+                {/* Speaker cone - main body (muted grey) */}
                 <rect x="2" y="6" width="3" height="4" fill="#9E9E9E" />
                 <rect x="5" y="4" width="3" height="8" fill="#9E9E9E" />
-                <rect x="10" y="5" width="1" height="6" fill="#D32F2F" transform="rotate(45 10.5 8)" />
-                <rect x="10" y="5" width="1" height="6" fill="#D32F2F" transform="rotate(-45 10.5 8)" />
-                <path d="M 9 5 L 14 11 M 14 5 L 9 11" stroke="#D32F2F" strokeWidth="1.5" />
+
+                {/* Speaker cone - highlights */}
+                <rect x="2" y="6" width="1" height="2" fill="#BDBDBD" opacity="0.7" />
+                <rect x="5" y="4" width="1" height="3" fill="#BDBDBD" opacity="0.5" />
+
+                {/* Speaker cone - shadows */}
+                <rect x="4" y="8" width="1" height="2" fill="#616161" opacity="0.6" />
+                <rect x="7" y="9" width="1" height="3" fill="#616161" opacity="0.5" />
+
+                {/* X mark - black outline for crisp definition */}
+                <rect x="9" y="4" width="1" height="1" fill="#000000" />
+                <rect x="10" y="5" width="1" height="1" fill="#000000" />
+                <rect x="11" y="6" width="1" height="1" fill="#000000" />
+                <rect x="12" y="7" width="1" height="1" fill="#000000" />
+                <rect x="13" y="8" width="1" height="1" fill="#000000" />
+                <rect x="12" y="9" width="1" height="1" fill="#000000" />
+                <rect x="11" y="10" width="1" height="1" fill="#000000" />
+                <rect x="10" y="11" width="1" height="1" fill="#000000" />
+                <rect x="9" y="12" width="1" height="1" fill="#000000" />
+
+                <rect x="13" y="4" width="1" height="1" fill="#000000" />
+                <rect x="12" y="5" width="1" height="1" fill="#000000" />
+                <rect x="11" y="6" width="1" height="1" fill="#000000" />
+                <rect x="10" y="7" width="1" height="1" fill="#000000" />
+                <rect x="9" y="8" width="1" height="1" fill="#000000" />
+                <rect x="10" y="9" width="1" height="1" fill="#000000" />
+                <rect x="11" y="10" width="1" height="1" fill="#000000" />
+                <rect x="12" y="11" width="1" height="1" fill="#000000" />
+                <rect x="13" y="12" width="1" height="1" fill="#000000" />
+
+                {/* X mark - red fill (slightly inset from outline) */}
+                <rect x="10" y="5" width="1" height="1" fill="#D32F2F" />
+                <rect x="11" y="6" width="1" height="1" fill="#D32F2F" />
+                <rect x="12" y="7" width="1" height="1" fill="#D32F2F" />
+                <rect x="11" y="8" width="1" height="1" fill="#D32F2F" />
+                <rect x="12" y="9" width="1" height="1" fill="#D32F2F" />
+                <rect x="11" y="10" width="1" height="1" fill="#D32F2F" />
+                <rect x="10" y="11" width="1" height="1" fill="#D32F2F" />
+
+                <rect x="12" y="5" width="1" height="1" fill="#D32F2F" />
+                <rect x="11" y="6" width="1" height="1" fill="#D32F2F" />
+                <rect x="10" y="7" width="1" height="1" fill="#D32F2F" />
+                <rect x="11" y="8" width="1" height="1" fill="#D32F2F" />
+                <rect x="10" y="9" width="1" height="1" fill="#D32F2F" />
+                <rect x="11" y="10" width="1" height="1" fill="#D32F2F" />
+                <rect x="12" y="11" width="1" height="1" fill="#D32F2F" />
+
+                {/* X mark - highlights for shine */}
+                <rect x="10" y="5" width="1" height="1" fill="#EF5350" opacity="0.8" />
+                <rect x="12" y="5" width="1" height="1" fill="#EF5350" opacity="0.8" />
+                <rect x="11" y="6" width="1" height="1" fill="#EF5350" opacity="0.6" />
             </>
         )
     },
