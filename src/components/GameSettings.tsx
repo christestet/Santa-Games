@@ -34,7 +34,7 @@ export default function GameSettings({ settings, onUpdate, onClose }: GameSettin
         <Modal isOpen={true} onClose={onClose} title={t('settings.title')}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'center', width: '100%' }}>
                 <label style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>
-                    {t('settings.duration')}: <span style={{ color: 'var(--warm-gold)', fontSize: '1.4rem' }}>{formatTime(settings.TIMER)}</span>
+                    {t('settings.duration')}: <span style={{ color: 'var(--primary-color)', fontSize: '1.4rem' }}>{formatTime(settings.TIMER)}</span>
                 </label>
 
                 <input
@@ -56,7 +56,7 @@ export default function GameSettings({ settings, onUpdate, onClose }: GameSettin
                             onClick={() => handleTimerChange(p)}
                             style={{
                                 opacity: settings.TIMER === p ? 1 : 0.6,
-                                border: settings.TIMER === p ? '2px solid var(--warm-gold)' : '1px solid var(--antique-gold)'
+                                border: settings.TIMER === p ? '4px solid var(--primary-color)' : 'var(--border-width) solid var(--card-border)'
                             }}
                         >
                             {p}s
@@ -64,7 +64,7 @@ export default function GameSettings({ settings, onUpdate, onClose }: GameSettin
                     ))}
                 </div>
 
-                <div style={{ width: '100%', height: '1px', background: 'var(--antique-gold)', opacity: 0.3, margin: '1rem 0' }} />
+                <div style={{ width: '100%', height: '4px', background: 'var(--card-border)', opacity: 0.3, margin: '1rem 0' }} />
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', padding: '0 1rem' }}>
                     <label style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>{t('settings.sound')}</label>

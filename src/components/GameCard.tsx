@@ -29,7 +29,7 @@ const GameCard: React.FC<GameCardProps> = ({ title, icon, instructions, onPlay }
                         <button className="btn-small">{t('menu.play')}</button>
                         <button
                             className="btn-small"
-                            style={{ background: 'transparent', border: '1px solid var(--antique-gold)', color: 'var(--antique-gold)' }}
+                            style={{ background: 'transparent', border: 'var(--border-width) solid var(--card-border)', color: 'var(--card-border)' }}
                             onClick={handleFlip}
                         >
                             {t('menu.info')}
@@ -39,7 +39,7 @@ const GameCard: React.FC<GameCardProps> = ({ title, icon, instructions, onPlay }
 
                 {/* Back Side */}
                 <div className="game-card-back">
-                    <h3 style={{ fontFamily: 'var(--font-festive)', color: 'var(--warm-gold)', margin: 0 }}>{title}</h3>
+                    <h3 style={{ fontFamily: 'var(--font-retro)', color: 'var(--primary-color)', margin: 0 }}>{title}</h3>
                     <p className="instruction-text">{instructions}</p>
                     <button className="btn-small" onClick={handleFlip}>
                         {t('common.back')}

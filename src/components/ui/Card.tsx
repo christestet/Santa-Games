@@ -12,12 +12,12 @@ export const Card: React.FC<CardProps> = ({ title, className = '', children, sty
         <div className={`frost-card ${className}`} style={style}>
             {title && (
                 <h2 style={{
-                    fontFamily: 'var(--font-festive)',
-                    color: 'var(--warm-gold)',
+                    fontFamily: 'var(--font-retro)',
+                    color: 'var(--primary-color)',
                     margin: '0 0 1rem 0',
                     fontSize: '2rem',
                     textAlign: 'center',
-                    borderBottom: '2px solid var(--antique-gold)',
+                    borderBottom: '4px solid var(--card-border)',
                     paddingBottom: '0.5rem'
                 }}>
                     {title}

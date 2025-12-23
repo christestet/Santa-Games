@@ -45,7 +45,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
                 scores.slice(0, limit).map((s, i) => (
                     <div key={i} className="score-row">
                         <span>{i + 1}. {s.name}</span>
-                        <span style={{ color: 'var(--christmas-gold)' }}>{s.score}</span>
+                        <span style={{ color: 'var(--accent-color)' }}>{s.score}</span>
                     </div>
                 ))
             )}

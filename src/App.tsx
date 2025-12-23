@@ -48,19 +48,23 @@ const App: React.FC = () => {
             <Snow />
 
             {gameState === 'menu' && (
-                <div style={{ textAlign: 'center', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', width: '90%' }}>
-                    <div style={{ position: 'absolute', top: '1rem', right: '1rem', display: 'flex', gap: '0.5rem' }}>
+                <div className="menu-container">
+                    <div className="top-bar">
                         <Button
                             variant="icon"
                             onClick={() => setLanguage(language === 'de' ? 'en' : 'de')}
-                            style={{ fontSize: '1.5rem', background: 'rgba(255,255,255,0.1)', padding: '0.5rem' }}
                         >
                             {language === 'de' ? '🇺🇸' : '🇩🇪'}
                         </Button>
                         <Button
                             variant="icon"
+                            onClick={() => toggleSettings(true)}
+                        >
+                            ⚙️
+                        </Button>
+                        <Button
+                            variant="icon"
                             onClick={toggleTheme}
-                            style={{ fontSize: '1.5rem', background: 'rgba(255,255,255,0.1)', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                         >
                             {theme === 'classic' ? '🎅' : <img src={grinchIcon} alt="Grinch" style={{ width: '1.5em', height: '1.5em' }} />}
                         </Button>
@@ -68,9 +72,9 @@ const App: React.FC = () => {
 
                     <h1>
                         {theme === 'grinch' ? (
-                            <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
-                                {t('menu.grinchTitle')} <img src={grinchIcon} alt="Grinch" style={{ width: '0.8em', height: '0.8em' }} />
-                            </span>
+                            <>
+                                {t('menu.grinchTitle')} <img src={grinchIcon} alt="Grinch" style={{ width: '0.8em', height: '0.8em', verticalAlign: 'middle' }} />
+                            </>
                         ) : t('menu.title')}
                     </h1>
 
@@ -89,9 +93,7 @@ const App: React.FC = () => {
                         />
                     </div>
 
-                    <Button variant="icon" onClick={() => toggleSettings(true)} style={{ marginTop: '1rem' }}>
-                        ⚙️ {t('menu.settings')}
-                    </Button>
+
 
                     {showSettings && (
                         <GameSettings
@@ -101,7 +103,7 @@ const App: React.FC = () => {
                         />
                     )}
 
-                    <div style={{ marginTop: '2rem' }}>
+                    <div style={{ marginTop: '2rem', width: '100%' }}>
                         <Leaderboard
                             scores={highScores}
                             isLoading={isLoadingScores}
@@ -110,12 +112,7 @@ const App: React.FC = () => {
                         />
                     </div>
 
-                    <div style={{
-                        marginTop: '2rem',
-                        opacity: 0.5,
-                        fontSize: '0.8rem',
-                        fontFamily: 'monospace'
-                    }}>
+                    <div className="version-tag">
                         v{pkg.version}
                     </div>
                 </div>
@@ -202,7 +199,7 @@ const App: React.FC = () => {
                         />
 
                         <Card className="joke-card" style={{ width: '100%' }}>
-                            <h2 style={{ fontFamily: 'var(--font-festive)', color: 'var(--warm-gold)', margin: '0', fontSize: '1.5rem' }}>{t('game.jokeTitle')}</h2>
+                            <h2 style={{ fontFamily: 'var(--font-retro)', color: 'var(--primary-color)', margin: '0', fontSize: '1.5rem' }}>{t('game.jokeTitle')}</h2>
                             <p style={{ fontSize: '1rem', fontStyle: 'italic' }}>"{currentJoke}"</p>
                         </Card>
 

@@ -248,7 +248,7 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
             case 'gold':
                 points = settings.POINTS.BONUS
                 text = `MEGA +${points}!`
-                color = 'var(--christmas-gold)'
+                color = 'var(--accent-color)'
                 break
             case 'time':
                 setTimeLeft(t => t + 5)

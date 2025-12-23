@@ -6,63 +6,93 @@
 }
 
 :root {
-  --font-festive: 'JetBrains Mono', monospace;
-  --font-main: 'JetBrains Mono', monospace;
-  transition: all 0.3s ease;
+  --font-retro: 'JetBrains Mono', monospace;
+  
+  /* Retro Pixel Spacing/Sizing */
+  --border-width: 4px;
+  --pixel-size: 4px;
+  
+  transition: background-color 0s, color 0s; /* Retro snaps, no smooth fades for theme */
 }
 
+/* =========================================
+   THEMES
+   ========================================= */
+
+/* SANTA MODE (Light/Retro) */
 .classic-theme {
-  --cozy-red: #ffb700; /* Swapped: Was Gold, now Red (Background) - wait, user said background should be gold */
-  --velvet-red: #d4af37; /* Swapped: Was Antique Gold, now Red (Background) */
-  --warm-gold: #8b0000; /* Swapped: Was Red, now Gold (Font) */
-  --antique-gold: #580000; /* Swapped: Was Velvet Red, now Gold (Font) */
-  --cream-white: #ffffff;
-  --fireplace-glow: rgba(139, 0, 0, 0.4);
-  --christmas-gold: #8b0000;
-  --bg-gradient: radial-gradient(circle at center, #ffb700, #b8860b);
-  --card-bg: rgba(255, 253, 208, 0.95);
-  --card-bg-glass: rgba(255, 253, 208, 0.85);
-  --game-card-front: rgba(255, 183, 0, 0.8);
-  --game-card-back: rgba(255, 253, 208, 1);
-  --btn-text: #ffffff;
-  --input-bg: rgba(255, 255, 255, 0.4);
+  --bg-color: #f0f0f0;
+  --bg-pattern: #ffe0e0; /* Faint red pattern */
+  --text-main: #2a2a2a;
+  --text-accent: #d32f2f; /* Santa Red */
+
+  --primary-color: #d32f2f; /* Red */
+  --secondary-color: #388e3c; /* Green */
+  --accent-color: #fbc02d; /* Gold */
+
+  --card-bg: #ffffff;
+  --card-border: #2a2a2a;
+  --text-stroke: #2a2a2a; /* Dark stroke for text outlines */
+  
+  --btn-primary-bg: #d32f2f;
+  --btn-primary-text: #ffffff;
+  --btn-primary-shadow: #8b0000;
+  
+  --btn-secondary-bg: #388e3c;
+  --btn-secondary-text: #ffffff;
+  --btn-secondary-shadow: #1b5e20;
+
+  --input-bg: #ffffff;
+  --input-border: #2a2a2a;
+  --input-text: #2a2a2a;
 }
 
+/* GRINCH MODE (Dark/Terminal) */
 .grinch-theme {
-  --cozy-red: #000000; /* Pure Black Background */
-  --velvet-red: #050505; /* Very Dark Grey */
-  --warm-gold: #00ff00; /* Terminal Green */
-  --antique-gold: #00cc00; /* Darker Terminal Green */
-  --cream-white: #ccffcc; /* Pale Terminal Green Text */
-  --fireplace-glow: rgba(0, 255, 0, 0.2);
-  --christmas-gold: #00ff00;
-  --bg-gradient: linear-gradient(to bottom, #001100, #000000);
-  --card-bg: rgba(0, 20, 0, 0.95);
-  --card-bg-glass: rgba(0, 20, 0, 0.9);
-  --game-card-front: rgba(0, 30, 0, 0.95);
-  --game-card-back: #000000;
-  --btn-text: #000000;
+  --bg-color: #000000;
+  --bg-pattern: #0a2a0a; /* Faint green pattern */
+  --text-main: #33ff33; /* Terminal Green */
+  --text-accent: #ff3333; /* Dark Red */
+
+  --primary-color: #33ff33;
+  --secondary-color: #006600;
+  --accent-color: #ccffcc;
+
+  --card-bg: #0a0a0a;
+  --card-border: #33ff33;
+  --text-stroke: #000000; /* Dark stroke for text outlines */
+  
+  --btn-primary-bg: #006600;
+  --btn-primary-text: #33ff33;
+  --btn-primary-shadow: #003300;
+  
+  --btn-secondary-bg: #333333;
+  --btn-secondary-text: #ffffff;
+  --btn-secondary-shadow: #111111;
+
   --input-bg: #001100;
-  --accent-purple: #00ff00;
+  --input-border: #33ff33;
+  --input-text: #33ff33;
 }
+
+/* =========================================
+   GLOBAL RESET & BASE
+   ========================================= */
 
 body {
   margin: 0;
   padding: 0;
-  background-color: var(--velvet-red);
-  background-image: var(--bg-gradient);
-  color: var(--cream-white);
-  font-family: var(--font-main);
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  font-family: var(--font-retro);
   height: 100vh;
   width: 100vw;
   overflow: hidden;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  touch-action: none;
-  position: fixed;
+  image-rendering: pixelated; /* Crucial for retro feel */
+  user-select: none;
 }
 
+/* Retro Background Pattern */
 body::before {
   content: "";
   position: absolute;
@@ -71,430 +101,154 @@ body::before {
   width: 100%;
   height: 100%;
   background-image: 
-    radial-gradient(var(--warm-gold) 1px, transparent 1px),
-    radial-gradient(var(--warm-gold) 1px, transparent 1px);
-  background-size: 50px 50px;
-  background-position: 0 0, 25px 25px;
-  opacity: 0.1;
-  pointer-events: none;
+    linear-gradient(45deg, var(--bg-pattern) 25%, transparent 25%, transparent 75%, var(--bg-pattern) 75%, var(--bg-pattern)),
+    linear-gradient(45deg, var(--bg-pattern) 25%, transparent 25%, transparent 75%, var(--bg-pattern) 75%, var(--bg-pattern));
+  background-size: 20px 20px;
+  background-position: 0 0, 10px 10px;
+  opacity: 0.2;
   z-index: -1;
 }
 
-#root {
-  width: 100%;
-}
+/* =========================================
+   CONTAINERS & LAYOUT
+   ========================================= */
+
+#root { width: 100%; height: 100%; }
 
 .game-container {
   width: 100%;
   height: 100%;
-  position: relative;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border: 4px solid var(--antique-gold);
-  box-shadow: 
-    inset 0 0 100px var(--velvet-red),
-    0 0 30px var(--fireplace-glow);
-  box-sizing: border-box;
-  z-index: 1;
+  position: relative;
 }
 
-.snow-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 5;
-  overflow: hidden;
-}
-
-.snowflake {
-  position: absolute;
-  top: -2rem;
-  color: white;
-  user-select: none;
-  pointer-events: none;
-  animation: fall linear infinite;
-}
-
-@keyframes fall {
-  0% {
-    transform: translateY(0) rotate(0deg);
-  }
-  100% {
-    transform: translateY(110vh) rotate(360deg);
-  }
-}
-
-.frost-card, .leaderboard {
+/* Retro Card / Container Style */
+.frost-card, .leaderboard, .game-card-front, .game-card-back {
   background: var(--card-bg);
-  border: 2px solid var(--antique-gold);
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-  border-radius: 12px;
+  border: var(--border-width) solid var(--card-border);
+  box-shadow: 8px 8px 0 rgba(0,0,0,0.2); /* Hard shadow */
   padding: 1.5rem;
-  width: 90%;
-  max-width: 450px;
-  z-index: 10;
+  box-sizing: border-box;
+  /* Pixel corners approximation */
+  position: relative;
 }
 
-@media (min-width: 1024px) {
-  .frost-card, .leaderboard {
-    background: var(--card-bg-glass);
-    backdrop-filter: blur(8px);
-  }
+/* Leaderboard Specifics */
+/* Leaderboard Specifics */
+.leaderboard {
+  width: 90%;
+  max-width: 800px;
+  margin: 1rem auto;
+}
+
+.menu-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+/* =========================================
+   TYPOGRAPHY
+   ========================================= */
+
+h1, h2, h3 {
+  font-family: var(--font-retro);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin: 0 0 1rem 0;
 }
 
 h1 {
-  font-family: var(--font-festive);
-  font-size: clamp(2.5rem, 8vw, 5rem);
-  color: var(--warm-gold);
-  text-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
-  margin-bottom: 0.5rem;
-  z-index: 10;
-  line-height: 1.1;
-  letter-spacing: 2px;
+  font-size: clamp(2rem, 5vw, 4rem);
+  text-shadow: 4px 4px 0 rgba(0,0,0,1); /* Retro Hard Shadow */
+  color: var(--primary-color);
+  font-weight: bold;
+}
+
+/* =========================================
+   COMPONENTS
+   ========================================= */
+
+/* Buttons */
+.btn-start, .btn-small {
+  font-family: var(--font-retro);
+  border: var(--border-width) solid var(--card-border);
+  cursor: pointer;
+  text-transform: uppercase;
+  font-weight: bold;
+  position: relative;
+  transition: transform 0.1s;
+  /* Pixel look */
+  box-shadow: 4px 4px 0 rgba(0,0,0,1);
 }
 
 .btn-start {
-  font-family: var(--font-main);
-  background: linear-gradient(to bottom, var(--warm-gold), var(--antique-gold));
-  color: var(--btn-text);
-  border: 1px solid #ffd700;
-  border-radius: 8px;
-  padding: clamp(0.8rem, 2vw, 1rem) clamp(1.5rem, 4vw, 3rem);
-  font-size: clamp(1.2rem, 4vw, 2rem);
-  font-weight: 800;
-  cursor: pointer;
+  background-color: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+  padding: 1rem 2rem;
+  font-size: 1.5rem;
+}
+
+.btn-small {
+  background-color: var(--btn-secondary-bg);
+  color: var(--btn-secondary-text);
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  min-width: 44px;
   min-height: 44px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.4);
-  z-index: 10;
-  user-select: none;
-  text-transform: uppercase;
-  letter-spacing: 3px;
-  margin-top: 1rem;
 }
 
-.btn-start:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(255, 183, 0, 0.3), inset 0 1px 0 rgba(255,255,255,0.4);
-  filter: brightness(1.1);
+.btn-start:active, .btn-small:active {
+  transform: translate(4px, 4px);
+  box-shadow: none;
 }
 
-.btn-start:active {
-  transform: scale(0.95);
-  filter: brightness(0.85);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-}
-
-.score-display, .timer-display {
-  position: absolute;
-  top: 1.5rem;
-  font-size: clamp(1rem, 3vw, 2.2rem);
-  font-weight: 900;
-  z-index: 20;
-  padding: 0.5rem 1.2rem;
-  border-radius: 8px;
-  background: rgba(0, 0, 0, 0.6);
-  border: 1px solid var(--antique-gold);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-}
-
-.score-display {
-  top: calc(1.5rem + env(safe-area-inset-top));
-  right: calc(1.5rem + env(safe-area-inset-right));
-  color: var(--warm-gold);
-}
-
-.timer-display {
-  top: calc(1.5rem + env(safe-area-inset-top));
-  left: calc(1.5rem + env(safe-area-inset-left));
-  color: var(--cream-white);
-}
-
-.timer-pulse {
-  animation: pulse-gold 1s infinite;
-  color: #ff6b6b;
-  border-color: #ff6b6b;
-}
-
-@keyframes pulse-gold {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
-}
-
-.target {
-  position: absolute;
-  cursor: pointer;
-  z-index: 15;
-  touch-action: none;
-  user-select: none;
-  will-change: transform, opacity;
-}
-
-.target-bubble {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.1));
-    border: 2px solid rgba(255, 255, 255, 0.5);
-    box-shadow:
-        inset 0 0 10px rgba(255, 255, 255, 0.3),
-        0 4px 10px rgba(0, 0, 0, 0.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    position: relative;
-    animation: pop-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.target-bubble::after {
-    content: "";
-    position: absolute;
-    top: 15%;
-    left: 15%;
-    width: 25%;
-    height: 15%;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.6);
-    filter: blur(2px);
-    transform: rotate(-45deg);
-}
-
-@keyframes pop-in {
-    0% { transform: scale(0); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
-}
-
-.target-inner {
-  font-size: 3.5rem;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
-  transition: transform 0.1s;
-  z-index: 2;
-}
-
-.target-inner:active {
-  transform: scale(0.9);
-  filter: brightness(0.9);
-}
-
-.combo-container {
-    position: absolute;
-    bottom: 2rem;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 300px;
-    height: 10px;
-    background: rgba(0,0,0,0.5);
-    border-radius: 10px;
-    border: 1px solid var(--antique-gold);
-    overflow: hidden;
-    z-index: 20;
-}
-
-.combo-bar {
-    height: 100%;
-    background: linear-gradient(90deg, var(--warm-gold), #ff4d4d);
-    transition: width 0.3s ease-out;
-    box-shadow: 0 0 10px var(--warm-gold);
-}
-
-.combo-display {
-    position: absolute;
-    top: calc(6rem + env(safe-area-inset-top));
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 1.5rem;
-    font-weight: 900;
-    color: var(--warm-gold);
-    z-index: 20;
-    padding: 0.5rem 1rem;
-    background: rgba(0, 0, 0, 0.6);
-    border: 2px solid var(--warm-gold);
-    border-radius: 8px;
-    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
-}
-
-.combo-shake {
-    animation: shake-combo 0.3s ease-in-out;
-}
-
-@keyframes shake-combo {
-    0%, 100% { transform: translateX(-50%) rotate(0deg); }
-    25% { transform: translateX(-50%) rotate(-5deg); }
-    75% { transform: translateX(-50%) rotate(5deg); }
-}
-
-.frozen-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 100;
-    box-shadow: inset 0 0 100px #a5f2f3;
-    border: 20px solid rgba(165, 242, 243, 0.3);
-    animation: freeze-in 0.5s ease-out;
-}
-
-@media (min-width: 1024px) {
-    .frozen-overlay {
-        backdrop-filter: blur(2px);
-    }
-}
-
-@keyframes freeze-in {
-    from { opacity: 0; transform: scale(1.1); }
-    to { opacity: 1; transform: scale(1); }
-}
-
-/* Varied Particles */
-.particle-gift { background: #ff4d4d; box-shadow: 0 0 5px #ff4d4d; }
-.particle-gold { background: var(--warm-gold); box-shadow: 0 0 8px var(--warm-gold); }
-.particle-coal { background: #333; box-shadow: 0 0 2px #888; border: 1px solid #555; border-radius: 2px; }
-.particle-ice { background: #a5f2f3; box-shadow: 0 0 5px #fff; }
-.particle-time { background: #4caf50; }
-
-.leaderboard h2 {
-  font-family: var(--font-festive);
-  margin: 0;
-  border-bottom: 2px solid var(--antique-gold);
-  padding-bottom: 0.5rem;
-  font-size: 2.5rem;
-  color: var(--warm-gold);
-  text-align: center;
-}
-
-.score-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 0.8rem 0;
-  border-bottom: 1px dashed rgba(212, 175, 55, 0.3);
-  font-size: 1.3rem;
-  font-weight: 500;
-  color: var(--cream-white);
-}
-
+/* Inputs */
 .arcade-input {
   background: var(--input-bg);
-  border: 2px solid var(--antique-gold);
-  border-radius: 8px;
-  color: var(--warm-gold);
-  font-family: var(--font-main);
-  font-weight: bold;
-  font-size: 2.5rem;
+  border: var(--border-width) solid var(--input-border);
+  color: var(--input-text);
+  font-family: var(--font-retro);
+  font-size: 2rem;
+  padding: 0.5rem;
   text-align: center;
   width: 90%;
-  padding: 0.5rem;
   outline: none;
-  margin: 1.5rem 0;
-  text-transform: uppercase;
-  letter-spacing: 3px;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: inset 4px 4px 0 rgba(0,0,0,0.1);
 }
 
-/* Animations */
-@keyframes floatUp {
-  0% { transform: translateY(0) scale(0.8); opacity: 0; }
-  10% { transform: translateY(-10px) scale(1.1); opacity: 1; }
-  80% { opacity: 1; }
-  100% { transform: translateY(-80px) scale(1); opacity: 0; }
-}
+/* =========================================
+   GAME ELEMENTS
+   ========================================= */
 
-.floating-text {
-  position: absolute;
-  font-family: var(--font-main);
-  font-weight: 900;
-  pointer-events: none;
-  z-index: 30;
-  animation: floatUp 2s ease-out forwards;
-  text-shadow: 0 2px 5px rgba(0,0,0,0.5);
-  will-change: transform, opacity;
-}
-
-.target-coal .target-inner {
-  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.4)) brightness(1.2);
-}
-
-.particle {
-  position: absolute;
-  width: 6px;
-  height: 6px;
-  background: var(--warm-gold);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 25;
-  box-shadow: 0 0 5px var(--warm-gold);
-  animation: pop-particle 0.6s ease-out forwards;
-  will-change: transform, opacity;
-}
-
-@keyframes pop-particle {
-  0% { transform: translate(0, 0) scale(1); opacity: 1; }
-  100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
-}
-
-/* Game Selection */
 .game-selection {
   display: flex;
-  gap: 1.5rem;
+  gap: 2rem;
   justify-content: center;
   flex-wrap: wrap;
   width: 100%;
   max-width: 800px;
   z-index: 10;
-  margin-top: 2rem;
 }
 
-.game-card {
-  flex: 1;
-  min-width: 250px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s;
-  cursor: pointer;
-  background: var(--game-card-front);
-  border: 3px solid var(--antique-gold);
-  position: relative;
-  overflow: hidden;
-}
-
-.game-card:hover {
-  transform: translateY(-10px) scale(1.05);
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6), 0 0 20px var(--fireplace-glow);
-  background: var(--cozy-red);
-}
-
-.game-card:active {
-  transform: translateY(-5px) scale(1.02);
-  filter: brightness(0.9);
-}
-
-/* 3D Flip Styles */
+/* Game Cards */
 .game-card-container {
   perspective: 1000px;
-  flex: 1;
-  min-width: 250px;
-  height: 350px; /* Fixed height for better flip */
+  width: 250px;
+  height: 350px;
+  cursor: pointer;
 }
 
 .game-card-inner {
   position: relative;
   width: 100%;
   height: 100%;
-  text-align: center;
-  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.6s;
   transform-style: preserve-3d;
-  cursor: pointer;
 }
 
 .game-card-container.is-flipped .game-card-inner {
@@ -505,351 +259,607 @@ h1 {
   position: absolute;
   width: 100%;
   height: 100%;
-  -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
-  padding: 1.5rem;
-  box-sizing: border-box;
-  border-radius: 12px;
-  border: 3px solid var(--antique-gold);
-}
-
-.game-card-front {
-  background: var(--game-card-front);
 }
 
 .game-card-back {
-  background: var(--game-card-back);
   transform: rotateY(180deg);
-  justify-content: space-between;
-}
-
-.instruction-text {
-    font-size: 1.1rem;
-    line-height: 1.5;
-    color: var(--warm-gold); /* Using the new red color for readability */
-    opacity: 0.9;
-    margin: 1rem 0;
 }
 
 .game-icon {
-  font-size: 4.5rem;
-  filter: drop-shadow(0 5px 15px rgba(0,0,0,0.4));
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  filter: drop-shadow(4px 4px 0 rgba(0,0,0,0.3));
 }
 
-.game-card h3 {
-  font-family: var(--font-festive);
-  font-size: 2.2rem;
-  margin: 0;
-  color: var(--warm-gold); /* This is now red */
+.instruction-text {
+    font-size: 1rem;
+    line-height: 1.4;
+    text-align: center;
 }
 
-.btn-small {
-  background: var(--antique-gold);
-  color: var(--velvet-red);
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 20px;
-  font-weight: 900;
-  font-size: 1.1rem;
-  letter-spacing: 1px;
-  min-width: 44px;
-  min-height: 44px;
-  cursor: pointer;
-  transition: transform 0.2s ease, filter 0.2s ease;
-}
+/* =========================================
+   HUD & IN-GAME
+   ========================================= */
 
-.btn-small:active {
-  transform: scale(0.95);
-  filter: brightness(0.85);
-}
-
-/* Common Game Area */
-.game-area {
-  width: 100vw;
-  height: 100vh;
-  position: relative;
-  overflow: hidden;
-}
-
-/* Gift Toss Specific */
-.gift-toss {
-  background: linear-gradient(to bottom, #00122e, #002d5e);
-}
-
-.chimney {
+.score-display, .timer-display {
   position: absolute;
-  top: 0;
-  background-color: #8b4040;
-  background-image: 
-    linear-gradient(335deg, rgba(255,255,255,0.1) 23px, transparent 23px),
-    linear-gradient(155deg, rgba(255,255,255,0.1) 23px, transparent 23px),
-    linear-gradient(335deg, rgba(255,255,255,0.1) 23px, transparent 23px),
-    linear-gradient(155deg, rgba(255,255,255,0.1) 23px, transparent 23px);
-  background-size: 58px 58px;
-  background-position: 0px 2px, 4px 35px, 29px 31px, 34px 6px;
-  border-left: 4px solid #5d2b2b;
-  border-right: 4px solid #5d2b2b;
-  box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+  top: 1rem;
+  padding: 0.5rem 1rem;
+  background: var(--card-bg);
+  border: var(--border-width) solid var(--card-border);
+  color: var(--text-main);
+  font-size: 1.5rem;
+  z-index: 20;
+  box-shadow: 4px 4px 0 rgba(0,0,0,1);
+}
+
+.score-display { right: 1rem; }
+.timer-display { left: 1rem; }
+
+/* =========================================
+   ANIMATIONS
+   ========================================= */
+
+/* Game Over / Modals */
+.game-modal {
+  /* This is just a helper class if we need it, existing logic uses Modals which output to portals usually or inline.
+     App.tsx uses inline Modals. The Modal component usually renders a div.
+     We will check Modal component styles later, but usually they just render content.
+  */
+}
+
+/* Snow/Overlay - keep minimal or pixelate? */
+.snow-overlay {
+  pointer-events: none;
   z-index: 5;
-  will-change: transform;
 }
 
-.chimney-top {
+/* Make snowflakes square for retro feel? */
+.snowflake {
   position: absolute;
-  top: -15px;
-  left: -8px;
-  width: calc(100% + 16px);
-  height: 20px;
-  background: white; /* Snow cap */
-  border-radius: 4px;
-  box-shadow: 0 4px 0 #ddd, 0 8px 10px rgba(0,0,0,0.3);
+  width: 8px;
+  height: 8px;
+  background: white;
+  border-radius: 0; /* Square snow */
+  color: white;
+  user-select: none;
+  pointer-events: none;
+  animation: fall linear infinite;
+  z-index: 1000;
 }
 
-.chimney-smoke {
+/* =========================================
+   MEDIA QUERIES
+   ========================================= */
+@media (max-width: 768px) {
+  h1 { font-size: 2.5rem; -webkit-text-stroke: 1px var(--card-border); }
+  .game-selection { flex-direction: column; align-items: center; }
+  .game-card-container { width: 90%; height: 250px; }
+  .score-display, .timer-display { font-size: 1.2rem; top: 0.5rem; }
+
+  /* Game elements mobile adjustments */
+  .santa-hand-top {
+    font-size: 3rem;
+    top: 30px;
+  }
+
+  .target-inner {
+    font-size: 2rem;
+  }
+
+  .gift-item {
+    font-size: 2rem;
+  }
+
+  .combo-display {
+    font-size: 2rem;
+    letter-spacing: 2px;
+  }
+
+  .floating-text {
+    font-size: 1.5rem !important;
+  }
+
+  .chimney {
+    background-size: 40px 40px;
+  }
+
+  .score-row {
+    font-size: 1rem;
+    padding: 0.5rem;
+  }
+
+  .score-row:first-child {
+    font-size: 1.1rem;
+  }
+
+  .top-bar {
+    top: 0.5rem;
+    right: 0.5rem;
+    gap: 0.25rem;
+  }
+
+  .version-tag {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.4rem;
+  }
+}
+
+/* =========================================
+   GAME AREAS
+   ========================================= */
+
+.game-area {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--bg-color);
+  cursor: crosshair;
+}
+
+/* =========================================
+   GAME SPECIFIC: GIFT TOSS
+   ========================================= */
+
+/* Santa Hand */
+.santa-hand-top {
   position: absolute;
-  top: -40px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 20px;
-  height: 20px;
-  background: rgba(255,255,255,0.2);
-  border-radius: 50%;
-  box-shadow: 
-    10px -10px 0 5px rgba(255,255,255,0.1),
-    -5px -20px 0 8px rgba(255,255,255,0.05);
-  animation: smoke 3s infinite linear;
+  top: 50px;
+  font-size: 4rem;
+  pointer-events: none;
+  z-index: 10;
+  filter: drop-shadow(4px 4px 0 rgba(0,0,0,0.5));
+  transition: left 0.05s linear;
 }
 
-@keyframes smoke {
-  0% { transform: translate(-50%, 0) scale(1); opacity: 0; }
-  50% { opacity: 0.5; }
-  100% { transform: translate(-30%, -60px) scale(2); opacity: 0; }
-}
-
+/* Gift Items */
 .gift-item {
   position: absolute;
-  font-size: 3rem;
-  z-index: 10;
   display: flex;
   align-items: center;
   justify-content: center;
-  filter: drop-shadow(0 5px 10px rgba(0,0,0,0.3));
-  will-change: transform;
+  font-size: 2.5rem;
+  pointer-events: none;
+  filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.4));
+  animation: gift-spin 1s linear infinite;
 }
 
-.santa-hand-top {
+.gift-item.red {
+  filter: drop-shadow(2px 2px 0 rgba(211, 47, 47, 0.6));
+}
+
+.gift-item.blue {
+  filter: drop-shadow(2px 2px 0 rgba(33, 150, 243, 0.6));
+}
+
+.gift-item.coal {
+  filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.8));
+}
+
+/* Chimney */
+.chimney {
   position: absolute;
-  top: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 6rem;
-  z-index: 10;
-  filter: drop-shadow(0 5px 20px rgba(0,0,0,0.5));
+  background-color: #8b4040;
+  background-image:
+    linear-gradient(335deg, rgba(0,0,0,0.2) 23px, transparent 23px),
+    linear-gradient(155deg, rgba(0,0,0,0.2) 23px, transparent 23px),
+    linear-gradient(335deg, rgba(0,0,0,0.2) 23px, transparent 23px),
+    linear-gradient(155deg, rgba(0,0,0,0.2) 23px, transparent 23px);
+  background-size: 58px 58px;
+  border: var(--border-width) solid #331a1a;
+  box-shadow: 4px -4px 0 rgba(0,0,0,0.5);
   pointer-events: none;
 }
 
-.obstacle {
-    position: absolute;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2rem;
-    z-index: 8;
-    will-change: transform;
+/* Chimney Smoke */
+.chimney-smoke {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 30px;
+  background: rgba(200, 200, 200, 0.6);
+  border-radius: 50%;
+  animation: smoke-rise 2s linear infinite;
 }
 
-
-.sling-guide {
+/* Obstacles */
+.obstacle {
   position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   pointer-events: none;
   z-index: 8;
 }
 
-.joke-card {
-  margin: 1.5rem 0;
-  border: 2px dashed var(--antique-gold);
-  background: rgba(0,0,0,0.3);
+/* =========================================
+   GAME SPECIFIC: SNOWBALL HUNT
+   ========================================= */
+
+/* Targets */
+.target {
+  position: absolute;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: var(--border-width) solid var(--card-border);
+  background: var(--card-bg);
+  box-shadow: 4px 4px 0 rgba(0,0,0,0.8);
+  border-radius: 50%;
 }
 
-/* Add smooth fade-in animation for all states */
-.game-container > div {
-  animation: fadeIn 0.3s ease-in;
+.target-moving {
+  animation: target-pulse 0.8s linear infinite;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+.target-inner {
+  font-size: clamp(2rem, 4vw, 3rem);
+  filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.5));
+  user-select: none;
+  pointer-events: none;
 }
 
-/* Media Queries */
-@media (max-width: 480px) {
-  /* Extra small phones */
-  .frost-card { padding: 1rem; max-width: 100%; }
-  .game-container { border-width: 0; }
-  .target-inner { font-size: 2.5rem; }
+/* Target type variations */
+.target-gift {
+  border-color: var(--primary-color);
 }
 
-@media (max-width: 768px) {
-  /* Small tablets and large phones */
-  .game-container { border-width: 0; }
-  .target-inner { font-size: 3rem; }
-  .leaderboard { width: 95%; padding: 0.8rem; margin: 1rem 0; }
-  .leaderboard h2 { font-size: 1.8rem; }
-  .score-row { font-size: 1rem; padding: 0.5rem 0; }
-  .arcade-input { font-size: 2rem; width: 100%; }
-
-  .game-selection { gap: 1rem; margin-top: 1rem; }
-  .game-card { min-width: 140px; padding: 1rem; }
-  .game-icon { font-size: 3rem; }
-  .game-card h3 { font-size: 1.2rem; }
+.target-gold {
+  border-color: var(--accent-color);
+  background: rgba(251, 192, 45, 0.2);
+  box-shadow: 4px 4px 0 rgba(251, 192, 45, 0.5);
 }
 
-@media (min-width: 769px) and (max-width: 1024px) {
-  /* Tablets */
-  .game-selection { max-width: 700px; }
-  .frost-card, .leaderboard { max-width: 500px; }
+.target-coal {
+  border-color: #666;
+  background: rgba(100, 100, 100, 0.2);
 }
 
-@media (max-height: 700px) {
-  /* Landscape/small height - save vertical space */
-  h1 { display: none; }
-  .leaderboard { max-height: 200px; overflow-y: auto; }
+.target-time {
+  border-color: #4caf50;
+  background: rgba(76, 175, 80, 0.2);
 }
 
-/* --- Snowball Hunt New Styles --- */
+.target-ice {
+  border-color: #a5f2f3;
+  background: rgba(165, 242, 243, 0.2);
+}
+
+/* Snowball Projectile */
+.snowball {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: white;
+  border: 2px solid #ccc;
+  border-radius: 50%;
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.3);
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Splat Effect */
+.splat {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  background: radial-gradient(circle, white 30%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: splat-fade 1s linear forwards;
+  z-index: 5;
+}
+
+/* Frozen Overlay */
+.frozen-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(165, 242, 243, 0.3);
+  border: 8px solid #a5f2f3;
+  box-sizing: border-box;
+  pointer-events: none;
+  z-index: 15;
+  animation: frozen-pulse 1s ease-in-out infinite;
+}
+
+/* Screen Shake */
+.shake {
+  animation: shake 0.4s linear;
+}
+
+/* Legacy styles (keep for backwards compatibility) */
+.target-bubble {
+    border: 4px solid black;
+    background: white;
+    box-shadow: inset -5px -5px 0 #ccc;
+    border-radius: 50%;
+}
 
 .cursor-crosshair {
-    cursor: crosshair; /* Fallback */
-    /* We will use a custom SVG cursor ideally, but standard crosshair is fine for now if no asset */
-    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="red" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="2" x2="12" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>') 12 12, crosshair;
+    cursor: crosshair;
 }
 
-.snowball {
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    background: radial-gradient(circle at 30% 30%, #fff, #ddd);
-    border-radius: 50%;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    pointer-events: none;
-    z-index: 100;
-    will-change: transform;
-}
+/* =========================================
+   PARTICLE EFFECTS
+   ========================================= */
 
-.splat {
-    position: absolute;
-    width: 40px;
-    height: 40px;
-    background: radial-gradient(circle, rgba(255,255,255,0.9), rgba(255,255,255,0));
-    border-radius: 50%;
-    transform: scale(1);
-    animation: fadeSplat 1s forwards;
-    pointer-events: none;
-    z-index: 5;
-}
-
-.splat::before, .splat::after {
-    content: "";
-    position: absolute;
-    background: rgba(255,255,255,0.8);
-    border-radius: 50%;
-}
-.splat::before { width: 60%; height: 60%; top: -20%; left: 10%; }
-.splat::after { width: 50%; height: 50%; bottom: -10%; right: -10%; }
-
-
-@keyframes fadeSplat {
-    0% { opacity: 1; transform: scale(0.5); }
-    10% { transform: scale(1.2); }
-    20% { transform: scale(1); }
-    100% { opacity: 0; transform: scale(1); }
-}
-
-/* Target Movement Animation Override */
-.target-moving {
-    animation: floatTarget 3s ease-in-out infinite alternate;
-}
-
-@keyframes floatTarget {
-    from { transform: translateY(0) rotate(-2deg); }
-    to { transform: translateY(-10px) rotate(2deg); }
-}
-
-/* Range Slider Styles */
-input[type=range] {
-  -webkit-appearance: none;
-  width: 100%;
-  background: transparent;
-  margin: 1.5rem 0;
-}
-
-input[type=range]:focus {
-  outline: none;
-}
-
-input[type=range]::-webkit-slider-runnable-track {
-  width: 100%;
+.particle {
+  position: absolute;
+  width: 8px;
   height: 8px;
-  cursor: pointer;
-  background: rgba(0, 0, 0, 0.4);
-  border-radius: 4px;
-  border: 1px solid var(--antique-gold);
-}
-
-input[type=range]::-webkit-slider-thumb {
-  height: 24px;
-  width: 24px;
   border-radius: 50%;
-  background: var(--warm-gold);
-  cursor: pointer;
-  -webkit-appearance: none;
-  appearance: none;
-  margin-top: -9px;
-  box-shadow: 0 0 10px rgba(255, 183, 0, 0.5), inset 0 2px 2px rgba(255, 255, 255, 0.5);
-  border: 2px solid var(--antique-gold);
+  pointer-events: none;
+  animation: particle-burst 0.6s linear forwards;
 }
 
-input[type=range]:active::-webkit-slider-thumb {
-  transform: scale(1.2);
+.particle-gift {
+  background: var(--primary-color);
+  border: 2px solid var(--card-border);
+}
+
+.particle-coal {
+  background: #666;
+  border: 2px solid #333;
+}
+
+.particle-gold {
+  background: var(--accent-color);
+  border: 2px solid #f9a825;
+  box-shadow: 0 0 4px var(--accent-color);
+}
+
+.particle-time {
+  background: #4caf50;
+  border: 2px solid #2e7d32;
+}
+
+.particle-ice {
+  background: #a5f2f3;
+  border: 2px solid #81d4fa;
+  box-shadow: 0 0 4px #a5f2f3;
+}
+
+/* =========================================
+   FLOATING TEXT
+   ========================================= */
+
+.floating-text {
+  position: absolute;
+  font-family: var(--font-retro);
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  pointer-events: none;
+  z-index: 20;
+  text-shadow: 4px 4px 0 rgba(0,0,0,1);
+  -webkit-text-stroke: 2px var(--card-border);
+  animation: float-up 2s linear forwards;
+  white-space: nowrap;
+}
+
+/* =========================================
+   HUD ENHANCEMENTS
+   ========================================= */
+
+.combo-display {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-retro);
+  font-size: clamp(2rem, 5vw, 4rem);
+  font-weight: bold;
+  text-transform: uppercase;
+  color: var(--accent-color);
+  text-shadow: 4px 4px 0 rgba(0,0,0,1);
+  -webkit-text-stroke: 2px var(--card-border);
+  pointer-events: none;
+  z-index: 25;
+  letter-spacing: 4px;
+}
+
+.combo-shake {
+  animation: combo-shake 0.3s linear infinite;
+}
+
+.timer-pulse {
+  animation: timer-pulse 1s ease-in-out infinite;
+}
+
+/* =========================================
+   LEADERBOARD ENTRIES
+   ========================================= */
+
+.score-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  margin: 0.5rem 0;
+  background: rgba(0,0,0,0.1);
+  border: 2px solid var(--card-border);
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.3);
+  font-family: var(--font-retro);
+  font-size: 1.2rem;
+  letter-spacing: 1px;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.score-row:hover {
+  transform: translate(2px, 2px);
+  box-shadow: none;
+  background: rgba(0,0,0,0.2);
+}
+
+.score-row:first-child {
+  border-color: var(--accent-color);
+  border-width: 4px;
+  font-size: 1.4rem;
+  background: rgba(251, 192, 45, 0.1);
+}
+
+.spinner {
+  font-size: 3rem;
+  animation: spin 2s linear infinite;
+}
+
+/* =========================================
+   MENU ELEMENTS
+   ========================================= */
+
+.top-bar {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  gap: 0.5rem;
+  z-index: 10;
+}
+
+.version-tag {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  font-family: var(--font-retro);
+  font-size: 0.9rem;
+  color: var(--text-main);
+  opacity: 0.5;
+  letter-spacing: 1px;
+  padding: 0.25rem 0.5rem;
+  border: 2px solid var(--card-border);
+  background: var(--card-bg);
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.3);
+}
+
+.joke-card {
+  max-width: 500px;
+  text-align: left;
+}
+
+.joke-card p {
+  line-height: 1.6;
+  margin: 1rem 0 0 0;
 }
 
 .preset-container {
   display: flex;
-  gap: 0.8rem;
+  gap: 0.5rem;
   justify-content: center;
   flex-wrap: wrap;
-  margin-top: 0.5rem;
+  width: 100%;
+  margin: 0.5rem 0;
 }
 
-.btn-preset {
-  background: rgba(139, 0, 0, 0.4);
-  border: 1px solid var(--antique-gold);
-  color: var(--cream-white);
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.2s ease;
+/* =========================================
+   ANIMATIONS (CONSOLIDATED)
+   ========================================= */
+
+/* Snowfall animation */
+@keyframes fall {
+  0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
 }
 
-.btn-preset.active {
-  background: var(--warm-gold);
-  color: #2a0000;
-  box-shadow: 0 0 10px rgba(255, 183, 0, 0.4);
+/* Target pulse animation */
+@keyframes target-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
 }
 
-.btn-preset:hover {
-  border-color: var(--warm-gold);
-  filter: brightness(1.2);
+/* Splat fade animation */
+@keyframes splat-fade {
+  0% { opacity: 1; transform: scale(0.5); }
+  100% { opacity: 0; transform: scale(1.5); }
 }
 
+/* Frozen pulse animation */
+@keyframes frozen-pulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
 
+/* Screen shake animation */
+@keyframes shake {
+  0%, 100% { transform: translate(0, 0); }
+  10%, 30%, 50%, 70%, 90% { transform: translate(-4px, 4px); }
+  20%, 40%, 60%, 80% { transform: translate(4px, -4px); }
+}
+
+/* Gift spin animation */
+@keyframes gift-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Chimney smoke rise animation */
+@keyframes smoke-rise {
+  0% {
+    opacity: 0.6;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-50px) scale(1.5);
+  }
+}
+
+/* Particle burst animation */
+@keyframes particle-burst {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--tx), var(--ty)) scale(0);
+  }
+}
+
+/* Floating text animation */
+@keyframes float-up {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-100px) scale(1.2);
+  }
+}
+
+/* Combo shake animation */
+@keyframes combo-shake {
+  0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
+  25% { transform: translate(-50%, -50%) rotate(-2deg) scale(1.05); }
+  75% { transform: translate(-50%, -50%) rotate(2deg) scale(1.05); }
+}
+
+/* Timer pulse animation */
+@keyframes timer-pulse {
+  0%, 100% {
+    box-shadow: 4px 4px 0 rgba(0,0,0,1);
+    border-color: var(--card-border);
+  }
+  50% {
+    box-shadow: 4px 4px 0 rgba(255, 82, 82, 0.8), 0 0 12px rgba(255, 82, 82, 0.6);
+    border-color: #ff5252;
+  }
+}
+
+/* Loading spinner animation */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
