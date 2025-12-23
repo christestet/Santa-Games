@@ -7,7 +7,8 @@ const Snow = () => {
         const flakes = Array.from({ length: 30 }).map((_, i) => ({
             id: i,
             left: `${Math.random() * 100}%`,
-            delay: `${Math.random() * 5}s`,
+            // Use negative delay to start the animation at a random point in its cycle
+            delay: `-${Math.random() * 5}s`,
             duration: `${Math.random() * 3 + 4}s`,
             size: `${Math.random() * 1 + 0.5}rem`,
             opacity: Math.random(),

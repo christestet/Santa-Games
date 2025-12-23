@@ -80,7 +80,7 @@ interface GiftTossProps {
 }
 
 export default function GiftToss({ onGameOver, settings, isPaused, onPause }: GiftTossProps) {
-    const { t, getJoke } = useLanguage();
+    const { t, getJoke, getSpruch } = useLanguage();
     const { isMuted } = useSound();
     const [score, setScore] = useState(0)
     const [timeLeft, setTimeLeft] = useState(settings.TIMER)
@@ -220,60 +220,95 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
         setObstacles(prev => prev.map(o => ({ ...o, x: o.x + o.speed })).filter(o => o.x > -200 && o.x < window.innerWidth + 200));
 
         // 3. Update Gifts (Physics & Collision)
-        setGifts(prev => {
-            const currentObstacles = stateRef.current.obstacles;
-            const currentChimneys = stateRef.current.chimneys;
-            const chimneyY = window.innerHeight - CHIMNEY_HEIGHT;
+        const currentGifts = stateRef.current.gifts; // Use ref as source of truth for calculations
+        const currentObstacles = stateRef.current.obstacles;
+        const currentChimneys = stateRef.current.chimneys;
+        const chimneyY = window.innerHeight - CHIMNEY_HEIGHT;
 
-            return prev.map(gift => {
-                if (!gift.active || gift.landed) return gift;
+        const nextGifts: Gift[] = [];
+        const hits: { type: 'obstacle' | 'chimney' | 'ground' | 'miss', x: number, y: number, pts?: number }[] = [];
 
-                const nextX = gift.x + gift.vx;
-                const nextY = gift.y + gift.vy;
-                const nextVy = gift.vy + GRAVITY;
+        currentGifts.forEach(gift => {
+            if (!gift.active || gift.landed) {
+                if (gift.active || gift.landed) nextGifts.push(gift); // Keep inactive/landed gifts until cleaned up? Actually logic filters active
+                return;
+            }
 
-                // Obstacle Collision
-                const hitObstacle = currentObstacles.find(obs =>
-                    nextX + GIFT_SIZE > obs.x && nextX < obs.x + obs.width &&
-                    nextY + GIFT_SIZE > obs.y && nextY < obs.y + obs.height
+            const nextX = gift.x + gift.vx;
+            const nextY = gift.y + gift.vy;
+            const nextVy = gift.vy + GRAVITY;
+
+            // Obstacle Collision
+            const hitObstacle = currentObstacles.find(obs =>
+                nextX + GIFT_SIZE > obs.x && nextX < obs.x + obs.width &&
+                nextY + GIFT_SIZE > obs.y && nextY < obs.y + obs.height
+            );
+
+            if (hitObstacle) {
+                hits.push({ type: 'obstacle', x: nextX, y: nextY });
+                nextGifts.push({ ...gift, active: false });
+                return;
+            }
+
+            // Chimney Collision
+            if (nextY >= chimneyY && gift.y < chimneyY) {
+                const hitChimney = currentChimneys.find(c =>
+                    nextX + GIFT_SIZE / 2 > c.x && nextX + GIFT_SIZE / 2 < c.x + c.width
                 );
 
-                if (hitObstacle) {
-                    soundManager.current?.playPoof();
-                    addFloatingText(nextX, nextY, t("game.poof"), "#fff");
-                    return { ...gift, active: false };
+                if (hitChimney) {
+                    const pts = Math.max(10, Math.floor(50 - Math.abs(nextX - hitChimney.x) / 2));
+                    hits.push({ type: 'chimney', x: nextX, y: nextY, pts });
+                    nextGifts.push({ ...gift, landed: true, active: false });
+                } else {
+                    hits.push({ type: 'miss', x: nextX, y: nextY });
+                    nextGifts.push({ ...gift, landed: true, active: false });
                 }
+                return;
+            }
 
-                // Chimney Collision
-                if (nextY >= chimneyY && gift.y < chimneyY) {
-                    const hitChimney = currentChimneys.find(c =>
-                        nextX + GIFT_SIZE / 2 > c.x && nextX + GIFT_SIZE / 2 < c.x + c.width
-                    );
+            // Ground Collision
+            if (nextY > window.innerHeight - 20) {
+                hits.push({ type: 'ground', x: nextX, y: nextY });
+                nextGifts.push({ ...gift, landed: true, active: false });
+                return;
+            }
 
-                    if (hitChimney) {
-                        soundManager.current?.playHit();
-                        const pts = Math.max(10, Math.floor(50 - Math.abs(nextX - hitChimney.x) / 2));
-                        stateRef.current.score += pts;
-                        setScore(prev => prev + pts);
-                        addFloatingText(nextX, nextY, pts > 40 ? `${t("game.perfect")} +${pts}` : `+${pts}`, pts > 40 ? '#4caf50' : '#ffd700');
-                        if (navigator.vibrate) navigator.vibrate(20);
-                    } else {
-                        addFloatingText(nextX, nextY, t('game.miss'), '#aaa');
-                    }
-                    return { ...gift, landed: true, active: false };
-                }
+            // Out of Bounds
+            if (nextX < -100 || nextX > window.innerWidth + 100) {
+                nextGifts.push({ ...gift, active: false });
+                return;
+            }
 
-                // Ground Collision
-                if (nextY > window.innerHeight - 20) {
-                    addFloatingText(nextX, nextY, t("game.miss"), "#aaa");
-                    return { ...gift, landed: true, active: false };
-                }
+            nextGifts.push({ ...gift, x: nextX, y: nextY, vy: nextVy });
+        });
 
-                // Out of Bounds
-                if (nextX < -100 || nextX > window.innerWidth + 100) return { ...gift, active: false };
+        // Apply State updates once
+        const activeGifts = nextGifts.filter(g => g.active);
+        setGifts(activeGifts); // This might replace the stateRef syncing if we trust our calc
+        // Sync ref immediately for next frame consistency
+        // stateRef.current.gifts = activeGifts; // Effect already does this? No, effect is lagged.
 
-                return { ...gift, x: nextX, y: nextY, vy: nextVy };
-            }).filter(g => g.active);
+        // Process Side Effects
+        hits.forEach(hit => {
+            if (hit.type === 'obstacle') {
+                soundManager.current?.playPoof();
+                const penalty = settings.POINTS.COAL;
+                const newScore = Math.max(0, stateRef.current.score + penalty);
+                stateRef.current.score = newScore;
+                setScore(newScore);
+                addFloatingText(hit.x, hit.y, getSpruch(), "#ff6b6b");
+            } else if (hit.type === 'chimney') {
+                soundManager.current?.playHit();
+                const pts = hit.pts || 10;
+                const newScore = stateRef.current.score + pts;
+                stateRef.current.score = newScore;
+                setScore(newScore);
+                addFloatingText(hit.x, hit.y, pts > 40 ? `${t("game.perfect")} +${pts}` : `+${pts}`, pts > 40 ? '#4caf50' : '#ffd700');
+                if (navigator.vibrate) navigator.vibrate(20);
+            } else if (hit.type === 'miss' || hit.type === 'ground') {
+                addFloatingText(hit.x, hit.y, t("game.miss"), "#aaa");
+            }
         });
 
         // Cleanup UI elements
@@ -281,7 +316,7 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
         setFloatingTexts(prev => prev.some(t => t.expiry <= now) ? prev.filter(t => t.expiry > now) : prev);
 
         requestRef.current = requestAnimationFrame(update);
-    }, [addFloatingText, settings.POINTS, t]);
+    }, [addFloatingText, settings.POINTS, t, getSpruch]);
 
     useEffect(() => {
         requestRef.current = requestAnimationFrame(update);
@@ -345,8 +380,21 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
         handleThrow();
     };
 
+    const handlePointerMove = (e: React.PointerEvent) => {
+        if (!stateRef.current.isPlaying || stateRef.current.isPaused) return;
+        // Directly update ref for smoother performance
+        santaRef.current.x = e.clientX;
+        setSantaX(e.clientX);
+    };
+
     return (
-        <div className="game-area gift-toss" onPointerDown={handleTap} style={{ cursor: 'pointer', outline: 'none' }} tabIndex={0}>
+        <div
+            className="game-area gift-toss"
+            onPointerDown={handleTap}
+            onPointerMove={handlePointerMove}
+            style={{ cursor: 'none', outline: 'none', touchAction: 'none' }}
+            tabIndex={0}
+        >
             <HUD score={score} timeLeft={timeLeft} onPause={onPause} />
             <div className="santa-hand-top" style={{ left: santaX }}>
                 <GameIcon name="santa" size={40} />
