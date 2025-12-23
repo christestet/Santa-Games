@@ -12,7 +12,8 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 2412;
 const MAX_SCORES = parseInt(process.env.MAX_SCORES) || 50;
-const SCORES_FILE = path.join(__dirname, "scores.json");
+const SCORES_DIR = path.join(__dirname, "data");
+const SCORES_FILE = path.join(SCORES_DIR, "scores.json");
 
 let isHealthy = true;
 
@@ -66,6 +67,10 @@ if (fs.existsSync(DIST_PATH)) {
 
 // Initialize scores file
 const initializeScores = async () => {
+  if (!fs.existsSync(SCORES_DIR)) {
+    await fsPromises.mkdir(SCORES_DIR, { recursive: true });
+  }
+
   if (!fs.existsSync(SCORES_FILE)) {
     await fsPromises.writeFile(
       SCORES_FILE,
