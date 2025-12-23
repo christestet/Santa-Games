@@ -63,7 +63,7 @@ interface Gift {
     y: number;
     vx: number;
     vy: number;
-    type: 'red' | 'blue' | 'coal';
+    type: 'red' | 'blue' | 'coal' | 'parcel';
     active: boolean;
     landed: boolean;
 }
@@ -353,6 +353,10 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
         }
     }, [update, spawnChimney, spawnObstacle, onGameOver]);
 
+
+
+    // ... existing code ...
+
     const handleThrow = () => {
         if (!stateRef.current.isPlaying || stateRef.current.isPaused) return;
         if (Date.now() - lastThrowTime.current < COOLDOWN) return;
@@ -360,7 +364,12 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
         lastThrowTime.current = Date.now();
 
         const rand = Math.random();
-        const type = rand > 0.9 ? 'blue' : (rand > 0.8 ? 'coal' : 'red');
+        let type: Gift['type'];
+
+        // Approx 1 in 8 throws is a parcel (12.5%)
+        if (rand > 0.875) type = 'parcel';
+        else if (rand > 0.75) type = 'coal';
+        else type = Math.random() > 0.5 ? 'blue' : 'red';
 
         // Give the gift a little horizontal momentum based on Santa's movement
         let momentum = 0;
@@ -420,6 +429,7 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
                     {g.type === 'red' && <GameIcon name="gift" size={GIFT_SIZE} />}
                     {g.type === 'blue' && <GameIcon name="gift" size={GIFT_SIZE} style={{ filter: 'hue-rotate(220deg)' }} />}
                     {g.type === 'coal' && <GameIcon name="coal" size={GIFT_SIZE} />}
+                    {g.type === 'parcel' && <GameIcon name="parcel" size={GIFT_SIZE} />}
                 </div>
             ))}
 

@@ -49,9 +49,11 @@ class SoundManager {
         osc.stop(this.ctx.currentTime + 0.1);
     }
 
-    playHit(type: 'gift' | 'coal' | 'gold' | 'time' | 'ice') {
+    playHit(type: 'gift' | 'coal' | 'gold' | 'time' | 'ice' | 'parcel') {
         switch (type) {
-            case 'gift': this.playTone(600, 'sine', 0.1, 0.1); break;
+            case 'gift':
+            case 'parcel':
+                this.playTone(600, 'sine', 0.1, 0.1); break;
             case 'gold': this.playTone(800, 'square', 0.2, 0.1); break;
             case 'coal': this.playTone(100, 'sawtooth', 0.3, 0.1); break;
             case 'time': this.playTone(1000, 'sine', 0.1, 0.05); break;
@@ -76,7 +78,7 @@ interface Target {
     id: number;
     x: number;
     y: number;
-    type: 'gift' | 'coal' | 'gold' | 'time' | 'ice';
+    type: 'gift' | 'coal' | 'gold' | 'time' | 'ice' | 'parcel';
     vx: number;
     vy: number;
     createdAt: number;
@@ -194,12 +196,15 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
         const y = Math.random() * (window.innerHeight - targetSize - padding * 2) + padding
 
         const rand = Math.random()
-        let type: 'gift' | 'coal' | 'gold' | 'time' | 'ice' = 'gift'
+        let type: 'gift' | 'coal' | 'gold' | 'time' | 'ice' | 'parcel' = 'gift'
 
+        // Adjusted probabilities to include parcel
         if (rand > 0.97) type = 'ice'
         else if (rand > 0.95) type = 'time'
         else if (rand > 0.85) type = 'gold'
         else if (rand > 0.70) type = 'coal'
+        else if (rand > 0.55 && rand <= 0.70) type = 'parcel' // ~15% chance for parcel
+        // Remaining 55% is gift
 
         const vx = (Math.random() - 0.5) * 1.5;
         const vy = (Math.random() - 0.5) * 1.5;
@@ -215,13 +220,14 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
         setTargets(prev => [...prev, newTarget])
     }, [targetSize])
 
-    const handleHitSuccess = useCallback((id: number, type: 'gift' | 'coal' | 'gold' | 'time' | 'ice', x: number, y: number) => {
+    const handleHitSuccess = useCallback((id: number, type: 'gift' | 'coal' | 'gold' | 'time' | 'ice' | 'parcel', x: number, y: number) => {
         if (processedHits.current.has(id)) return;
         processedHits.current.add(id);
 
         soundManager.current?.playHit(type);
         setTargets(prev => prev.filter(t => t.id !== id));
-        spawnParticles(x, y, `particle-${type}`);
+        // Use gift particles for parcel too? Or generic? Let's stick to particle-gift for consistency or type
+        spawnParticles(x, y, `particle-${type === 'parcel' ? 'gift' : type}`);
 
         let points = 0;
         let text = "";
@@ -242,6 +248,7 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
 
         switch (type) {
             case 'gift':
+            case 'parcel':
                 points = settings.POINTS.REGULAR
                 text = `+${points}`
                 color = '#ff4d4d'
@@ -440,6 +447,7 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
                 >
                     <div className="target-inner">
                         {target.type === 'gift' && <GameIcon name="gift" size={targetSize * 0.8} />}
+                        {target.type === 'parcel' && <GameIcon name="parcel" size={targetSize * 0.8} />}
                         {target.type === 'coal' && <GameIcon name="coal" size={targetSize * 0.8} />}
                         {target.type === 'gold' && <GameIcon name="star" size={targetSize * 0.8} />}
                         {target.type === 'time' && <GameIcon name="timer" size={targetSize * 0.8} />}
