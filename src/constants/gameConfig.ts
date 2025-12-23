@@ -49,7 +49,7 @@ export const GAME_CONFIG: GameSettings = {
         COOLDOWN: 400,
         GIFT_SIZE: 40,
         CHIMNEY_HEIGHT: 80,
-        SPAWN_RATE_CHIMNEY: 2500,
+        SPAWN_RATE_CHIMNEY: 4000,
         SPAWN_RATE_OBSTACLE: 3500,
     }
 };
