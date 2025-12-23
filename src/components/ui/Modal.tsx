@@ -25,6 +25,7 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, 
             justifyContent: 'center',
             background: 'rgba(0, 0, 0, 0.7)',
             backdropFilter: 'blur(4px)',
+            padding: window.innerWidth <= 375 ? '1rem' : '1.5rem',
             ...style
         }} onClick={(e) => {
             if (e.target === e.currentTarget && onClose) {

@@ -111,6 +111,12 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
     const [particles, setParticles] = useState<Particle[]>([])
     const [targetSize, setTargetSize] = useState(100)
     const [frozen, setFrozen] = useState(false)
+    const [tapRipples, setTapRipples] = useState<Array<{
+        id: number;
+        x: number;
+        y: number;
+        expiry: number;
+    }>>([])
 
     const stateRef = useRef({
         targets: [] as Target[],
@@ -301,7 +307,7 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
 
     const handleProjectileImpact = useCallback((p: Projectile) => {
         const { targetX, targetY } = p;
-        const hitRadius = targetSize / 2;
+        const hitRadius = window.innerWidth < 768 ? targetSize / 1.5 : targetSize / 2;
         const currentTargets = stateRef.current.targets;
 
         let hitId = -1;
@@ -368,17 +374,27 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
             });
         });
 
-        // Cleanup expired UI elements (floating text, particles, splats)
+        // Cleanup expired UI elements (floating text, particles, splats, ripples)
         const now = Date.now();
         setFloatingTexts(prev => prev.some(t => t.expiry <= now) ? prev.filter(t => t.expiry > now) : prev);
         setParticles(prev => prev.some(p => p.expiry <= now) ? prev.filter(p => p.expiry > now) : prev);
         setSplats(prev => prev.some(s => s.expiry <= now) ? prev.filter(s => s.expiry > now) : prev);
+        setTapRipples(prev => prev.some(r => r.expiry <= now) ? prev.filter(r => r.expiry > now) : prev);
 
         requestRef.current = requestAnimationFrame(animate);
     }, [targetSize, handleProjectileImpact, settings.PHYSICS.PROJECTILE_SPEED, settings.SNOWBALL_HUNT.TARGET_MAX_AGE_BASE, settings.SNOWBALL_HUNT.TARGET_MAX_AGE_MIN]);
 
     const handlePointerDown = (e: React.PointerEvent) => {
         if (!stateRef.current.isPlaying || stateRef.current.isPaused) return;
+
+        // Add tap ripple feedback
+        const now = Date.now();
+        const rippleId = nextId.current++;
+        setTapRipples(prev => [
+            ...prev.filter(r => r.expiry > now),
+            { id: rippleId, x: e.clientX, y: e.clientY, expiry: now + 500 }
+        ]);
+
         soundManager.current?.playThrow();
         const startX = window.innerWidth / 2;
         const startY = window.innerHeight;
@@ -428,6 +444,25 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
 
             {splats.map(s => (
                 <div key={s.id} className="splat" style={{ left: s.x - 20, top: s.y - 20 }}></div>
+            ))}
+
+            {tapRipples.map(r => (
+                <div
+                    key={r.id}
+                    className="tap-ripple"
+                    style={{
+                        left: r.x - 25,
+                        top: r.y - 25,
+                        position: 'absolute',
+                        width: '50px',
+                        height: '50px',
+                        border: '3px solid var(--primary-color)',
+                        borderRadius: '50%',
+                        pointerEvents: 'none',
+                        animation: 'tap-ripple-expand 0.5s ease-out forwards',
+                        zIndex: 15
+                    }}
+                />
             ))}
 
             {particles.map(p => (

@@ -149,6 +149,44 @@ body::before {
   flex-direction: column;
   align-items: center;
   width: 100%;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 1rem 0;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  overscroll-behavior: contain; /* Prevent pull-to-refresh interference */
+  position: relative;
+}
+
+/* Scroll indicator - subtle fade at bottom (mobile only) */
+@media (max-width: 768px) {
+  .menu-container::after {
+    content: '';
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: linear-gradient(to top, var(--bg-color) 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 50;
+    opacity: 0.8;
+  }
+}
+
+/* Desktop Top Bar - Absolute Top Right */
+.top-bar {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  gap: 1rem;
+  z-index: 100;
+}
+
+/* Adjust H1 to not be covered or too high */
+.menu-container h1 {
+  margin-top: 4rem; /* Space for top bar */
 }
 
 /* =========================================
@@ -245,13 +283,13 @@ input[type=range]::-webkit-slider-runnable-track {
 }
 
 input[type=range]::-webkit-slider-thumb {
-  height: 32px;
-  width: 32px;
+  height: 44px;
+  width: 44px;
   border: var(--border-width) solid var(--card-border);
   background: var(--primary-color);
   cursor: pointer;
   -webkit-appearance: none;
-  margin-top: -14px; /* Adjust to center on track */
+  margin-top: -20px; /* Adjust to center on track */
   box-shadow: 4px 4px 0 rgba(0,0,0,0.4);
 }
 
@@ -266,8 +304,8 @@ input[type=range]::-moz-range-track {
 }
 
 input[type=range]::-moz-range-thumb {
-  height: 32px;
-  width: 32px;
+  height: 44px;
+  width: 44px;
   border: var(--border-width) solid var(--card-border);
   background: var(--primary-color);
   cursor: pointer;
@@ -349,10 +387,61 @@ input[type=range]::-moz-range-thumb {
   font-size: 1.5rem;
   z-index: 20;
   box-shadow: 4px 4px 0 rgba(0,0,0,1);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
 .score-display { right: 1rem; }
 .timer-display { left: 1rem; }
+
+.hud-controls {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.hud-btn {
+    padding: 0.6rem 0.8rem;
+    font-size: 1.2rem;
+    min-height: 44px;
+    min-width: 44px;
+    background: rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Specific styling for Classic Santa Theme HUD buttons (Green) */
+.classic-theme .hud-btn {
+    background-color: var(--secondary-color);
+    color: white;
+    border: 2px solid var(--card-border);
+    box-shadow: 2px 2px 0 var(--btn-secondary-shadow);
+}
+
+.classic-theme .hud-btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: none;
+}
+
+/* Settings Modal Layout */
+.settings-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 0 1rem;
+    gap: 1rem;
+}
+
+.settings-label {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.settings-btn-group {
+    min-width: 100px;
+}
 
 /* =========================================
    ANIMATIONS
@@ -389,6 +478,276 @@ input[type=range]::-moz-range-thumb {
 /* =========================================
    MEDIA QUERIES
    ========================================= */
+
+/* iPhone SE and smaller (375px and below) */
+@media (max-width: 375px) {
+  /* Scrollable menu container */
+  .menu-container {
+    padding: 5rem 0 3rem 0; /* Increased top padding */
+  }
+
+  h1 {
+    font-size: 1.8rem;
+    -webkit-text-stroke: 1px var(--card-border);
+    margin: 0 0 0.5rem 0;
+    padding: 0 0.5rem; /* Prevent edge touching */
+    text-align: center;
+    line-height: 1.2;
+  }
+  
+  .frost-card, .leaderboard, .game-card-front, .game-card-back { padding: 0.75rem; }
+  .arcade-input { font-size: 1.5rem; padding: 0.4rem; }
+  
+  /* HUD Compact */
+  .score-display, .timer-display { 
+      font-size: 1rem; 
+      padding: 0.4rem 0.6rem; 
+      top: 0.5rem; 
+      gap: 0.5rem;
+  }
+  .score-display { right: 0.25rem; }
+  .timer-display { left: 0.25rem; flex-direction: column; align-items: flex-start; }
+  
+  .hud-controls {
+      margin-top: 0.25rem;
+  }
+  
+  .hud-btn {
+      padding: 0.4rem;
+      min-height: 36px;
+      min-width: 36px;
+  }
+  
+  .hud-btn svg {
+      width: 16px;
+      height: 16px;
+  }
+
+  /* Compact menu layout */
+  .game-selection { gap: 0.75rem; }
+  .game-card-container { width: 95%; height: 180px; }
+  .game-card-front h3, .game-card-back h3 { font-size: 1.2rem; margin: 0.25rem 0; }
+  .game-icon { font-size: 2.5rem; }
+  .instruction-text { font-size: 0.85rem; line-height: 1.3; }
+
+  /* Compact leaderboard */
+  .leaderboard { 
+      padding: 0.75rem; 
+      margin-top: 1rem !important; /* Force margin */
+      width: 95%;
+  }
+  .leaderboard h2 { font-size: 1.3rem; margin-bottom: 0.5rem; }
+  .score-row { padding: 0.4rem 0.5rem; font-size: 0.85rem; }
+
+  /* Compact settings modal */
+  .preset-container {
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+  .preset-container button {
+    flex: 1 1 calc(50% - 0.2rem); /* 2 buttons per row */
+    min-width: 60px;
+    font-size: 0.9rem;
+    padding: 0.4rem 0.6rem;
+  }
+  
+  /* Settings Rows wrap on small screens */
+  .settings-row {
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 0 0.5rem;
+      gap: 0.5rem;
+  }
+  
+  .settings-label {
+      font-size: 1rem;
+      width: 100%;
+  }
+  
+  .settings-btn-group {
+      width: 100%;
+      min-width: unset;
+      display: flex;
+      justify-content: flex-start;
+  }
+  
+  .settings-btn-group button {
+      flex: 1;
+      font-size: 0.9rem;
+  }
+
+  .modal-content {
+    max-width: 95%;
+    padding: 1rem;
+  }
+
+  /* Fixed top bar for scrolling */
+  .top-bar {
+    position: fixed;
+    top: 0.5rem;
+    right: 0.5rem;
+    gap: 0.5rem;
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(8px);
+    padding: 0.5rem;
+    border-radius: 8px;
+    display: flex;
+  }
+  
+  .top-bar button { 
+      min-width: 36px; 
+      min-height: 36px; 
+      padding: 0.4rem; 
+  }
+  
+  .top-bar svg {
+      width: 20px;
+      height: 20px;
+  }
+
+  .floating-text { font-size: 1.2rem !important; }
+  .santa-hand-top { font-size: 2.5rem; top: 50px; }
+  .gift-item { font-size: 1.8rem; }
+  
+  .version-tag {
+    position: relative; 
+    bottom: auto;
+    right: auto;
+    font-size: 0.7rem;
+    margin-top: 2rem;
+    opacity: 0.6;
+    margin-bottom: 1rem;
+  }
+}
+
+/* Landscape Mode Optimization for Mobile (Short screens) */
+@media (max-width: 932px) and (max-height: 480px) and (orientation: landscape) {
+  .menu-container {
+    padding: 1rem 0; /* Increased padding to prevent cramping */
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 0.75rem; /* Add gap between elements */
+  }
+
+  .game-selection {
+      flex-direction: row;
+      gap: 1rem;
+      align-items: center;
+      margin-top: 0;
+  }
+
+  .menu-container h1 {
+      width: 100%;
+      text-align: center;
+      font-size: 1.5rem;
+      margin: 0.5rem 0; /* Add top margin for spacing from top-bar */
+      padding: 0 1rem; /* Prevent edge touching */
+  }
+
+  /* Position top bar compactly in landscape - use flow layout to avoid overlap */
+  .top-bar {
+    position: static; /* Part of the flow */
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    padding: 0.5rem 1rem 0 1rem; /* No bottom padding */
+    background: transparent;
+    backdrop-filter: none;
+    box-sizing: border-box;
+    margin: 0; /* Remove any margin */
+  }
+
+  .top-bar button {
+      min-width: 40px;
+      min-height: 40px;
+  }
+
+  .game-card-container {
+      width: 180px;
+      height: 140px;
+  }
+  
+  .game-card-front h3 {
+      font-size: 1rem;
+  }
+  
+  .game-icon {
+      font-size: 2rem;
+      margin-bottom: 0.25rem;
+  }
+  
+  /* Ensure modal fits in landscape */
+  .modal-content {
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 0.5rem;
+  }
+  
+  .settings-row {
+      padding: 0;
+      margin-bottom: 0.5rem;
+  }
+}
+
+/* iPhone 12/13/14 (376px-428px) */
+@media (min-width: 376px) and (max-width: 428px) {
+  /* Scrollable menu container */
+  .menu-container {
+    padding: 4.5rem 0 3rem 0;
+  }
+
+  h1 { font-size: 2.2rem; -webkit-text-stroke: 1px var(--card-border); margin: 0 0 0.5rem 0; }
+  .frost-card, .leaderboard, .game-card-front, .game-card-back { padding: 1.25rem; }
+  .arcade-input { font-size: 1.75rem; padding: 0.45rem; }
+  .score-display, .timer-display { font-size: 1.1rem; padding: 0.5rem 0.8rem; top: 0.4rem; }
+  .score-display { right: 0.4rem; }
+  .timer-display { left: 0.4rem; }
+  .game-card-container { width: 92%; height: 240px; }
+  .floating-text { font-size: 1.4rem !important; }
+  .santa-hand-top { font-size: 3.2rem; top: 55px; }
+  .gift-item { font-size: 2.2rem; }
+
+  /* Fixed top bar for consistency */
+  .top-bar {
+    position: fixed;
+    top: 0.5rem;
+    right: 0.5rem;
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(8px);
+    padding: 0.25rem;
+    border-radius: 8px;
+  }
+
+  .version-tag {
+    position: relative;
+    bottom: auto;
+    right: auto;
+    margin-top: 1rem;
+    opacity: 0.6;
+  }
+}
+
+/* Landscape mode for phones (max-height: 480px) */
+@media (max-height: 480px) and (orientation: landscape) {
+  .score-display { top: 0.25rem; right: auto; left: 0.25rem; }
+  .timer-display { top: 0.25rem; left: auto; right: 0.25rem; flex-direction: row-reverse; }
+  .timer-display > div { flex-direction: row; gap: 0.25rem; }
+  h1 { font-size: 1.8rem; margin-bottom: 0.5rem; }
+  .frost-card { padding: 0.75rem; }
+  .game-selection { flex-direction: row; gap: 1rem; }
+  .game-card-container { width: 200px; height: 180px; }
+  .arcade-input { font-size: 1.3rem; }
+  .combo-display { font-size: 1.5rem; top: 30%; }
+  .santa-hand-top { font-size: 2.5rem; top: 20px; }
+  .gift-toss .santa-hand-top { font-size: 2.8rem; top: 55px; }
+  .gift-item { font-size: 1.8rem; }
+  .floating-text { font-size: 1.2rem !important; }
+}
+
 @media (max-width: 768px) {
   h1 { font-size: 2.5rem; -webkit-text-stroke: 1px var(--card-border); }
   .game-selection { flex-direction: column; align-items: center; }
@@ -398,7 +757,7 @@ input[type=range]::-moz-range-thumb {
   /* Game elements mobile adjustments */
   .santa-hand-top {
     font-size: 3rem;
-    top: 30px;
+    top: 55px;
   }
 
   .target-inner {
@@ -788,9 +1147,7 @@ input[type=range]::-moz-range-thumb {
 }
 
 .version-tag {
-  position: absolute;
-  bottom: 1rem;
-  right: 1rem;
+  position: relative;
   font-family: var(--font-retro);
   font-size: 0.9rem;
   color: var(--text-main);
@@ -800,6 +1157,9 @@ input[type=range]::-moz-range-thumb {
   border: 2px solid var(--card-border);
   background: var(--card-bg);
   box-shadow: 2px 2px 0 rgba(0,0,0,0.3);
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  align-self: center;
 }
 
 .joke-card {
@@ -871,6 +1231,18 @@ input[type=range]::-moz-range-thumb {
   100% {
     opacity: 0;
     transform: translateX(-50%) translateY(-50px) scale(1.5);
+  }
+}
+
+/* Tap ripple animation for SnowballHunt */
+@keyframes tap-ripple-expand {
+  0% {
+    transform: scale(0.5);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
   }
 }
 

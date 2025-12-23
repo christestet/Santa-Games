@@ -67,28 +67,32 @@ export default function GameSettings({ settings, onUpdate, onClose }: GameSettin
 
                 <div style={{ width: '100%', height: '4px', background: 'var(--card-border)', opacity: 0.3, margin: '1rem 0' }} />
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', padding: '0 1rem' }}>
-                    <label style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>{t('settings.sound')}</label>
-                    <Button
-                        variant={isMuted ? 'secondary' : 'primary'}
-                        size="small"
-                        onClick={toggleMute}
-                        style={{ minWidth: '100px' }}
-                    >
-                        {isMuted ? <> <GameIcon name="sound_off" size={16} /> {t('settings.soundOff')} </> : <> <GameIcon name="sound_on" size={16} /> {t('settings.soundOn')} </>}
-                    </Button>
+                <div className="settings-row">
+                    <label className="settings-label">{t('settings.sound')}</label>
+                    <div className="settings-btn-group">
+                        <Button
+                            variant={isMuted ? 'secondary' : 'primary'}
+                            size="small"
+                            onClick={toggleMute}
+                            style={{ minWidth: '100px' }}
+                        >
+                            {isMuted ? <> <GameIcon name="sound_off" size={16} /> {t('settings.soundOff')} </> : <> <GameIcon name="sound_on" size={16} /> {t('settings.soundOn')} </>}
+                        </Button>
+                    </div>
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', padding: '0 1rem' }}>
-                    <label style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>{t('settings.theme')}</label>
-                    <Button
-                        variant="secondary"
-                        size="small"
-                        onClick={toggleTheme}
-                        style={{ minWidth: '140px' }}
-                    >
-                        {theme === 'classic' ? <> <GameIcon name="santa" size={16} /> {t('settings.themeClassic')} </> : <> <GameIcon name="grinch" size={16} /> {t('settings.themeGrinch')} </>}
-                    </Button>
+                <div className="settings-row">
+                    <label className="settings-label">{t('settings.theme')}</label>
+                    <div className="settings-btn-group">
+                        <Button
+                            variant="secondary"
+                            size="small"
+                            onClick={toggleTheme}
+                            style={{ minWidth: '140px' }}
+                        >
+                            {theme === 'classic' ? <> <GameIcon name="santa" size={16} /> {t('settings.themeClassic')} </> : <> <GameIcon name="grinch" size={16} /> {t('settings.themeGrinch')} </>}
+                        </Button>
+                    </div>
                 </div>
             </div>
 

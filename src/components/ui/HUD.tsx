@@ -23,9 +23,9 @@ export const HUD: React.FC<HUDProps> = ({ score, timeLeft, frozen = false, combo
         <>
             <div className={`score-display ${className}`}>{t('common.score')}: {score}</div>
 
-            <div className={`timer-display ${timeLeft < 10 ? 'timer-pulse' : ''} ${className}`} style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <div className={`timer-display ${timeLeft < 10 ? 'timer-pulse' : ''} ${className}`}>
                 <span>{frozen ? <GameIcon name="snowflake" size={20} /> : <GameIcon name="timer" size={20} />} {timeLeft}</span>
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <div className="hud-controls">
                     <Button
                         variant="icon"
                         size="small"
@@ -34,7 +34,7 @@ export const HUD: React.FC<HUDProps> = ({ score, timeLeft, frozen = false, combo
                             e.stopPropagation();
                             toggleMute();
                         }}
-                        style={{ padding: '0.2rem 0.6rem', fontSize: '1.2rem', minHeight: 'auto', background: 'rgba(255,255,255,0.1)' }}
+                        className="hud-btn"
                     >
                         {isMuted ? <GameIcon name="sound_off" size={20} /> : <GameIcon name="sound_on" size={20} />}
                     </Button>
@@ -46,7 +46,7 @@ export const HUD: React.FC<HUDProps> = ({ score, timeLeft, frozen = false, combo
                             e.stopPropagation();
                             toggleTheme();
                         }}
-                        style={{ padding: '0.2rem 0.6rem', fontSize: '1.2rem', minHeight: 'auto', background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center' }}
+                        className="hud-btn"
                     >
                         {theme === 'classic' ? <GameIcon name="santa" size={24} /> : <GameIcon name="grinch" size={24} />}
                     </Button>
@@ -59,7 +59,7 @@ export const HUD: React.FC<HUDProps> = ({ score, timeLeft, frozen = false, combo
                                 e.stopPropagation();
                                 onPause();
                             }}
-                            style={{ padding: '0.2rem 0.6rem', fontSize: '1.2rem', minHeight: 'auto' }}
+                            className="hud-btn"
                         >
                             <GameIcon name="pause" size={24} />
                         </Button>

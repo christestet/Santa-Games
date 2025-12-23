@@ -103,7 +103,10 @@ const App: React.FC = () => {
                         />
                     )}
 
-                    <div style={{ marginTop: '2rem', width: '100%' }}>
+                    <div style={{
+                        marginTop: '2rem',
+                        width: '100%'
+                    }}>
                         <Leaderboard
                             scores={highScores}
                             isLoading={isLoadingScores}
@@ -177,6 +180,9 @@ const App: React.FC = () => {
                             }}
                             autoFocus
                             disabled={isSubmittingScore}
+                            style={{
+                                fontSize: '2rem'
+                            }}
                         />
                         <br />
                         <Button

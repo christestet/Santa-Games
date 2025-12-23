@@ -98,6 +98,11 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
     const requestRef = useRef<number>(0)
     const lastTimeRef = useRef<number>(0)
     const lastThrowTime = useRef(0)
+    const velocityTracker = useRef({
+        lastX: 0,
+        lastTime: 0,
+        velocityX: 0
+    })
 
     // Physics constants
     const GRAVITY = settings.PHYSICS.GRAVITY
@@ -388,8 +393,17 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
 
         // Give the gift a little horizontal momentum based on Santa's movement
         let momentum = 0;
+
+        // Keyboard momentum
         if (keysPressed.current['ArrowLeft'] || keysPressed.current['KeyA']) momentum = -2;
         if (keysPressed.current['ArrowRight'] || keysPressed.current['KeyD']) momentum = 2;
+
+        // Touch velocity momentum (convert from px/ms to game units)
+        const touchMomentum = velocityTracker.current.velocityX * 5; // Scale factor
+        momentum = Math.max(-5, Math.min(5, momentum + touchMomentum)); // Clamp
+
+        // Reset velocity after throw
+        velocityTracker.current.velocityX = 0;
 
         const newGift: Gift = {
             id: nextId.current++,
@@ -406,13 +420,30 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
     };
 
     const handleTap = (e: React.PointerEvent) => {
-        // Prevent default to avoid double firing if mixing touch/mouse
-        // e.preventDefault(); 
+        // Reset velocity tracker on new touch
+        velocityTracker.current = {
+            lastX: e.clientX,
+            lastTime: performance.now(),
+            velocityX: 0
+        };
         handleThrow();
     };
 
     const handlePointerMove = (e: React.PointerEvent) => {
         if (!stateRef.current.isPlaying || stateRef.current.isPaused) return;
+
+        const now = performance.now();
+        const dt = now - velocityTracker.current.lastTime;
+
+        if (dt > 0) {
+            // Calculate velocity in pixels per millisecond
+            const dx = e.clientX - velocityTracker.current.lastX;
+            velocityTracker.current.velocityX = dx / dt;
+        }
+
+        velocityTracker.current.lastX = e.clientX;
+        velocityTracker.current.lastTime = now;
+
         // Directly update ref for smoother performance
         santaRef.current.x = e.clientX;
         setSantaX(e.clientX);
