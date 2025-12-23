@@ -588,7 +588,8 @@ h1 {
 }
 
 .cursor-crosshair {
-    cursor: crosshair;
+  /* High contrast crosshair: white inside, black outline */
+  cursor: url('data:image/svg+xml;utf8,<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><defs><filter id="shadow"><feDropShadow dx="1" dy="1" stdDeviation="0" flood-color="black"/></filter></defs><circle cx="16" cy="16" r="14" stroke="black" stroke-width="2" fill="none"/><line x1="16" y1="2" x2="16" y2="30" stroke="white" stroke-width="2" style="filter:url(%23shadow)"/><line x1="2" y1="16" x2="30" y2="16" stroke="white" stroke-width="2" style="filter:url(%23shadow)"/><circle cx="16" cy="16" r="4" fill="red" stroke="white" stroke-width="1"/></svg>') 16 16, crosshair;
 }
 
 /* =========================================

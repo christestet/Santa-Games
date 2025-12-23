@@ -120,6 +120,13 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
     // Handle Keyboard Input
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.code === 'Escape' || e.code === 'KeyP') {
+                if (stateRef.current.isPlaying && !stateRef.current.isPaused) {
+                    onPause();
+                }
+                return;
+            }
+
             keysPressed.current[e.code] = true;
             if (e.code === 'Space') {
                 handleThrow();
@@ -136,7 +143,7 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
             window.removeEventListener('keydown', handleKeyDown);
             window.removeEventListener('keyup', handleKeyUp);
         };
-    }, []); // Empty dependency array as we use refs
+    }, [onPause]); // Added onPause dependency
 
     // Sync refs for collision detection
     useEffect(() => { stateRef.current.gifts = gifts }, [gifts])

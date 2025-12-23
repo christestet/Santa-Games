@@ -29,7 +29,11 @@ export const HUD: React.FC<HUDProps> = ({ score, timeLeft, frozen = false, combo
                     <Button
                         variant="icon"
                         size="small"
-                        onClick={toggleMute}
+                        onPointerDown={(e) => e.stopPropagation()}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            toggleMute();
+                        }}
                         style={{ padding: '0.2rem 0.6rem', fontSize: '1.2rem', minHeight: 'auto', background: 'rgba(255,255,255,0.1)' }}
                     >
                         {isMuted ? <GameIcon name="sound_off" size={20} /> : <GameIcon name="sound_on" size={20} />}
@@ -37,7 +41,11 @@ export const HUD: React.FC<HUDProps> = ({ score, timeLeft, frozen = false, combo
                     <Button
                         variant="icon"
                         size="small"
-                        onClick={toggleTheme}
+                        onPointerDown={(e) => e.stopPropagation()}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            toggleTheme();
+                        }}
                         style={{ padding: '0.2rem 0.6rem', fontSize: '1.2rem', minHeight: 'auto', background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center' }}
                     >
                         {theme === 'classic' ? <GameIcon name="santa" size={24} /> : <GameIcon name="grinch" size={24} />}
@@ -46,10 +54,14 @@ export const HUD: React.FC<HUDProps> = ({ score, timeLeft, frozen = false, combo
                         <Button
                             variant="icon"
                             size="small"
-                            onClick={onPause}
+                            onPointerDown={(e) => e.stopPropagation()}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onPause();
+                            }}
                             style={{ padding: '0.2rem 0.6rem', fontSize: '1.2rem', minHeight: 'auto' }}
                         >
-                            ⏸️
+                            <GameIcon name="pause" size={24} />
                         </Button>
                     )}
                 </div>

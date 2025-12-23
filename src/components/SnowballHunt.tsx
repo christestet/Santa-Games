@@ -149,6 +149,19 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
         }
     }, [])
 
+    // Keyboard Pause
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.code === 'Escape' || e.code === 'KeyP') {
+                if (stateRef.current.isPlaying && !stateRef.current.isPaused) {
+                    onPause();
+                }
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [onPause]);
+
     // Sync refs for physics logic and timers
     useEffect(() => { stateRef.current.score = score }, [score])
     useEffect(() => { stateRef.current.frozen = frozen }, [frozen])
