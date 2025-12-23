@@ -6,7 +6,7 @@ interface AppConfig {
 
 const getApiBaseUrl = (): string => {
   if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
-  return import.meta.env.DEV ? 'http://localhost:3001' : window.location.origin;
+  return import.meta.env.DEV ? 'http://localhost:2412' : window.location.origin;
 };
 
 export const config: AppConfig = {

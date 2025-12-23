@@ -9,7 +9,7 @@ import { Modal } from '@components/ui/Modal'
 import { Card } from '@components/ui/Card'
 import { useLanguage } from '@components/LanguageContext'
 import { useTheme } from '@components/ThemeContext'
-import { useGame } from '@components/GameContext'
+import { useGame } from '@/context/GameContext'
 import GameIcon from '@components/GameIcon'
 import pkg from '@/../package.json'
 

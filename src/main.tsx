@@ -5,7 +5,7 @@ import App from './App.tsx'
 import { LanguageProvider } from '@components/LanguageContext.tsx'
 import { SoundProvider } from '@components/SoundContext.tsx'
 import { ThemeProvider } from '@components/ThemeContext.tsx'
-import { GameProvider } from '@components/GameContext.tsx'
+import { GameProvider } from '@components/GameProvider.tsx'
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>

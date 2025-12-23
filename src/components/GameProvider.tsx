@@ -1,47 +1,8 @@
-import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
+import React, { useState, useCallback, ReactNode } from 'react';
 import { GAME_CONFIG } from '@constants/gameConfig';
 import { useHighScores } from '@hooks/useHighScores';
-
-// Types
-export type GameType = 'snowball' | 'gift-toss' | 'none';
-export type GameState = 'menu' | 'playing' | 'name-entry' | 'gameover';
-
-interface GameSettings {
-    duration: number;
-    spawnInterval: number;
-    // Add other settings as needed based on GAME_CONFIG structure
-    [key: string]: any;
-}
-
-interface GameContextProps {
-    gameState: GameState;
-    currentGame: GameType;
-    score: number;
-    currentJoke: string;
-    playerName: string;
-    isPaused: boolean;
-    settings: typeof GAME_CONFIG;
-    showSettings: boolean;
-    highScores: any[]; // Replace with specific type if available
-    isLoadingScores: boolean;
-    scoreError: string | null;
-    isSubmittingScore: boolean;
-
-    // Actions
-    startGame: (game: GameType) => void;
-    endGame: (finalScore: number, joke: string) => void;
-    pauseGame: () => void;
-    resumeGame: () => void;
-    restartGame: () => void;
-    quitGame: () => void;
-    updateSettings: (newSettings: typeof GAME_CONFIG) => void;
-    toggleSettings: (show: boolean) => void;
-    setPlayerName: (name: string) => void;
-    submitScore: () => Promise<void>;
-    fetchScores: () => Promise<void>;
-}
-
-const GameContext = createContext<GameContextProps | undefined>(undefined);
+import { GameType, GameState } from '@/types/game';
+import { GameContext } from '../context/GameContext';
 
 export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [gameState, setGameState] = useState<GameState>('menu');
@@ -133,12 +94,4 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             {children}
         </GameContext.Provider>
     );
-};
-
-export const useGame = () => {
-    const context = useContext(GameContext);
-    if (context === undefined) {
-        throw new Error('useGame must be used within a GameProvider');
-    }
-    return context;
 };

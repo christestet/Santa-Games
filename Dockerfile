@@ -16,7 +16,8 @@ RUN npm run build
 FROM node:24-slim AS runner
 WORKDIR /app
 
-ENV NODE_ENV=production
+ENV NODE_ENV=production \
+    PORT=2412
 
 # Create non-root user (Debian syntax for slim image)
 RUN groupadd -r santa && useradd -r -g santa santa
@@ -35,11 +36,11 @@ RUN touch scores.json && chown santa:santa scores.json
 # Switch to non-root user
 USER santa
 
-EXPOSE 3001
+EXPOSE $PORT
 
 # Native Node.js Healthcheck
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD node -e "require('http').get('http://localhost:3001/api/health', (res) => { \
+    CMD node -e "require('http').get('http://localhost:$PORT/api/health', (res) => { \
     if (res.statusCode !== 200) { console.error('Health check failed: ' + res.statusCode); process.exit(1); } \
     process.exit(0); \
     }).on('error', (err) => { console.error(err); process.exit(1); })"
