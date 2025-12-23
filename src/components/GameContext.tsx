@@ -95,12 +95,12 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const submitScore = useCallback(async () => {
         if (!playerName.trim() || isSubmitting) return;
         setIsSubmitting(true);
-        const success = await apiSubmitScore(playerName, score);
+        const success = await apiSubmitScore(playerName, score, settings.TIMER);
         if (success) {
             setGameState('gameover');
         }
         setIsSubmitting(false);
-    }, [playerName, score, isSubmitting, apiSubmitScore]);
+    }, [playerName, score, isSubmitting, apiSubmitScore, settings.TIMER]);
 
     const value = {
         gameState,

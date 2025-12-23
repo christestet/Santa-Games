@@ -5,6 +5,8 @@ import { useLanguage } from '../components/LanguageContext';
 export interface Score {
     name: string;
     score: number;
+    time?: number;
+    timestamp?: number;
 }
 
 export const useHighScores = () => {
@@ -34,13 +36,13 @@ export const useHighScores = () => {
         }
     }, [t]);
 
-    const submitScore = async (name: string, score: number) => {
+    const submitScore = async (name: string, score: number, time?: number) => {
         setError(null);
         try {
             const res = await fetch(config.apiUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, score })
+                body: JSON.stringify({ name, score, time })
             });
             if (!res.ok) throw new Error(`Server returned ${res.status}`);
             await fetchScores();

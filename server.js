@@ -71,9 +71,9 @@ const initializeScores = async () => {
       SCORES_FILE,
       JSON.stringify(
         [
-          { name: "Santa", score: 500, timestamp: Date.now() },
-          { name: "Rudolph", score: 400, timestamp: Date.now() },
-          { name: "Elf", score: 300, timestamp: Date.now() },
+          { name: "Santa", score: 500, time: 60, timestamp: Date.now() },
+          { name: "Rudolph", score: 400, time: 60, timestamp: Date.now() },
+          { name: "Elf", score: 300, time: 60, timestamp: Date.now() },
         ],
         null,
         2
@@ -157,7 +157,7 @@ app.get("/api/scores", async (req, res) => {
     const topScores = scores
       .sort((a, b) => b.score - a.score)
       .slice(0, 10)
-      .map(({ name, score }) => ({ name, score })); // Don't expose timestamps
+      .map(({ name, score, time, timestamp }) => ({ name, score, time, timestamp })); // Expose timestamps
     res.json(topScores);
   } catch (err) {
     console.error("❌ The elves dropped the leaderboard!", err);
@@ -168,8 +168,8 @@ app.get("/api/scores", async (req, res) => {
 });
 
 app.post("/api/scores", scoreLimiter, async (req, res) => {
-  let { name, score } = req.body;
-  console.log(`🎁 New score delivery attempt: ${name} with ${score} points`);
+  let { name, score, time } = req.body;
+  console.log(`🎁 New score delivery attempt: ${name} with ${score} points (Time: ${time}s)`);
 
   try {
     // Validation
@@ -208,6 +208,16 @@ app.post("/api/scores", scoreLimiter, async (req, res) => {
         .json({ error: "That score is faker than Rudolph's nose!" });
     }
 
+    // Validate time (optional but suggested to be a number if present)
+    if (time !== undefined) {
+      time = parseInt(time, 10);
+      if (isNaN(time) || time < 0) {
+         // We can treat invalid time as undefined or default, or error out. 
+         // Let's just ignore it if invalid or treat as undefined.
+         time = undefined;
+      }
+    }
+
     // Read existing scores
     let scores = await readScores();
 
@@ -229,7 +239,7 @@ app.post("/api/scores", scoreLimiter, async (req, res) => {
     }
 
     // Add new score with timestamp
-    scores.push({ name, score, timestamp: now });
+    scores.push({ name, score, time, timestamp: now });
 
     // Keep only top scores
     const topScores = scores

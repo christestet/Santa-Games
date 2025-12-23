@@ -1,1 +1,20 @@
-[{"name": "Santa", "score": 500}, {"name": "Rudolph", "score": 400}, {"name": "Elf", "score": 300}]
+[
+  {
+    "name": "Santa",
+    "score": 500,
+    "time": 60,
+    "timestamp": 1766486172647
+  },
+  {
+    "name": "Rudolph",
+    "score": 400,
+    "time": 60,
+    "timestamp": 1766486172647
+  },
+  {
+    "name": "Elf",
+    "score": 300,
+    "time": 60,
+    "timestamp": 1766486172647
+  }
+]

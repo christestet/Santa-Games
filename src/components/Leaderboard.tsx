@@ -4,6 +4,8 @@ import { useLanguage } from '../components/LanguageContext';
 interface Score {
     name: string;
     score: number;
+    time?: number;
+    timestamp?: number;
 }
 
 interface LeaderboardProps {
@@ -45,7 +47,22 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
                 scores.slice(0, limit).map((s, i) => (
                     <div key={i} className="score-row">
                         <span>{i + 1}. {s.name}</span>
-                        <span style={{ color: 'var(--accent-color)' }}>{s.score}</span>
+                        <span style={{ color: 'var(--accent-color)' }}>
+                            {s.score}
+                            {(s.time || s.timestamp) && (
+                                <span style={{ fontSize: '0.8em', opacity: 0.8, marginLeft: '0.5rem' }}>
+                                    (
+                                    {s.time ? `${s.time}s` : ''}
+                                    {s.time && s.timestamp ? ' - ' : ''}
+                                    {s.timestamp ? new Date(s.timestamp).toLocaleDateString('en-GB', {
+                                        year: '2-digit',
+                                        month: '2-digit',
+                                        day: '2-digit'
+                                    }) : ''}
+                                    )
+                                </span>
+                            )}
+                        </span>
                     </div>
                 ))
             )}
