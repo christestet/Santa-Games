@@ -11,3 +11,5 @@
 - [ ] feat: user initial am anfang gefragt werden ob er sound will oder nicht und ob er den classic oder den grinch theme nutzen möchte
 
 - [ ] feat: zeige einen countdown bis ende des jahres - so lange soll die anwendung spielbar sein, ab den 1.1.2026 ( TZ Europe/Berlin) zeige nur noch ALLE (nicht nur top 5) Highscores an
+
+- [ ] feat: server.js soll die treafik und cf access proxies respekteren, siehe https://gemini.google.com/share/74070987cb2c
