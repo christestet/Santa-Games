@@ -13,25 +13,17 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, 
     if (!isOpen) return null;
 
     return (
-        <div style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            zIndex: 100,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'rgba(0, 0, 0, 0.7)',
-            backdropFilter: 'blur(4px)',
-            padding: window.innerWidth <= 375 ? '1rem' : '1.5rem',
-            ...style
-        }} onClick={(e) => {
-            if (e.target === e.currentTarget && onClose) {
-                onClose();
-            }
-        }}>
+        <div
+            className={`fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm ${
+                window.innerWidth <= 375 ? 'p-4' : 'p-6'
+            }`}
+            style={style}
+            onClick={(e) => {
+                if (e.target === e.currentTarget && onClose) {
+                    onClose();
+                }
+            }}
+        >
             <Card title={title} className="modal-content">
                 {children}
             </Card>

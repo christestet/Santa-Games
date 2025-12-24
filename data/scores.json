@@ -1,0 +1,20 @@
+[
+  {
+    "name": "Santa",
+    "score": 500,
+    "time": 60,
+    "timestamp": 1766566784412
+  },
+  {
+    "name": "Rudolph",
+    "score": 400,
+    "time": 60,
+    "timestamp": 1766566784412
+  },
+  {
+    "name": "Elf",
+    "score": 300,
+    "time": 60,
+    "timestamp": 1766566784412
+  }
+]

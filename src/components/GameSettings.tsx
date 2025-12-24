@@ -32,10 +32,10 @@ export default function GameSettings({ settings, onUpdate, onClose }: GameSettin
     const presets = [30, 60, 90, 120];
 
     return (
-        <Modal isOpen={true} onClose={onClose} title={<div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>{t('settings.title')} <GameIcon name="settings" size={24} /></div>}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'center', width: '100%' }}>
-                <label style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>
-                    {t('settings.duration')}: <span style={{ color: 'var(--primary-color)', fontSize: '1.4rem' }}>{formatTime(settings.TIMER)}</span>
+        <Modal isOpen={true} onClose={onClose} title={<div className="flex items-center gap-2">{t('settings.title')} <GameIcon name="settings" size={24} /></div>}>
+            <div className="flex flex-col gap-2 items-center w-full">
+                <label className="text-xl font-bold">
+                    {t('settings.duration')}: <span className="text-[var(--primary-color)] text-2xl">{formatTime(settings.TIMER)}</span>
                 </label>
 
                 <input
@@ -45,7 +45,7 @@ export default function GameSettings({ settings, onUpdate, onClose }: GameSettin
                     step="10"
                     value={settings.TIMER}
                     onChange={(e) => handleTimerChange(parseInt(e.target.value))}
-                    style={{ width: '100%' }}
+                    className="w-full"
                 />
 
                 <div className="preset-container">
@@ -55,17 +55,14 @@ export default function GameSettings({ settings, onUpdate, onClose }: GameSettin
                             variant="secondary"
                             size="small"
                             onClick={() => handleTimerChange(p)}
-                            style={{
-                                opacity: settings.TIMER === p ? 1 : 0.6,
-                                border: settings.TIMER === p ? '4px solid var(--primary-color)' : 'var(--border-width) solid var(--card-border)'
-                            }}
+                            className={`${settings.TIMER === p ? 'opacity-100 border-4 border-[var(--primary-color)]' : 'opacity-60 border-[length:var(--border-width)] border-[var(--card-border)]'}`}
                         >
                             {p}s
                         </Button>
                     ))}
                 </div>
 
-                <div style={{ width: '100%', height: '4px', background: 'var(--card-border)', opacity: 0.3, margin: '1rem 0' }} />
+                <div className="w-full h-1 bg-[var(--card-border)] opacity-30 my-4" />
 
                 <div className="settings-row">
                     <label className="settings-label">{t('settings.sound')}</label>
@@ -74,7 +71,7 @@ export default function GameSettings({ settings, onUpdate, onClose }: GameSettin
                             variant={isMuted ? 'secondary' : 'primary'}
                             size="small"
                             onClick={toggleMute}
-                            style={{ minWidth: '100px' }}
+                            className="min-w-[100px]"
                         >
                             {isMuted ? <> <GameIcon name="sound_off" size={16} /> {t('settings.soundOff')} </> : <> <GameIcon name="sound_on" size={16} /> {t('settings.soundOn')} </>}
                         </Button>
@@ -88,7 +85,7 @@ export default function GameSettings({ settings, onUpdate, onClose }: GameSettin
                             variant="secondary"
                             size="small"
                             onClick={toggleTheme}
-                            style={{ minWidth: '140px' }}
+                            className="min-w-[140px]"
                         >
                             {theme === 'classic' ? <> <GameIcon name="santa" size={16} /> {t('settings.themeClassic')} </> : <> <GameIcon name="grinch" size={16} /> {t('settings.themeGrinch')} </>}
                         </Button>
@@ -96,7 +93,7 @@ export default function GameSettings({ settings, onUpdate, onClose }: GameSettin
                 </div>
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '1rem' }}>
+            <div className="flex justify-center gap-4 mt-4">
                 <Button onClick={onClose} size="small">
                     {t('common.done')}
                 </Button>

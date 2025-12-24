@@ -27,33 +27,33 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
     const { t } = useLanguage();
     return (
         <div className="leaderboard frost-card">
-            <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center' }}>
+            <h2 className="flex items-center gap-2 justify-center">
                 <GameIcon name="trophy" size={24} /> {t('game.leaderboard')}
             </h2>
             {isLoading ? (
-                <div style={{ padding: '2rem', textAlign: 'center' }}>
+                <div className="p-8 text-center">
                     <div className="spinner">⏳</div>
                     <p>{t('common.loading')}</p>
                 </div>
             ) : error ? (
-                <div style={{ padding: '1rem', color: '#ff6b6b' }}>
+                <div className="p-4 text-[#ff6b6b]">
                     <p>{error}</p>
                     {onRetry && (
-                        <button className="btn-small" onClick={onRetry} style={{ marginTop: '0.5rem' }}>
+                        <button className="btn-small mt-2" onClick={onRetry}>
                             {t('common.retry')}
                         </button>
                     )}
                 </div>
             ) : scores.length === 0 ? (
-                <p style={{ padding: '1rem', opacity: 0.7 }}>{t('game.noScores')}</p>
+                <p className="p-4 opacity-70">{t('game.noScores')}</p>
             ) : (
                 scores.slice(0, limit).map((s, i) => (
                     <div key={i} className="score-row">
                         <span>{i + 1}. {s.name}</span>
-                        <span style={{ color: 'var(--accent-color)' }}>
+                        <span className="text-[var(--accent-color)]">
                             {s.score}
                             {(s.time || s.timestamp) && (
-                                <span style={{ fontSize: '0.8em', opacity: 0.8, marginLeft: '0.5rem' }}>
+                                <span className="text-[0.8em] opacity-80 ml-2">
                                     (
                                     {s.time ? `${s.time}s` : ''}
                                     {s.time && s.timestamp ? ' - ' : ''}

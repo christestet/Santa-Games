@@ -25,11 +25,10 @@ const GameCard: React.FC<GameCardProps> = ({ title, icon, instructions, onPlay }
                 <div className="game-card-front">
                     <span className="game-icon">{icon}</span>
                     <h3>{title}</h3>
-                    <div style={{ display: 'flex', gap: '0.5rem', width: '100%', justifyContent: 'center' }}>
+                    <div className="flex gap-2 w-full justify-center">
                         <button className="btn-small">{t('menu.play')}</button>
                         <button
-                            className="btn-small"
-                            style={{ background: 'transparent', border: 'var(--border-width) solid var(--card-border)', color: 'var(--card-border)' }}
+                            className="btn-small bg-transparent border-[length:var(--border-width)] border-[var(--card-border)] text-[var(--card-border)]"
                             onClick={handleFlip}
                         >
                             {t('menu.info')}
@@ -39,7 +38,7 @@ const GameCard: React.FC<GameCardProps> = ({ title, icon, instructions, onPlay }
 
                 {/* Back Side */}
                 <div className="game-card-back">
-                    <h3 style={{ fontFamily: 'var(--font-retro)', color: 'var(--primary-color)', margin: 0 }}>{title}</h3>
+                    <h3 className="font-[var(--font-retro)] text-[var(--primary-color)] m-0">{title}</h3>
                     <p className="instruction-text">{instructions}</p>
                     <button className="btn-small" onClick={handleFlip}>
                         {t('common.back')}

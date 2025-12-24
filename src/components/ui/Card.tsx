@@ -11,15 +11,7 @@ export const Card: React.FC<CardProps> = ({ title, className = '', children, sty
     return (
         <div className={`frost-card ${className}`} style={style}>
             {title && (
-                <h2 style={{
-                    fontFamily: 'var(--font-retro)',
-                    color: 'var(--primary-color)',
-                    margin: '0 0 1rem 0',
-                    fontSize: '2rem',
-                    textAlign: 'center',
-                    borderBottom: '4px solid var(--card-border)',
-                    paddingBottom: '0.5rem'
-                }}>
+                <h2 className="font-[var(--font-retro)] text-[var(--primary-color)] m-0 mb-4 text-[2rem] text-center border-b-4 border-[var(--card-border)] pb-2">
                     {title}
                 </h2>
             )}
