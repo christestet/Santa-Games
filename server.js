@@ -158,12 +158,19 @@ app.post("/api/toggle-health", (req, res) => {
 app.get("/api/scores", async (req, res) => {
   console.log("🎄 Checking Santa's nice list...");
   try {
+    const showAll = req.query.all === 'true';
     const scores = await readScores();
-    const topScores = scores
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 10)
-      .map(({ name, score, time, timestamp }) => ({ name, score, time, timestamp })); // Expose timestamps
-    res.json(topScores);
+    const sortedScores = scores.sort((a, b) => b.score - a.score);
+
+    // Return all scores if requested, otherwise top 10
+    const resultScores = showAll
+      ? sortedScores.map(({ name, score, time, timestamp }) => ({ name, score, time, timestamp }))
+      : sortedScores
+          .slice(0, 10)
+          .map(({ name, score, time, timestamp }) => ({ name, score, time, timestamp }));
+
+    console.log(`📊 Returning ${resultScores.length} scores (all: ${showAll})`);
+    res.json(resultScores);
   } catch (err) {
     console.error("❌ The elves dropped the leaderboard!", err);
     res
@@ -276,7 +283,7 @@ app.use((req, res) => {
 });
 
 // Error handling middleware
-app.use((err, req, res) => {
+app.use((err, req, res, _next) => {
   console.error("🔥 Santa's workshop caught fire:", err);
   res
     .status(500)
@@ -293,7 +300,7 @@ const startServer = async () => {
       await fsPromises.readFile(path.join(__dirname, "package.json"), "utf8")
     );
     version = packageJson.version;
-  } catch (err) {
+  } catch (_err) {
     console.warn("⚠️ Could not read package.json version");
   }
 

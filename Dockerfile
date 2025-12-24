@@ -17,7 +17,8 @@ FROM node:24-slim AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production \
-    PORT=2412
+    PORT=2412 \
+    TZ=Europe/Berlin
 
 # Create non-root user (Debian syntax for slim image)
 RUN groupadd -r santa && useradd -r -g santa santa

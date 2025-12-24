@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { config } from '../config';
 import { useLanguage } from '../components/LanguageContext';
+import { isGamePlayable } from '@constants/gameConstants';
 
 export interface Score {
     name: string;
@@ -19,7 +20,11 @@ export const useHighScores = () => {
         setIsLoading(true);
         setError(null);
         try {
-            const res = await fetch(config.apiUrl);
+            // Fetch all scores if game has expired, otherwise top scores only
+            const showAll = !isGamePlayable();
+            const url = showAll ? `${config.apiUrl}?all=true` : config.apiUrl;
+
+            const res = await fetch(url);
             if (!res.ok) throw new Error(`Server returned ${res.status}`);
             const data = await res.json();
             if (Array.isArray(data)) {

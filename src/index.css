@@ -172,11 +172,34 @@ body::before {
 }
 
 /* Leaderboard Specifics */
-/* Leaderboard Specifics */
 .leaderboard {
   width: 90%;
   max-width: 800px;
   margin: 1rem auto;
+}
+
+/* Scrollable leaderboard with retro scrollbar */
+.leaderboard > div:has(.score-row) {
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary-color) var(--card-bg);
+}
+
+.leaderboard > div:has(.score-row)::-webkit-scrollbar {
+  width: 12px;
+}
+
+.leaderboard > div:has(.score-row)::-webkit-scrollbar-track {
+  background: var(--card-bg);
+  border: 2px solid var(--card-border);
+}
+
+.leaderboard > div:has(.score-row)::-webkit-scrollbar-thumb {
+  background: var(--primary-color);
+  border: 2px solid var(--card-border);
+}
+
+.leaderboard > div:has(.score-row)::-webkit-scrollbar-thumb:hover {
+  background: var(--secondary-color);
 }
 
 .menu-container {
@@ -278,6 +301,12 @@ h1 {
 .btn-start:active, .btn-small:active {
   transform: translate(4px, 4px);
   box-shadow: none;
+}
+
+.btn-start:disabled, .btn-small:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 /* Inputs */

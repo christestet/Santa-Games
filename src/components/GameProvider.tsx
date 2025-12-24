@@ -1,5 +1,6 @@
 import React, { useState, useCallback, ReactNode } from 'react';
 import { GAME_CONFIG } from '@constants/gameConfig';
+import { isGamePlayable } from '@constants/gameConstants';
 import { useHighScores } from '@hooks/useHighScores';
 import { GameType, GameState } from '@/types/game';
 import { GameContext } from '../context/GameContext';
@@ -18,6 +19,12 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const { highScores, isLoading, error, fetchScores, submitScore: apiSubmitScore } = useHighScores();
 
     const startGame = useCallback((game: GameType) => {
+        // Prevent starting game if deadline has passed
+        if (!isGamePlayable()) {
+            console.warn('Game cannot be started - deadline has passed');
+            return;
+        }
+
         setCurrentGame(game);
         setScore(0);
         setPlayerName("");
@@ -41,6 +48,14 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }, []);
 
     const restartGame = useCallback(() => {
+        // Prevent restarting game if deadline has passed
+        if (!isGamePlayable()) {
+            console.warn('Game cannot be restarted - deadline has passed');
+            setIsPaused(false);
+            setGameState('menu');
+            return;
+        }
+
         setIsPaused(false);
         startGame(currentGame);
     }, [currentGame, startGame]);

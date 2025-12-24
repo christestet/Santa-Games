@@ -4,6 +4,7 @@ import GiftToss from '@components/GiftToss'
 import GameSettings from '@components/GameSettings'
 import GameCard from '@components/GameCard'
 import Leaderboard from '@components/Leaderboard'
+import Countdown from '@components/Countdown'
 import { Button } from '@components/ui/Button'
 import { Modal } from '@components/ui/Modal'
 import { Card } from '@components/ui/Card'
@@ -11,6 +12,7 @@ import { useLanguage } from '@components/LanguageContext'
 import { useTheme } from '@components/ThemeContext'
 import { useGame } from '@/context/GameContext'
 import GameIcon from '@components/GameIcon'
+import { GAME_DEADLINE, isGamePlayable } from '@constants/gameConstants'
 import pkg from '@/../package.json'
 
 const App: React.FC = () => {
@@ -42,6 +44,8 @@ const App: React.FC = () => {
         submitScore,
         fetchScores
     } = useGame()
+
+    const gamesPlayable = isGamePlayable()
 
     return (
         <div className="game-container">
@@ -84,12 +88,14 @@ const App: React.FC = () => {
                             icon={<GameIcon name="snowflake" size={64} />}
                             instructions={t('menu.snowballDesc')}
                             onPlay={() => startGame('snowball')}
+                            disabled={!gamesPlayable}
                         />
                         <GameCard
                             title={t('menu.giftTitle')}
                             icon={<GameIcon name="gift" size={64} />}
                             instructions={t('menu.giftDesc')}
                             onPlay={() => startGame('gift-toss')}
+                            disabled={!gamesPlayable}
                         />
                     </div>
 
@@ -115,8 +121,11 @@ const App: React.FC = () => {
                         />
                     </div>
 
-                    <div className="version-tag">
-                        v{pkg.version}
+                    <div className="flex flex-col gap-4 items-center mt-8 mb-4">
+                        <div className="version-tag">
+                            v{pkg.version}
+                        </div>
+                        <Countdown targetDate={GAME_DEADLINE} />
                     </div>
                 </div>
             )}

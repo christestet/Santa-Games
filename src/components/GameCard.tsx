@@ -7,9 +7,10 @@ interface GameCardProps {
     icon: React.ReactNode;
     instructions: string;
     onPlay: () => void;
+    disabled?: boolean;
 }
 
-const GameCard: React.FC<GameCardProps> = ({ title, icon, instructions, onPlay }) => {
+const GameCard: React.FC<GameCardProps> = ({ title, icon, instructions, onPlay, disabled = false }) => {
     const { t } = useLanguage();
     const [isFlipped, setIsFlipped] = useState(false);
 
@@ -18,15 +19,29 @@ const GameCard: React.FC<GameCardProps> = ({ title, icon, instructions, onPlay }
         setIsFlipped(!isFlipped);
     };
 
+    const handleCardClick = () => {
+        if (!disabled) {
+            onPlay();
+        }
+    };
+
     return (
-        <div className={`game-card-container ${isFlipped ? 'is-flipped' : ''}`} onClick={onPlay}>
+        <div
+            className={`game-card-container ${isFlipped ? 'is-flipped' : ''} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+            onClick={handleCardClick}
+        >
             <div className="game-card-inner">
                 {/* Front Side */}
                 <div className="game-card-front">
                     <span className="game-icon">{icon}</span>
                     <h3>{title}</h3>
                     <div className="flex gap-2 w-full justify-center">
-                        <button className="btn-small">{t('menu.play')}</button>
+                        <button
+                            className="btn-small"
+                            disabled={disabled}
+                        >
+                            {disabled ? t('menu.expired') : t('menu.play')}
+                        </button>
                         <button
                             className="btn-small bg-transparent border-[length:var(--border-width)] border-[var(--card-border)] text-[var(--card-border)]"
                             onClick={handleFlip}

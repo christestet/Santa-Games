@@ -1,5 +1,6 @@
 import React from 'react';
 import { useLanguage } from '../components/LanguageContext';
+import { isGamePlayable } from '@constants/gameConstants';
 import GameIcon from './GameIcon';
 
 interface Score {
@@ -25,10 +26,21 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
     limit = 5
 }) => {
     const { t } = useLanguage();
+    const gameExpired = !isGamePlayable();
+
+    // Show all scores when game has expired, otherwise respect limit
+    const displayLimit = gameExpired ? scores.length : limit;
+    const displayScores = scores.slice(0, displayLimit);
+
     return (
         <div className="leaderboard frost-card">
             <h2 className="flex items-center gap-2 justify-center">
                 <GameIcon name="trophy" size={24} /> {t('game.leaderboard')}
+                {gameExpired && scores.length > 0 && (
+                    <span className="text-sm opacity-70 ml-2">
+                        ({scores.length} {scores.length === 1 ? t('game.player') : t('game.players')})
+                    </span>
+                )}
             </h2>
             {isLoading ? (
                 <div className="p-8 text-center">
@@ -47,27 +59,29 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
             ) : scores.length === 0 ? (
                 <p className="p-4 opacity-70">{t('game.noScores')}</p>
             ) : (
-                scores.slice(0, limit).map((s, i) => (
-                    <div key={i} className="score-row">
-                        <span>{i + 1}. {s.name}</span>
-                        <span className="text-[var(--accent-color)]">
-                            {s.score}
-                            {(s.time || s.timestamp) && (
-                                <span className="text-[0.8em] opacity-80 ml-2">
-                                    (
-                                    {s.time ? `${s.time}s` : ''}
-                                    {s.time && s.timestamp ? ' - ' : ''}
-                                    {s.timestamp ? new Date(s.timestamp).toLocaleDateString('en-GB', {
-                                        year: '2-digit',
-                                        month: '2-digit',
-                                        day: '2-digit'
-                                    }) : ''}
-                                    )
-                                </span>
-                            )}
-                        </span>
-                    </div>
-                ))
+                <div className={gameExpired && displayScores.length > 10 ? 'max-h-96 overflow-y-auto' : ''}>
+                    {displayScores.map((s, i) => (
+                        <div key={i} className="score-row">
+                            <span>{i + 1}. {s.name}</span>
+                            <span className="text-[var(--accent-color)]">
+                                {s.score}
+                                {(s.time || s.timestamp) && (
+                                    <span className="text-[0.8em] opacity-80 ml-2">
+                                        (
+                                        {s.time ? `${s.time}s` : ''}
+                                        {s.time && s.timestamp ? ' - ' : ''}
+                                        {s.timestamp ? new Date(s.timestamp).toLocaleDateString('en-GB', {
+                                            year: '2-digit',
+                                            month: '2-digit',
+                                            day: '2-digit'
+                                        }) : ''}
+                                        )
+                                    </span>
+                                )}
+                            </span>
+                        </div>
+                    ))}
+                </div>
             )}
         </div>
     );

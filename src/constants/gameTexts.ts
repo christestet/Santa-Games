@@ -27,6 +27,7 @@ export const TRANSLATIONS = {
             snowballDesc: "Tippe auf Geschenke und Sterne, um Punkte zu sammeln. Vermeide die Kohle, außer du warst unartig! Nutze Eis für einen Freeze oder Uhren für mehr Zeit.",
             giftTitle: "Geschenke Weitwurf",
             giftDesc: "Tippe, um Geschenke abzuwerfen. Ziele genau in die Schornsteine! Achte auf Hindernisse wie Flugzeuge und Wolken - Santa hat keine Haftpflicht!",
+            expired: "ABGELAUFEN",
         },
         settings: {
             title: "Einstellungen",
@@ -54,6 +55,10 @@ export const TRANSLATIONS = {
             poof: "POOF!",
             perfect: "PERFEKT",
             miss: "Daneben",
+            playableUntil: "Spielbar bis 01.01.2026",
+            gameEnded: "Spiel beendet",
+            player: "Spieler",
+            players: "Spieler",
         },
         hooks: {
             fetchError: "Bestenliste konnte nicht geladen werden - die Elfen haben Mittagspause",
@@ -86,6 +91,7 @@ export const TRANSLATIONS = {
             snowballDesc: "Tap on gifts and stars to collect points. Avoid the coal unless you've been naughty! Use ice for a freeze or clocks for more time.",
             giftTitle: "Gift Toss",
             giftDesc: "Tap to drop gifts. Aim for the chimneys! Watch out for obstacles like planes and clouds - Santa's insurance doesn't cover that!",
+            expired: "EXPIRED",
         },
         settings: {
             title: "Settings",
@@ -113,6 +119,10 @@ export const TRANSLATIONS = {
             poof: "POOF!",
             perfect: "PERFECT",
             miss: "Miss",
+            playableUntil: "Playable until 01.01.2026",
+            gameEnded: "Game ended",
+            player: "player",
+            players: "players",
         },
         hooks: {
             fetchError: "Failed to load leaderboard - the elves are on lunch break",
