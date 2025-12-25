@@ -212,10 +212,10 @@ export default function ReindeerRun({ onGameOver, settings, isPaused, onPause }:
             let y = GROUND_Y;
 
             if (type === 'branch') {
-                // High obstacle - must duck
+                // Head-height obstacle - must duck under it
                 width = 80;
                 height = 30;
-                y = GROUND_Y - 80;
+                y = GROUND_Y - 20; // At head height - requires ducking
             } else if (type === 'tree') {
                 height = 70;
                 y = GROUND_Y - 20;
@@ -248,9 +248,11 @@ export default function ReindeerRun({ onGameOver, settings, isPaused, onPause }:
     const checkCollision = useCallback((obstacle: Obstacle): boolean => {
         const p = playerRef.current;
         const playerHeight = p.isDucking ? PLAYER_HEIGHT / 2 : PLAYER_HEIGHT;
+        // When ducking, shift Y down so feet stay on ground (head goes down)
+        const playerY = p.isDucking ? p.y + (PLAYER_HEIGHT / 2) : p.y;
 
         return checkAABBCollision(
-            { x: PLAYER_X, y: p.y, width: PLAYER_WIDTH, height: playerHeight },
+            { x: PLAYER_X, y: playerY, width: PLAYER_WIDTH, height: playerHeight },
             { x: obstacle.x, y: obstacle.y, width: obstacle.width, height: obstacle.height }
         );
     }, [PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_X]);
@@ -347,11 +349,12 @@ export default function ReindeerRun({ onGameOver, settings, isPaused, onPause }:
 
             const newX = sf.x - (gameSpeed.current * speedMultiplier);
             const playerHeight = p.isDucking ? PLAYER_HEIGHT / 2 : PLAYER_HEIGHT;
+            const playerY = p.isDucking ? p.y + (PLAYER_HEIGHT / 2) : p.y;
             const sfSize = 40;
 
             // Check collision with player
             if (checkAABBCollision(
-                { x: PLAYER_X, y: p.y, width: PLAYER_WIDTH, height: playerHeight },
+                { x: PLAYER_X, y: playerY, width: PLAYER_WIDTH, height: playerHeight },
                 { x: newX, y: sf.y, width: sfSize, height: sfSize }
             )) {
                 // Snowflake collected!
@@ -422,6 +425,7 @@ export default function ReindeerRun({ onGameOver, settings, isPaused, onPause }:
 
     const p = playerRef.current;
     const playerHeight = p.isDucking ? PLAYER_HEIGHT / 2 : PLAYER_HEIGHT;
+    const playerY = p.isDucking ? p.y + (PLAYER_HEIGHT / 2) : p.y;
 
     return (
         <div
@@ -465,13 +469,13 @@ export default function ReindeerRun({ onGameOver, settings, isPaused, onPause }:
             <div style={{
                 position: 'absolute',
                 left: PLAYER_X,
-                top: p.y,
+                top: playerY,
                 width: PLAYER_WIDTH,
                 height: playerHeight,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                transition: p.isDucking ? 'height 0.1s' : 'none'
+                transition: p.isDucking ? 'height 0.1s, top 0.1s' : 'none'
             }}>
                 <GameIcon name="reindeer" size={PLAYER_WIDTH} />
             </div>

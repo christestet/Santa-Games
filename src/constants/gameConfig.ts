@@ -69,13 +69,13 @@ export const GAME_CONFIG: GameSettings = {
     },
     REINDEER_RUN: {
         GROUND_SPEED: 6,
-        JUMP_FORCE: -12,
+        JUMP_FORCE: -10, // Reduced from -12 for more reasonable jump height
         DUCK_DURATION: 400,
         OBSTACLE_SPAWN_RATE_MIN: 1200,
         OBSTACLE_SPAWN_RATE_MAX: 2000,
         OBSTACLE_SPEED_START: 6,
         OBSTACLE_SPEED_INCREMENT: 0.005,
-        OBSTACLE_SPEED_MAX: 12,
+        OBSTACLE_SPEED_MAX: 9, // Reduced from 12 to prevent collision tunneling at high speeds
         POINTS_PER_OBSTACLE: 10,
         POINTS_PER_SECOND: 5,
         SNOWFLAKE_SPAWN_CHANCE: 0.15,
