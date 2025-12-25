@@ -4,9 +4,12 @@ services:
     build: .
     container_name: santa-game
     ports:
-      - "${PORT}:${PORT}"
+      - "${PORT:-2412}:${PORT:-2412}"
     env_file:
       - .env
     volumes:
-      - ./scores.json:/app/scores.json
+      - santa_data:/app/data
     restart: unless-stopped
+
+volumes:
+  santa_data:

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useLanguage } from '../components/LanguageContext';
 import { isGamePlayable } from '@constants/gameConstants';
+import { ScoreError } from '@hooks/useHighScores';
 import GameIcon from './GameIcon';
 
 interface Score {
@@ -13,7 +14,7 @@ interface Score {
 interface LeaderboardProps {
     scores: Score[];
     isLoading?: boolean;
-    error?: string | null;
+    error?: ScoreError;
     onRetry?: () => void;
     limit?: number;
 }
@@ -49,7 +50,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
                 </div>
             ) : error ? (
                 <div className="p-4 text-[#ff6b6b]">
-                    <p>{error}</p>
+                    <p>{error === 'fetch' ? t('hooks.fetchError') : t('hooks.submitError')}</p>
                     {onRetry && (
                         <button className="btn-small mt-2" onClick={onRetry}>
                             {t('common.retry')}

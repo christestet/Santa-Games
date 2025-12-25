@@ -1,6 +1,7 @@
 import { createContext, useContext } from 'react';
 import { GameType, GameState } from '@/types/game';
 import { GAME_CONFIG } from '@constants/gameConfig';
+import { ScoreError } from '@hooks/useHighScores';
 
 export interface GameContextProps {
     gameState: GameState;
@@ -13,7 +14,7 @@ export interface GameContextProps {
     showSettings: boolean;
     highScores: { name: string; score: number; time: number; timestamp: number }[];
     isLoadingScores: boolean;
-    scoreError: string | null;
+    scoreError: ScoreError;
     isSubmittingScore: boolean;
 
     // Actions

@@ -4,6 +4,7 @@ import fs from "node:fs";
 import { promises as fsPromises } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { createHash } from "node:crypto";
 import rateLimit from "express-rate-limit";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -14,8 +15,36 @@ const PORT = process.env.PORT || 2412;
 const MAX_SCORES = parseInt(process.env.MAX_SCORES) || 50;
 const SCORES_DIR = path.join(__dirname, "data");
 const SCORES_FILE = path.join(SCORES_DIR, "scores.json");
+const GAME_DEADLINE = new Date('2026-01-01T00:00:00+01:00');
 
 let isHealthy = true;
+
+// Check if games are still playable
+const isGamePlayable = () => {
+  return new Date().getTime() < GAME_DEADLINE.getTime();
+};
+
+// In-memory cache for optimized performance
+const cache = {
+  scores: null,
+  scoresTop10: null,
+  etag: null,
+  etagTop10: null,
+  lastModified: null,
+  lastModifiedTop10: null,
+  lastFileModified: null,
+};
+
+// Helper to invalidate cache
+const invalidateCache = () => {
+  cache.scores = null;
+  cache.scoresTop10 = null;
+  cache.etag = null;
+  cache.etagTop10 = null;
+  cache.lastModified = null;
+  cache.lastModifiedTop10 = null;
+  console.log("🗑️  Cache invalidated");
+};
 
 // Middleware
 app.use(
@@ -109,6 +138,12 @@ const writeScores = async (scores) => {
   await fsPromises.writeFile(SCORES_FILE, JSON.stringify(scores, null, 2));
 };
 
+// Helper to generate ETag from data
+const generateETag = (data) => {
+  const hash = createHash("md5").update(JSON.stringify(data)).digest("hex");
+  return `"${hash}"`;
+};
+
 // Input validation helpers
 const hasSuspiciousPatterns = (str) => {
   const patterns =
@@ -156,20 +191,69 @@ app.post("/api/toggle-health", (req, res) => {
 });
 
 app.get("/api/scores", async (req, res) => {
-  console.log("🎄 Checking Santa's nice list...");
+  const showAll = req.query.all === 'true';
+  console.log(`🎄 Checking Santa's nice list... (all=${showAll})`);
+
   try {
-    const showAll = req.query.all === 'true';
-    const scores = await readScores();
-    const sortedScores = scores.sort((a, b) => b.score - a.score);
+    // Check file modification time for cache invalidation
+    const stats = fs.existsSync(SCORES_FILE)
+      ? await fsPromises.stat(SCORES_FILE)
+      : null;
+    const fileMtime = stats ? stats.mtime.getTime() : 0;
 
-    // Return all scores if requested, otherwise top 10
-    const resultScores = showAll
-      ? sortedScores.map(({ name, score, time, timestamp }) => ({ name, score, time, timestamp }))
-      : sortedScores
-          .slice(0, 10)
-          .map(({ name, score, time, timestamp }) => ({ name, score, time, timestamp }));
+    // Invalidate cache if file was modified
+    if (cache.lastFileModified !== fileMtime) {
+      invalidateCache();
+      cache.lastFileModified = fileMtime;
+    }
 
-    console.log(`📊 Returning ${resultScores.length} scores (all: ${showAll})`);
+    // Use appropriate cache based on request type
+    const cacheKey = showAll ? 'scores' : 'scoresTop10';
+    const etagKey = showAll ? 'etag' : 'etagTop10';
+    const modifiedKey = showAll ? 'lastModified' : 'lastModifiedTop10';
+
+    // Build cache if needed
+    if (!cache[cacheKey]) {
+      const scores = await readScores();
+      const sortedScores = scores.sort((a, b) => b.score - a.score);
+
+      const resultScores = showAll
+        ? sortedScores.map(({ name, score, time, timestamp }) => ({ name, score, time, timestamp }))
+        : sortedScores
+            .slice(0, 10)
+            .map(({ name, score, time, timestamp }) => ({ name, score, time, timestamp }));
+
+      cache[cacheKey] = resultScores;
+      cache[etagKey] = generateETag(resultScores);
+      cache[modifiedKey] = resultScores.length > 0
+        ? new Date(Math.max(...resultScores.map(s => s.timestamp || 0)))
+        : new Date();
+
+      console.log(`💾 Cache built for ${cacheKey} (${resultScores.length} scores)`);
+    }
+
+    const resultScores = cache[cacheKey];
+    const etag = cache[etagKey];
+    const lastModified = cache[modifiedKey];
+
+    // Adaptive cache duration based on game state
+    const cacheMaxAge = isGamePlayable() ? 30 : 3600; // 30s during game, 1h after
+
+    // Set cache headers
+    res.setHeader("Cache-Control", `public, max-age=${cacheMaxAge}, must-revalidate`);
+    res.setHeader("ETag", etag);
+    res.setHeader("Last-Modified", lastModified.toUTCString());
+
+    // Check if client has cached version
+    const clientETag = req.headers["if-none-match"];
+    const clientModified = req.headers["if-modified-since"];
+
+    if (clientETag === etag || (clientModified && new Date(clientModified) >= lastModified)) {
+      console.log("✨ 304 Not Modified (client cache hit)");
+      return res.status(304).end();
+    }
+
+    console.log(`📊 200 OK - returning ${resultScores.length} scores from memory cache`);
     res.json(resultScores);
   } catch (err) {
     console.error("❌ The elves dropped the leaderboard!", err);
@@ -260,6 +344,9 @@ app.post("/api/scores", scoreLimiter, async (req, res) => {
 
     // Save to file
     await writeScores(topScores);
+
+    // Invalidate cache after new score
+    invalidateCache();
 
     console.log(
       `✨ ${name} made it onto Santa's nice list with ${score} points!`

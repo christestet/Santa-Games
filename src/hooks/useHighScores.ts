@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
 import { config } from '../config';
-import { useLanguage } from '../components/LanguageContext';
 import { isGamePlayable } from '@constants/gameConstants';
 
 export interface Score {
@@ -10,11 +9,12 @@ export interface Score {
     timestamp?: number;
 }
 
+export type ScoreError = 'fetch' | 'submit' | null;
+
 export const useHighScores = () => {
-    const { t } = useLanguage();
     const [highScores, setHighScores] = useState<Score[]>([]);
     const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    const [error, setError] = useState<ScoreError>(null);
 
     const fetchScores = useCallback(async () => {
         setIsLoading(true);
@@ -34,12 +34,12 @@ export const useHighScores = () => {
             }
         } catch (e) {
             console.error("Failed to fetch scores", e);
-            setError(t('hooks.fetchError'));
+            setError('fetch');
             setHighScores([]);
         } finally {
             setIsLoading(false);
         }
-    }, [t]);
+    }, []);
 
     const submitScore = async (name: string, score: number, time?: number) => {
         setError(null);
@@ -54,7 +54,7 @@ export const useHighScores = () => {
             return true;
         } catch (e) {
             console.error("Submission failed", e);
-            setError(t('hooks.submitError'));
+            setError('submit');
             return false;
         }
     };

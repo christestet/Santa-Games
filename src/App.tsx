@@ -175,7 +175,7 @@ const App: React.FC = () => {
                                 marginBottom: '1rem',
                                 color: '#ff6b6b'
                             }}>
-                                {scoreError}
+                                {scoreError === 'submit' ? t('hooks.submitError') : t('hooks.fetchError')}
                             </div>
                         )}
                         <input

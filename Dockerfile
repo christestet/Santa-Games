@@ -31,8 +31,8 @@ RUN npm ci --omit=dev && npm cache clean --force
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/server.js ./
 
-# Setup data file
-RUN touch scores.json && chown santa:santa scores.json
+# Setup data directory (will be replaced by volume in production)
+RUN mkdir -p data && chown -R santa:santa data
 
 # Switch to non-root user
 USER santa
