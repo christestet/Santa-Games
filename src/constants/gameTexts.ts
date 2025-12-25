@@ -27,6 +27,8 @@ export const TRANSLATIONS = {
             snowballDesc: "Tippe auf Geschenke und Sterne, um Punkte zu sammeln. Vermeide die Kohle, außer du warst unartig! Nutze Eis für einen Freeze oder Uhren für mehr Zeit.",
             giftTitle: "Geschenke Weitwurf",
             giftDesc: "Tippe, um Geschenke abzuwerfen. Ziele genau in die Schornsteine! Achte auf Hindernisse wie Flugzeuge und Wolken - Santa hat keine Haftpflicht!",
+            runnerTitle: "Rentier Rennen",
+            runnerDesc: "Renne endlos durch die verschneite Landschaft! Tippe zum Springen, wische nach unten zum Ducken. Weiche Hindernissen aus und sammle Punkte!",
             expired: "ABGELAUFEN",
         },
         settings: {
@@ -59,6 +61,10 @@ export const TRANSLATIONS = {
             gameEnded: "Spiel beendet",
             player: "Spieler",
             players: "Spieler",
+            runner: {
+                tapToJump: "TIPPE ZUM SPRINGEN",
+                swipeDown: "WISCH NACH UNTEN ZUM DUCKEN",
+            },
         },
         hooks: {
             fetchError: "Bestenliste konnte nicht geladen werden - die Elfen haben Mittagspause",
@@ -91,6 +97,8 @@ export const TRANSLATIONS = {
             snowballDesc: "Tap on gifts and stars to collect points. Avoid the coal unless you've been naughty! Use ice for a freeze or clocks for more time.",
             giftTitle: "Gift Toss",
             giftDesc: "Tap to drop gifts. Aim for the chimneys! Watch out for obstacles like planes and clouds - Santa's insurance doesn't cover that!",
+            runnerTitle: "Reindeer Run",
+            runnerDesc: "Run endlessly through the snowy landscape! Tap to jump, swipe down to duck. Dodge obstacles and collect points!",
             expired: "EXPIRED",
         },
         settings: {
@@ -123,6 +131,10 @@ export const TRANSLATIONS = {
             gameEnded: "Game ended",
             player: "player",
             players: "players",
+            runner: {
+                tapToJump: "TAP TO JUMP",
+                swipeDown: "SWIPE DOWN TO DUCK",
+            },
         },
         hooks: {
             fetchError: "Failed to load leaderboard - the elves are on lunch break",

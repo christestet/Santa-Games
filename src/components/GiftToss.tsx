@@ -4,58 +4,7 @@ import { HUD } from './ui/HUD'
 import { useLanguage } from './LanguageContext';
 import { useSound } from './SoundContext';
 import GameIcon from './GameIcon';
-
-// --- Audio Manager ---
-class SoundManager {
-    ctx: AudioContext | null = null;
-    muted: boolean = false;
-
-    constructor() {
-        try {
-            // @ts-ignore
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            this.ctx = new AudioContext();
-        } catch (e) {
-            console.error("Web Audio API not supported", e);
-        }
-    }
-
-    playTone(freq: number, type: OscillatorType, duration: number, vol: number = 0.1) {
-        if (!this.ctx || this.muted) return;
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-        osc.type = type;
-        osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-        gain.gain.setValueAtTime(vol, this.ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-        osc.start();
-        osc.stop(this.ctx.currentTime + duration);
-    }
-
-    playThrow() {
-        if (!this.ctx || this.muted) return;
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-        osc.frequency.setValueAtTime(150, this.ctx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(50, this.ctx.currentTime + 0.2);
-        gain.gain.setValueAtTime(0.05, this.ctx.currentTime);
-        gain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 0.2);
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-        osc.start();
-        osc.stop(this.ctx.currentTime + 0.2);
-    }
-
-    playHit() {
-        this.playTone(400, 'sine', 0.1, 0.1);
-    }
-
-    playPoof() {
-        this.playTone(80, 'sawtooth', 0.1, 0.1);
-    }
-}
+import { SoundManager } from '@/utils/SoundManager';
 
 interface Gift {
     id: number;
@@ -160,7 +109,7 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
     useEffect(() => {
         soundManager.current = new SoundManager();
         const resumeAudio = () => {
-            soundManager.current?.ctx?.resume();
+            soundManager.current?.resume();
             window.removeEventListener('pointerdown', resumeAudio);
         }
         window.addEventListener('pointerdown', resumeAudio);

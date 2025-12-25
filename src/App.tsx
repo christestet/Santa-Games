@@ -1,6 +1,7 @@
 import Snow from '@components/Snow'
 import SnowballHunt from '@components/SnowballHunt'
 import GiftToss from '@components/GiftToss'
+import ReindeerRun from '@components/ReindeerRun'
 import GameSettings from '@components/GameSettings'
 import GameCard from '@components/GameCard'
 import Leaderboard from '@components/Leaderboard'
@@ -97,6 +98,13 @@ const App: React.FC = () => {
                             onPlay={() => startGame('gift-toss')}
                             disabled={!gamesPlayable}
                         />
+                        <GameCard
+                            title={t('menu.runnerTitle')}
+                            icon={<GameIcon name="reindeer" size={64} />}
+                            instructions={t('menu.runnerDesc')}
+                            onPlay={() => startGame('reindeer-run')}
+                            disabled={!gamesPlayable}
+                        />
                     </div>
 
 
@@ -143,6 +151,14 @@ const App: React.FC = () => {
                     )}
                     {currentGame === 'gift-toss' && (
                         <GiftToss
+                            onGameOver={endGame}
+                            settings={settings}
+                            isPaused={isPaused}
+                            onPause={pauseGame}
+                        />
+                    )}
+                    {currentGame === 'reindeer-run' && (
+                        <ReindeerRun
                             onGameOver={endGame}
                             settings={settings}
                             isPaused={isPaused}

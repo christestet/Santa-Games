@@ -24,6 +24,21 @@ export interface GameSettings {
         SPAWN_RATE_CHIMNEY: number;
         SPAWN_RATE_OBSTACLE: number;
     };
+    REINDEER_RUN: {
+        GROUND_SPEED: number;
+        JUMP_FORCE: number;
+        DUCK_DURATION: number;
+        OBSTACLE_SPAWN_RATE_MIN: number;
+        OBSTACLE_SPAWN_RATE_MAX: number;
+        OBSTACLE_SPEED_START: number;
+        OBSTACLE_SPEED_INCREMENT: number;
+        OBSTACLE_SPEED_MAX: number;
+        POINTS_PER_OBSTACLE: number;
+        POINTS_PER_SECOND: number;
+        SNOWFLAKE_SPAWN_CHANCE: number;
+        BULLET_TIME_DURATION: number;
+        BULLET_TIME_SPEED_MULTIPLIER: number;
+    };
 }
 
 export const GAME_CONFIG: GameSettings = {
@@ -51,5 +66,20 @@ export const GAME_CONFIG: GameSettings = {
         CHIMNEY_HEIGHT: 80,
         SPAWN_RATE_CHIMNEY: 4000,
         SPAWN_RATE_OBSTACLE: 3500,
+    },
+    REINDEER_RUN: {
+        GROUND_SPEED: 6,
+        JUMP_FORCE: -12,
+        DUCK_DURATION: 400,
+        OBSTACLE_SPAWN_RATE_MIN: 1200,
+        OBSTACLE_SPAWN_RATE_MAX: 2000,
+        OBSTACLE_SPEED_START: 6,
+        OBSTACLE_SPEED_INCREMENT: 0.005,
+        OBSTACLE_SPEED_MAX: 12,
+        POINTS_PER_OBSTACLE: 10,
+        POINTS_PER_SECOND: 5,
+        SNOWFLAKE_SPAWN_CHANCE: 0.15,
+        BULLET_TIME_DURATION: 3000,
+        BULLET_TIME_SPEED_MULTIPLIER: 0.3,
     }
 };
