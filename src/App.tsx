@@ -98,13 +98,14 @@ const App: React.FC = () => {
                             onPlay={() => startGame('gift-toss')}
                             disabled={!gamesPlayable}
                         />
-                        <GameCard
+                        {/* Reindeer Run - temporarily hidden (not ready yet) */}
+                        {/* <GameCard
                             title={t('menu.runnerTitle')}
                             icon={<GameIcon name="reindeer" size={64} />}
                             instructions={t('menu.runnerDesc')}
                             onPlay={() => startGame('reindeer-run')}
                             disabled={!gamesPlayable}
-                        />
+                        /> */}
                     </div>
 
 
