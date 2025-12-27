@@ -15,6 +15,7 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const [settings, setSettings] = useState(GAME_CONFIG);
     const [showSettings, setShowSettings] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [lastPlayedTime, setLastPlayedTime] = useState(GAME_CONFIG.TIMER);
 
     const { highScores, isLoading, error, fetchScores, submitScore: apiSubmitScore } = useHighScores();
 
@@ -30,7 +31,8 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setPlayerName("");
         setGameState('playing');
         setIsPaused(false);
-    }, []);
+        setLastPlayedTime(settings.TIMER);
+    }, [settings.TIMER]);
 
     const endGame = useCallback((finalScore: number, joke: string) => {
         setScore(finalScore);
@@ -91,6 +93,7 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         isLoadingScores: isLoading,
         scoreError: error,
         isSubmittingScore: isSubmitting,
+        lastPlayedTime,
         startGame,
         endGame,
         pauseGame,

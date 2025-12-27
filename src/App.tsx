@@ -33,6 +33,7 @@ const App: React.FC = () => {
         isLoadingScores,
         scoreError,
         isSubmittingScore,
+        lastPlayedTime,
         startGame,
         endGame,
         pauseGame,
@@ -127,6 +128,7 @@ const App: React.FC = () => {
                             isLoading={isLoadingScores}
                             error={scoreError}
                             onRetry={fetchScores}
+                            defaultTime={lastPlayedTime}
                         />
                     </div>
 
@@ -257,6 +259,7 @@ const App: React.FC = () => {
                         <Leaderboard
                             scores={highScores}
                             isLoading={isLoadingScores}
+                            defaultTime={lastPlayedTime}
                         />
 
                         <Card className="joke-card" style={{ width: '100%' }}>

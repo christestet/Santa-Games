@@ -17,6 +17,7 @@ interface LeaderboardProps {
     error?: ScoreError;
     onRetry?: () => void;
     limit?: number;
+    defaultTime?: number;
 }
 
 const Leaderboard: React.FC<LeaderboardProps> = ({
@@ -24,7 +25,8 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
     isLoading,
     error,
     onRetry,
-    limit = 5
+    limit = 5,
+    defaultTime = 60
 }) => {
     const { t } = useLanguage();
     const gameExpired = !isGamePlayable();
@@ -32,8 +34,9 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
     // Available play time durations
     const timeOptions = [30, 60, 90, 120];
 
-    // State for selected time filter
-    const [selectedTime, setSelectedTime] = useState<number>(60);
+    // State for selected time filter - use defaultTime if it's one of the valid options
+    const initialTime = timeOptions.includes(defaultTime) ? defaultTime : 60;
+    const [selectedTime, setSelectedTime] = useState<number>(initialTime);
 
     // Filter scores by selected time duration
     const filteredScores = scores.filter(s => s.time === selectedTime);
