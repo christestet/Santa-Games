@@ -16,6 +16,7 @@ const PORT = process.env.PORT || 2412;
 const MAX_SCORES = parseInt(process.env.MAX_SCORES) || 50;
 const SCORES_DIR = path.join(__dirname, "data");
 const SCORES_FILE = path.join(SCORES_DIR, "scores.json");
+const LOCK_DIR = process.env.LOCK_DIR || "/tmp";
 const GAME_DEADLINE = new Date("2026-01-01T00:00:00+01:00");
 
 let isHealthy = true;
@@ -349,7 +350,8 @@ app.post("/api/scores", scoreLimiter, async (req, res) => {
           minTimeout: 100,
           maxTimeout: 500
         },
-        stale: 10000
+        stale: 10000,
+        lockfilePath: path.join(LOCK_DIR, "scores.json.lock")
       });
     } catch (lockErr) {
       console.error("🔒 Couldn't acquire lock on scores file:", lockErr);
