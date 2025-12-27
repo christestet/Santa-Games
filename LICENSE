@@ -19,3 +19,29 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+---
+
+## Third-Party Assets
+
+This project incorporates the following third-party assets that are licensed separately from the MIT-licensed source code:
+
+### Font
+
+**JetBrains Mono**
+- Copyright: 2020 The JetBrains Mono Project Authors (https://github.com/JetBrains/JetBrainsMono)
+- License: SIL Open Font License 1.1 (https://scripts.sil.org/OFL)
+- Files: `src/assets/JetBrainsMono-Regular.woff2`
+- No attribution is legally required under OFL-1.1, but attribution is appreciated
+
+### Music
+
+**Pixel Snowfall Carol**
+- Generated with: Suno AI v5 Pro
+- License: Commercial use rights granted under Suno Pro subscription
+- Files: `src/assets/pixel-snowfall-carol.mp3`
+- Note: AI-generated content may not be eligible for copyright protection in all jurisdictions. This music was created using Suno AI's Pro tier, which grants commercial usage rights to subscribers. However, users should be aware that AI-generated works currently exist in a legal gray area regarding copyright claims.
+
+### Disclaimer
+
+The third-party assets listed above are subject to their respective licenses. The MIT License for this project's source code does not apply to these assets. Users who fork or redistribute this project must ensure compliance with the respective licenses of these third-party components.
