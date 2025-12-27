@@ -131,8 +131,37 @@ const App: React.FC = () => {
                     </div>
 
                     <div className="flex flex-col gap-4 items-center mt-8 mb-4">
-                        <div className="version-tag">
-                            v{pkg.version}
+                        <div className="version-tag" style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.5rem',
+                            padding: '0.4rem 0.6rem'
+                        }}>
+                            <span>v{pkg.version}</span>
+                            <a
+                                href="https://github.com/christestet/Santa-Games"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="github-link"
+                                style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    opacity: 0.8,
+                                    transition: 'opacity 0.2s, transform 0.1s',
+                                    cursor: 'pointer',
+                                    lineHeight: 0,
+                                    minWidth: '24px',
+                                    minHeight: '24px',
+                                    padding: '2px'
+                                }}
+                                onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
+                                onMouseLeave={(e) => e.currentTarget.style.opacity = '0.8'}
+                                onPointerDown={(e) => e.currentTarget.style.transform = 'scale(0.95)'}
+                                onPointerUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                            >
+                                <GameIcon name="github" size={16} />
+                            </a>
                         </div>
                         <Countdown targetDate={GAME_DEADLINE} />
                     </div>

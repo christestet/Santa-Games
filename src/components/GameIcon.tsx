@@ -24,7 +24,8 @@ export type GameIconName =
     | 'pause'
     | 'snowman'
     | 'rock'
-    | 'branch';
+    | 'branch'
+    | 'github';
 
 interface GameIconProps {
     name: GameIconName;
@@ -595,6 +596,44 @@ const SPRITES: Record<GameIconName, SpriteDefinition> = {
                 <rect x="5" y="6" width="3" height="1" fill="#FFFFFF" />
                 <rect x="10" y="6" width="2" height="1" fill="#FFFFFF" />
                 <rect x="13" y="6" width="2" height="1" fill="#FFFFFF" />
+            </>
+        )
+    },
+    github: {
+        content: (
+            <>
+                {/* --- Body/Base (Shoulders) --- */}
+                {/* Wide base to suggest the tentacle mass without visual clutter */}
+                <rect x="3" y="10" width="10" height="4" style={{ fill: 'var(--text-main)' }} />
+                <rect x="4" y="9" width="8" height="2" style={{ fill: 'var(--text-main)' }} />
+
+                {/* --- Head --- */}
+                {/* Main face shape */}
+                <rect x="4" y="4" width="8" height="6" style={{ fill: 'var(--text-main)' }} />
+                <rect x="3" y="5" width="10" height="4" style={{ fill: 'var(--text-main)' }} />
+
+                {/* Ears (Pointy & Distinct) */}
+                <rect x="3" y="3" width="2" height="2" style={{ fill: 'var(--text-main)' }} />
+                <rect x="11" y="3" width="2" height="2" style={{ fill: 'var(--text-main)' }} />
+                <rect x="3" y="2" width="1" height="1" style={{ fill: 'var(--text-main)' }} />
+                <rect x="12" y="2" width="1" height="1" style={{ fill: 'var(--text-main)' }} />
+
+                {/* --- Face Details --- */}
+                {/* Eyes - positioned to look cute/iconic */}
+                <rect x="5" y="6" width="2" height="2" fill="#FFFFFF" />
+                <rect x="9" y="6" width="2" height="2" fill="#FFFFFF" />
+
+                {/* Pupils - inverted colors for contrast on both themes */}
+                <rect x="6" y="6" width="1" height="1" style={{ fill: 'var(--bg-color)' }} opacity="0.8" />
+                <rect x="10" y="6" width="1" height="1" style={{ fill: 'var(--bg-color)' }} opacity="0.8" />
+
+                {/* --- Lighting/Styling (Matching other icons) --- */}
+                {/* Subtle Highlight on forehead/ears (Plastic/Metal feel) */}
+                <rect x="5" y="4" width="2" height="1" style={{ fill: 'var(--text-main)' }} opacity="0.6" />
+                <rect x="4" y="3" width="1" height="1" style={{ fill: 'var(--text-main)' }} opacity="0.6" />
+
+                {/* Subtle Shadow under chin */}
+                <rect x="5" y="10" width="6" height="1" style={{ fill: 'var(--text-main)' }} opacity="0.3" />
             </>
         )
     }

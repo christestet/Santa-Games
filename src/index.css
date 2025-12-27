@@ -697,13 +697,19 @@ input[type=range]::-moz-range-thumb {
   .gift-item { font-size: 1.8rem; }
   
   .version-tag {
-    position: relative; 
+    position: relative;
     bottom: auto;
     right: auto;
     font-size: 0.7rem;
     margin-top: 2rem;
     opacity: 0.6;
     margin-bottom: 1rem;
+    padding: 0.3rem 0.5rem !important;
+  }
+
+  .version-tag .github-link svg {
+    width: 14px;
+    height: 14px;
   }
 }
 
@@ -818,6 +824,12 @@ input[type=range]::-moz-range-thumb {
     right: auto;
     margin-top: 1rem;
     opacity: 0.6;
+    padding: 0.3rem 0.5rem !important;
+  }
+
+  .version-tag .github-link svg {
+    width: 14px;
+    height: 14px;
   }
 }
 
@@ -892,7 +904,12 @@ input[type=range]::-moz-range-thumb {
 
   .version-tag {
     font-size: 0.7rem;
-    padding: 0.2rem 0.4rem;
+    padding: 0.3rem 0.5rem !important;
+  }
+
+  .version-tag .github-link svg {
+    width: 14px;
+    height: 14px;
   }
 }
 
@@ -1254,6 +1271,14 @@ input[type=range]::-moz-range-thumb {
   margin-top: 2rem;
   margin-bottom: 1rem;
   align-self: center;
+}
+
+.version-tag .github-link {
+  -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
+}
+
+.version-tag .github-link:active {
+  transform: scale(0.95);
 }
 
 .joke-card {
