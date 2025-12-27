@@ -52,6 +52,9 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
         lastTime: 0,
         velocityX: 0
     })
+    const rafThrottle = useRef<number>(0)
+    const isDragging = useRef(false)
+    const dragStartX = useRef(0)
 
     // Physics constants
     const GRAVITY = settings.PHYSICS.GRAVITY
@@ -220,7 +223,11 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
                 );
 
                 if (hitChimney) {
-                    const pts = Math.max(10, Math.floor(50 - Math.abs(nextX - hitChimney.x) / 2));
+                    // Improved scoring: 50-150 points based on accuracy (was 10-50)
+                    const centerX = hitChimney.x + hitChimney.width / 2;
+                    const distance = Math.abs(nextX + GIFT_SIZE / 2 - centerX);
+                    const accuracy = Math.max(0, 1 - distance / (hitChimney.width / 2));
+                    const pts = Math.floor(50 + accuracy * 100); // 50-150 points
                     hits.push({ type: 'chimney', giftType: gift.type, x: nextX, y: nextY, pts });
                     nextGifts.push({ ...gift, landed: true, active: false });
                 } else {
@@ -278,7 +285,15 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
                 if (hit.giftType === 'parcel') {
                     addFloatingText(hit.x, hit.y, getParcelText(), "#8D6E63");
                 } else {
-                    addFloatingText(hit.x, hit.y, pts > 40 ? `${t("game.perfect")} +${pts}` : `+${pts}`, pts > 40 ? '#4caf50' : '#ffd700');
+                    // Updated thresholds for new scoring system (50-150 range)
+                    const isPerfect = pts >= 120;
+                    const isGreat = pts >= 80;
+                    addFloatingText(
+                        hit.x,
+                        hit.y,
+                        isPerfect ? `${t("game.perfect")} +${pts}` : `+${pts}`,
+                        isPerfect ? '#4caf50' : isGreat ? '#ffd700' : '#ffeb3b'
+                    );
                 }
 
                 if (navigator.vibrate) navigator.vibrate(20);
@@ -322,6 +337,7 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
 
         return () => {
             cancelAnimationFrame(requestRef.current);
+            if (rafThrottle.current) cancelAnimationFrame(rafThrottle.current);
             clearInterval(chimneyInterval);
             clearInterval(obstacleInterval);
             clearInterval(timerInterval);
@@ -374,41 +390,68 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
         setGifts(prev => [...prev, newGift]);
     };
 
-    const handleTap = (e: React.PointerEvent) => {
-        // Reset velocity tracker on new touch
+    const handlePointerDown = (e: React.PointerEvent) => {
+        if (!stateRef.current.isPlaying || stateRef.current.isPaused) return;
+
+        isDragging.current = true;
+        dragStartX.current = e.clientX;
+
+        // Reset velocity tracker
         velocityTracker.current = {
             lastX: e.clientX,
             lastTime: performance.now(),
             velocityX: 0
         };
-        handleThrow();
     };
 
     const handlePointerMove = (e: React.PointerEvent) => {
+        if (!stateRef.current.isPlaying || stateRef.current.isPaused || !isDragging.current) return;
+
+        // Throttle using RAF for 60fps max (prevents excessive re-renders on 120Hz displays)
+        if (rafThrottle.current) return;
+
+        rafThrottle.current = requestAnimationFrame(() => {
+            const now = performance.now();
+            const dt = now - velocityTracker.current.lastTime;
+
+            if (dt > 0) {
+                // Calculate velocity in pixels per millisecond
+                const dx = e.clientX - velocityTracker.current.lastX;
+                velocityTracker.current.velocityX = dx / dt;
+            }
+
+            velocityTracker.current.lastX = e.clientX;
+            velocityTracker.current.lastTime = now;
+
+            // Update ref AND state (state update batched by React 19.2)
+            santaRef.current.x = Math.max(20, Math.min(e.clientX, window.innerWidth - 60));
+            setSantaX(santaRef.current.x);
+
+            rafThrottle.current = 0;
+        });
+    };
+
+    const handlePointerUp = (e: React.PointerEvent) => {
         if (!stateRef.current.isPlaying || stateRef.current.isPaused) return;
 
-        const now = performance.now();
-        const dt = now - velocityTracker.current.lastTime;
+        // Only throw if it was a quick tap (not a long drag)
+        const dragDistance = Math.abs(e.clientX - dragStartX.current);
+        const isQuickTap = dragDistance < 10; // Less than 10px movement = tap
 
-        if (dt > 0) {
-            // Calculate velocity in pixels per millisecond
-            const dx = e.clientX - velocityTracker.current.lastX;
-            velocityTracker.current.velocityX = dx / dt;
+        if (isQuickTap) {
+            handleThrow();
         }
 
-        velocityTracker.current.lastX = e.clientX;
-        velocityTracker.current.lastTime = now;
-
-        // Directly update ref for smoother performance
-        santaRef.current.x = e.clientX;
-        setSantaX(e.clientX);
+        isDragging.current = false;
     };
 
     return (
         <div
             className="game-area gift-toss"
-            onPointerDown={handleTap}
+            onPointerDown={handlePointerDown}
             onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onPointerCancel={handlePointerUp}
             style={{ cursor: 'none', outline: 'none', touchAction: 'none' }}
             tabIndex={0}
         >
@@ -416,6 +459,21 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
             <div className="santa-hand-top" style={{ left: santaX }}>
                 <GameIcon name="santa" size={40} />
             </div>
+            {/* Drop zone indicator - shows approximate landing zone */}
+            <div
+                style={{
+                    position: 'absolute',
+                    left: santaX - 30,
+                    bottom: CHIMNEY_HEIGHT + 10,
+                    width: '60px',
+                    height: '4px',
+                    background: 'rgba(255, 215, 0, 0.4)',
+                    borderRadius: '2px',
+                    pointerEvents: 'none',
+                    zIndex: 5,
+                    boxShadow: '0 0 10px rgba(255, 215, 0, 0.6)'
+                }}
+            />
 
             {obstacles.map(o => (
                 <div key={o.id} className="obstacle" style={{ left: o.x, top: o.y, width: o.width, height: o.height }}>

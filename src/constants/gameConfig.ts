@@ -49,8 +49,8 @@ export const GAME_CONFIG: GameSettings = {
         COAL: -50,
     },
     PHYSICS: {
-        GRAVITY: 0.4,
-        THROW_VELOCITY: 4,
+        GRAVITY: 0.3, // Reduced from 0.4 for easier aiming
+        THROW_VELOCITY: 6, // Increased from 4 for faster gift travel
         PROJECTILE_SPEED: 0.08,
     },
     SNOWBALL_HUNT: {
@@ -61,11 +61,11 @@ export const GAME_CONFIG: GameSettings = {
         TARGET_MAX_AGE_MIN: 1500,
     },
     GIFT_TOSS: {
-        COOLDOWN: 400,
-        GIFT_SIZE: 40,
+        COOLDOWN: 200, // Reduced from 400ms for better responsiveness
+        GIFT_SIZE: 50, // Increased from 40px for better visibility on mobile
         CHIMNEY_HEIGHT: 80,
-        SPAWN_RATE_CHIMNEY: 4000,
-        SPAWN_RATE_OBSTACLE: 3500,
+        SPAWN_RATE_CHIMNEY: 2000, // Reduced from 4000ms - spawn chimneys 2x faster
+        SPAWN_RATE_OBSTACLE: 5000, // Increased from 3500ms - fewer obstacles
     },
     REINDEER_RUN: {
         GROUND_SPEED: 6,
