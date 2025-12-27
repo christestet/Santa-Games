@@ -1,20 +1,22 @@
-import { useEffect, useState } from 'react'
+import { memo, useMemo } from 'react'
 
-const Snow = () => {
-    const [snowflakes, setSnowflakes] = useState<any[]>([])
+// Generate snowflakes once outside component to avoid recalculation
+// This leverages React 19.2's improved rendering performance
+const generateSnowflakes = () =>
+    Array.from({ length: 30 }, (_, i) => ({
+        id: i,
+        left: `${Math.random() * 100}%`,
+        // Use negative delay to start the animation at a random point in its cycle
+        delay: `-${Math.random() * 5}s`,
+        duration: `${Math.random() * 3 + 4}s`,
+        size: `${Math.random() * 1 + 0.5}rem`,
+        opacity: Math.random(),
+    }))
 
-    useEffect(() => {
-        const flakes = Array.from({ length: 30 }).map((_, i) => ({
-            id: i,
-            left: `${Math.random() * 100}%`,
-            // Use negative delay to start the animation at a random point in its cycle
-            delay: `-${Math.random() * 5}s`,
-            duration: `${Math.random() * 3 + 4}s`,
-            size: `${Math.random() * 1 + 0.5}rem`,
-            opacity: Math.random(),
-        }))
-        setSnowflakes(flakes)
-    }, [])
+const Snow = memo(() => {
+    // Memoize snowflakes array - only calculate once per component instance
+    // React 19.2's improved memoization handles this efficiently
+    const snowflakes = useMemo(() => generateSnowflakes(), [])
 
     return (
         <div className="snow-overlay">
@@ -35,6 +37,9 @@ const Snow = () => {
             ))}
         </div>
     )
-}
+})
+
+// Add display name for React DevTools
+Snow.displayName = 'Snow'
 
 export default Snow
