@@ -217,11 +217,26 @@ app.get("/api/scores", async (req, res) => {
       const scores = await readScores();
       const sortedScores = scores.sort((a, b) => b.score - a.score);
 
-      const resultScores = showAll
-        ? sortedScores.map(({ name, score, time, timestamp }) => ({ name, score, time, timestamp }))
-        : sortedScores
-            .slice(0, 10)
+      let resultScores;
+      if (showAll) {
+        // After deadline: return all scores
+        resultScores = sortedScores.map(({ name, score, time, timestamp }) => ({ name, score, time, timestamp }));
+      } else {
+        // During gameplay: return top 10 scores PER time duration
+        const timeDurations = [30, 60, 90, 120];
+        const scoresPerTime = {};
+
+        // Group scores by time duration
+        timeDurations.forEach(duration => {
+          scoresPerTime[duration] = sortedScores
+            .filter(s => s.time === duration)
+            .slice(0, 10)  // Top 10 per duration
             .map(({ name, score, time, timestamp }) => ({ name, score, time, timestamp }));
+        });
+
+        // Flatten all scores from all durations
+        resultScores = timeDurations.flatMap(duration => scoresPerTime[duration]);
+      }
 
       cache[cacheKey] = resultScores;
       cache[etagKey] = generateETag(resultScores);
