@@ -390,6 +390,14 @@ export default function ReindeerRun({ onGameOver, settings, isPaused, onPause }:
         requestRef.current = requestAnimationFrame(update);
     }, [settings, checkCollision, spawnObstacle, onGameOver, getJoke, GROUND_Y, PLAYER_X, PLAYER_WIDTH, PLAYER_HEIGHT, bulletTimeEndTime]);
 
+    // Trigger game over when time runs out
+    useEffect(() => {
+        if (timeLeft <= 0 && stateRef.current.isPlaying) {
+            stateRef.current.isPlaying = false;
+            onGameOver(stateRef.current.score, getJoke());
+        }
+    }, [timeLeft, onGameOver, getJoke]);
+
     useEffect(() => {
         requestRef.current = requestAnimationFrame(update);
 
@@ -403,8 +411,6 @@ export default function ReindeerRun({ onGameOver, settings, isPaused, onPause }:
             if (!stateRef.current.isPaused && stateRef.current.isPlaying) {
                 setTimeLeft(t => {
                     if (t <= 1) {
-                        stateRef.current.isPlaying = false;
-                        onGameOver(stateRef.current.score, getJoke());
                         return 0;
                     }
                     return t - 1;
@@ -421,7 +427,7 @@ export default function ReindeerRun({ onGameOver, settings, isPaused, onPause }:
             clearInterval(cloudInterval);
             clearInterval(timerInterval);
         }
-    }, [update, spawnCloud, onGameOver, getJoke]);
+    }, [update, spawnCloud]);
 
     const p = playerRef.current;
     const playerHeight = p.isDucking ? PLAYER_HEIGHT / 2 : PLAYER_HEIGHT;

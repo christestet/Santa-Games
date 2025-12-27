@@ -1,9 +1,27 @@
 [
   {
+    "name": "CHRIS",
+    "score": 2300,
+    "time": 30,
+    "timestamp": 1766865447649
+  },
+  {
+    "name": "CHRIS",
+    "score": 650,
+    "time": 10,
+    "timestamp": 1766865755488
+  },
+  {
     "name": "Santa",
     "score": 500,
     "time": 60,
     "timestamp": 1766566784412
+  },
+  {
+    "name": "CHRIS",
+    "score": 400,
+    "time": 10,
+    "timestamp": 1766867460391
   },
   {
     "name": "Rudolph",
@@ -16,5 +34,65 @@
     "score": 300,
     "time": 60,
     "timestamp": 1766566784412
+  },
+  {
+    "name": "CHRIS",
+    "score": 200,
+    "time": 10,
+    "timestamp": 1766868025478
+  },
+  {
+    "name": "C",
+    "score": 100,
+    "time": 10,
+    "timestamp": 1766866730076
+  },
+  {
+    "name": "CHRIS",
+    "score": 100,
+    "time": 10,
+    "timestamp": 1766867992369
+  },
+  {
+    "name": "CHRIS",
+    "score": 0,
+    "time": 10,
+    "timestamp": 1766866049691
+  },
+  {
+    "name": "C",
+    "score": 0,
+    "time": 10,
+    "timestamp": 1766866789235
+  },
+  {
+    "name": "CHROS",
+    "score": 0,
+    "time": 10,
+    "timestamp": 1766866962590
+  },
+  {
+    "name": "CHROS",
+    "score": 0,
+    "time": 10,
+    "timestamp": 1766867028507
+  },
+  {
+    "name": "CHRIS",
+    "score": 0,
+    "time": 10,
+    "timestamp": 1766867922856
+  },
+  {
+    "name": "CHRIS",
+    "score": 0,
+    "time": 10,
+    "timestamp": 1766868194858
+  },
+  {
+    "name": "CHRIS",
+    "score": 0,
+    "time": 10,
+    "timestamp": 1766868246762
   }
 ]

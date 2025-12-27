@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useLanguage } from './LanguageContext';
+import { useGame } from '@/context/GameContext';
 import { Card } from './ui/Card';
 
 interface GameCardProps {
@@ -12,6 +13,7 @@ interface GameCardProps {
 
 const GameCard: React.FC<GameCardProps> = ({ title, icon, instructions, onPlay, disabled = false }) => {
     const { t } = useLanguage();
+    const { isTransitioning } = useGame();
     const [isFlipped, setIsFlipped] = useState(false);
 
     const handleFlip = (e: React.MouseEvent) => {
@@ -20,15 +22,16 @@ const GameCard: React.FC<GameCardProps> = ({ title, icon, instructions, onPlay, 
     };
 
     const handleCardClick = () => {
-        if (!disabled) {
+        if (!disabled && !isTransitioning) {
             onPlay();
         }
     };
 
     return (
         <div
-            className={`game-card-container ${isFlipped ? 'is-flipped' : ''} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className={`game-card-container ${isFlipped ? 'is-flipped' : ''} ${disabled || isTransitioning ? 'opacity-50 cursor-not-allowed' : ''}`}
             onClick={handleCardClick}
+            style={{ pointerEvents: isTransitioning ? 'none' : 'auto' }}
         >
             <div className="game-card-inner">
                 {/* Front Side */}
@@ -38,13 +41,14 @@ const GameCard: React.FC<GameCardProps> = ({ title, icon, instructions, onPlay, 
                     <div className="flex gap-2 w-full justify-center">
                         <button
                             className="btn-small"
-                            disabled={disabled}
+                            disabled={disabled || isTransitioning}
                         >
                             {disabled ? t('menu.expired') : t('menu.play')}
                         </button>
                         <button
                             className="btn-small bg-transparent border-[length:var(--border-width)] border-[var(--card-border)] text-[var(--card-border)]"
                             onClick={handleFlip}
+                            disabled={isTransitioning}
                         >
                             {t('menu.info')}
                         </button>
@@ -55,7 +59,7 @@ const GameCard: React.FC<GameCardProps> = ({ title, icon, instructions, onPlay, 
                 <div className="game-card-back">
                     <h3 className="font-[var(--font-retro)] text-[var(--primary-color)] m-0">{title}</h3>
                     <p className="instruction-text">{instructions}</p>
-                    <button className="btn-small" onClick={handleFlip}>
+                    <button className="btn-small" onClick={handleFlip} disabled={isTransitioning}>
                         {t('common.back')}
                     </button>
                 </div>

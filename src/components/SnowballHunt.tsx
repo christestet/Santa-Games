@@ -357,14 +357,20 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
         return () => clearInterval(spawnInterval);
     }, [spawnTarget, score, settings.SNOWBALL_HUNT.SPAWN_RATE_BASE, settings.SNOWBALL_HUNT.SPAWN_RATE_MIN]);
 
+    // Trigger game over when time runs out
+    useEffect(() => {
+        if (timeLeft <= 0 && stateRef.current.isPlaying) {
+            stateRef.current.isPlaying = false;
+            onGameOver(stateRef.current.score, getJoke());
+        }
+    }, [timeLeft, onGameOver, getJoke]);
+
     useEffect(() => {
         requestRef.current = requestAnimationFrame(animate);
         const timerInterval = setInterval(() => {
             if (!stateRef.current.frozen && stateRef.current.isPlaying && !stateRef.current.isPaused) {
                 setTimeLeft(t => {
                     if (t <= 1) {
-                        stateRef.current.isPlaying = false;
-                        onGameOver(stateRef.current.score, getJoke());
                         return 0;
                     }
                     return t - 1;
@@ -376,7 +382,7 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
             if (requestRef.current) cancelAnimationFrame(requestRef.current);
             clearInterval(timerInterval);
         }
-    }, [animate, onGameOver, getJoke]);
+    }, [animate]);
 
 
     return (

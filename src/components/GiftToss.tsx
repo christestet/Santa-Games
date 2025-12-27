@@ -294,6 +294,14 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
         requestRef.current = requestAnimationFrame(update);
     }, [addFloatingText, settings.POINTS, t, getSpruch]);
 
+    // Trigger game over when time runs out
+    useEffect(() => {
+        if (timeLeft <= 0 && stateRef.current.isPlaying) {
+            stateRef.current.isPlaying = false;
+            onGameOver(stateRef.current.score, getJoke());
+        }
+    }, [timeLeft, onGameOver, getJoke]);
+
     useEffect(() => {
         requestRef.current = requestAnimationFrame(update);
         const chimneyInterval = setInterval(spawnChimney, settings.GIFT_TOSS.SPAWN_RATE_CHIMNEY);
@@ -302,8 +310,6 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
             if (!stateRef.current.isPaused && stateRef.current.isPlaying) {
                 setTimeLeft(t => {
                     if (t <= 1) {
-                        stateRef.current.isPlaying = false;
-                        onGameOver(stateRef.current.score, getJoke());
                         return 0;
                     }
                     return t - 1;
@@ -320,7 +326,7 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
             clearInterval(obstacleInterval);
             clearInterval(timerInterval);
         }
-    }, [update, spawnChimney, spawnObstacle, onGameOver]);
+    }, [update, spawnChimney, spawnObstacle]);
 
 
 

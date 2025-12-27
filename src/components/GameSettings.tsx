@@ -16,11 +16,16 @@ export default function GameSettings({ settings, onUpdate, onClose }: GameSettin
     const { t } = useLanguage();
     const { isMuted, toggleMute } = useSound();
     const { theme, toggleTheme } = useTheme();
+    const presets = [30, 60, 90, 120];
+
     const handleTimerChange = (val: number) => {
-        onUpdate({
-            ...settings,
-            TIMER: Math.max(10, Math.min(300, val))
-        });
+        // Only allow preset values
+        if (presets.includes(val)) {
+            onUpdate({
+                ...settings,
+                TIMER: val
+            });
+        }
     };
 
     const formatTime = (seconds: number) => {
@@ -29,33 +34,22 @@ export default function GameSettings({ settings, onUpdate, onClose }: GameSettin
         return mins > 0 ? `${mins}:${secs.toString().padStart(2, '0')} ${t('settings.min')}` : `${secs} ${t('settings.sec')}`;
     };
 
-    const presets = [30, 60, 90, 120];
-
     return (
         <Modal isOpen={true} onClose={onClose} title={<div className="flex items-center gap-2">{t('settings.title')} <GameIcon name="settings" size={24} /></div>}>
-            <div className="flex flex-col gap-2 items-center w-full">
+            <div className="flex flex-col gap-4 items-center w-full">
                 <label className="text-xl font-bold">
-                    {t('settings.duration')}: <span className="text-[var(--primary-color)] text-2xl">{formatTime(settings.TIMER)}</span>
+                    {t('settings.duration')} <span className="text-[var(--primary-color)] text-2xl">{formatTime(settings.TIMER)}</span>
                 </label>
-
-                <input
-                    type="range"
-                    min="10"
-                    max="300"
-                    step="10"
-                    value={settings.TIMER}
-                    onChange={(e) => handleTimerChange(parseInt(e.target.value))}
-                    className="w-full"
-                />
 
                 <div className="preset-container">
                     {presets.map(p => (
                         <Button
                             key={p}
-                            variant="secondary"
+                            variant={settings.TIMER === p ? 'primary' : 'secondary'}
                             size="small"
                             onClick={() => handleTimerChange(p)}
-                            className={`${settings.TIMER === p ? 'opacity-100 border-4 border-[var(--primary-color)]' : 'opacity-60 border-[length:var(--border-width)] border-[var(--card-border)]'}`}
+                            className={`${settings.TIMER === p ? 'opacity-100' : 'opacity-60'}`}
+                            style={{ minWidth: '80px' }}
                         >
                             {p}s
                         </Button>

@@ -24,9 +24,11 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, 
                 }
             }}
         >
-            <Card title={title} className="modal-content">
-                {children}
-            </Card>
+            <div className="modal-scroll-wrapper">
+                <Card title={title} className="modal-content">
+                    {children}
+                </Card>
+            </div>
         </div>
     );
 };

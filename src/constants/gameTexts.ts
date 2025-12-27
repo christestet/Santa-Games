@@ -11,7 +11,6 @@ export const TRANSLATIONS = {
             back: "ZURÜCK",
             pause: "PAUSE",
             continue: "WEITER",
-            restart: "NEUSTART",
             exit: "BEENDEN",
             saving: "WIRD GESPEICHERT...",
             submit: "EINTRAGEN",
@@ -30,6 +29,8 @@ export const TRANSLATIONS = {
             runnerTitle: "Rentier Rennen",
             runnerDesc: "Renne endlos durch die verschneite Landschaft! Tippe zum Springen, wische nach unten zum Ducken. Weiche Hindernissen aus und sammle Punkte!",
             expired: "ABGELAUFEN",
+            githubHelp: "Hilf mit, dieses Spiel zu verbessern!",
+            githubVisit: "Besuche GitHub:",
         },
         settings: {
             title: "Einstellungen",
@@ -81,7 +82,6 @@ export const TRANSLATIONS = {
             back: "BACK",
             pause: "PAUSE",
             continue: "RESUME",
-            restart: "RESTART",
             exit: "QUIT",
             saving: "SAVING...",
             submit: "SUBMIT",
@@ -100,6 +100,8 @@ export const TRANSLATIONS = {
             runnerTitle: "Reindeer Run",
             runnerDesc: "Run endlessly through the snowy landscape! Tap to jump, swipe down to duck. Dodge obstacles and collect points!",
             expired: "EXPIRED",
+            githubHelp: "Help make this game better!",
+            githubVisit: "Visit us on GitHub:",
         },
         settings: {
             title: "Settings",

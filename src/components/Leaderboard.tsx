@@ -107,27 +107,29 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
                 </p>
             ) : (
                 <div className={gameExpired && displayScores.length > 10 ? 'max-h-96 overflow-y-auto' : ''}>
-                    {displayScores.map((s, i) => (
-                        <div key={i} className="score-row">
-                            <span>{i + 1}. {s.name}</span>
-                            <span className="text-[var(--accent-color)]">
-                                {s.score}
-                                {(s.time || s.timestamp) && (
-                                    <span className="text-[0.8em] opacity-80 ml-2">
-                                        (
-                                        {s.time ? `${s.time}s` : ''}
-                                        {s.time && s.timestamp ? ' - ' : ''}
-                                        {s.timestamp ? new Date(s.timestamp).toLocaleDateString('en-GB', {
-                                            year: '2-digit',
-                                            month: '2-digit',
-                                            day: '2-digit'
-                                        }) : ''}
-                                        )
-                                    </span>
-                                )}
-                            </span>
-                        </div>
-                    ))}
+                    {displayScores.map((s, i) => {
+                        // Scale down font size for longer names
+                        const nameLength = s.name.length;
+                        const fontSize = nameLength > 12 ? '0.85em' : nameLength > 8 ? '0.95em' : '1em';
+
+                        return (
+                            <div key={i} className="score-row">
+                                <span style={{ fontSize }}>{i + 1}. {s.name}</span>
+                                <span className="text-[var(--accent-color)]">
+                                    {s.score}
+                                    {s.timestamp && (
+                                        <span className="text-[0.8em] opacity-80 ml-2">
+                                            ({new Date(s.timestamp).toLocaleDateString('en-GB', {
+                                                year: '2-digit',
+                                                month: '2-digit',
+                                                day: '2-digit'
+                                            })})
+                                        </span>
+                                    )}
+                                </span>
+                            </div>
+                        );
+                    })}
                 </div>
             )}
         </div>

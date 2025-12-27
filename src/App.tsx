@@ -1,10 +1,6 @@
+import { lazy, Suspense } from 'react'
 import Snow from '@components/Snow'
-import SnowballHunt from '@components/SnowballHunt'
-import GiftToss from '@components/GiftToss'
-import ReindeerRun from '@components/ReindeerRun'
-import GameSettings from '@components/GameSettings'
 import GameCard from '@components/GameCard'
-import Leaderboard from '@components/Leaderboard'
 import Countdown from '@components/Countdown'
 import { Button } from '@components/ui/Button'
 import { Modal } from '@components/ui/Modal'
@@ -15,6 +11,13 @@ import { useGame } from '@/context/GameContext'
 import GameIcon from '@components/GameIcon'
 import { GAME_DEADLINE, isGamePlayable } from '@constants/gameConstants'
 import pkg from '@/../package.json'
+
+// Lazy load game components for code-splitting
+const SnowballHunt = lazy(() => import('@components/SnowballHunt'))
+const GiftToss = lazy(() => import('@components/GiftToss'))
+const ReindeerRun = lazy(() => import('@components/ReindeerRun'))
+const GameSettings = lazy(() => import('@components/GameSettings'))
+const Leaderboard = lazy(() => import('@components/Leaderboard'))
 
 const App: React.FC = () => {
     const { t, language, setLanguage } = useLanguage()
@@ -34,11 +37,11 @@ const App: React.FC = () => {
         scoreError,
         isSubmittingScore,
         lastPlayedTime,
+        gameKey,
         startGame,
         endGame,
         pauseGame,
         resumeGame,
-        restartGame,
         quitGame,
         updateSettings,
         toggleSettings,
@@ -76,13 +79,15 @@ const App: React.FC = () => {
                         </Button>
                     </div>
 
-                    <h1>
-                        {theme === 'grinch' ? (
-                            <>
-                                {t('menu.grinchTitle')}
-                            </>
-                        ) : t('menu.title')}
-                    </h1>
+                    <div className="w-full flex justify-center">
+                        <h1 className="text-center">
+                            {theme === 'grinch' ? (
+                                <>
+                                    {t('menu.grinchTitle')}
+                                </>
+                            ) : t('menu.title')}
+                        </h1>
+                    </div>
 
                     <div className="game-selection">
                         <GameCard
@@ -112,34 +117,39 @@ const App: React.FC = () => {
 
 
                     {showSettings && (
-                        <GameSettings
-                            settings={settings}
-                            onUpdate={updateSettings}
-                            onClose={() => toggleSettings(false)}
-                        />
+                        <Suspense fallback={<div className="loading-settings">{t('common.loading') || 'Loading...'}</div>}>
+                            <GameSettings
+                                settings={settings}
+                                onUpdate={updateSettings}
+                                onClose={() => toggleSettings(false)}
+                            />
+                        </Suspense>
                     )}
 
                     <div style={{
                         marginTop: '2rem',
                         width: '100%'
                     }}>
-                        <Leaderboard
-                            scores={highScores}
-                            isLoading={isLoadingScores}
-                            error={scoreError}
-                            onRetry={fetchScores}
-                            defaultTime={lastPlayedTime}
-                        />
+                        <Suspense fallback={<div className="loading-leaderboard">{t('common.loading') || 'Loading...'}</div>}>
+                            <Leaderboard
+                                scores={highScores}
+                                isLoading={isLoadingScores}
+                                error={scoreError}
+                                onRetry={fetchScores}
+                                defaultTime={lastPlayedTime}
+                            />
+                        </Suspense>
                     </div>
 
                     <div className="flex flex-col gap-4 items-center mt-8 mb-4">
+                        <span style={{ fontSize: '0.875rem' }}>{t('menu.githubHelp')}</span>
+                        <span style={{ fontSize: '0.875rem' }}>{t('menu.githubVisit')}</span>
                         <div className="version-tag" style={{
                             display: 'flex',
                             alignItems: 'center',
                             gap: '0.5rem',
                             padding: '0.4rem 0.6rem'
                         }}>
-                            <span>v{pkg.version}</span>
                             <a
                                 href="https://github.com/christestet/Santa-Games"
                                 target="_blank"
@@ -161,7 +171,8 @@ const App: React.FC = () => {
                                 onMouseLeave={(e) => e.currentTarget.style.opacity = '0.8'}
                                 onPointerDown={(e) => e.currentTarget.style.transform = 'scale(0.95)'}
                                 onPointerUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                            >
+                                >
+                                <span className="github-version">v{pkg.version}</span>
                                 <GameIcon name="github" size={16} />
                             </a>
                         </div>
@@ -172,37 +183,41 @@ const App: React.FC = () => {
 
             {gameState === 'playing' && (
                 <>
-                    {currentGame === 'snowball' && (
-                        <SnowballHunt
-                            onGameOver={endGame}
-                            highScores={highScores}
-                            settings={settings}
-                            isPaused={isPaused}
-                            onPause={pauseGame}
-                        />
-                    )}
-                    {currentGame === 'gift-toss' && (
-                        <GiftToss
-                            onGameOver={endGame}
-                            settings={settings}
-                            isPaused={isPaused}
-                            onPause={pauseGame}
-                        />
-                    )}
-                    {currentGame === 'reindeer-run' && (
-                        <ReindeerRun
-                            onGameOver={endGame}
-                            settings={settings}
-                            isPaused={isPaused}
-                            onPause={pauseGame}
-                        />
-                    )}
+                    <Suspense fallback={<div className="loading-game">{t('common.loading') || 'Loading...'}</div>}>
+                        {currentGame === 'snowball' && (
+                            <SnowballHunt
+                                key={gameKey}
+                                onGameOver={endGame}
+                                highScores={highScores}
+                                settings={settings}
+                                isPaused={isPaused}
+                                onPause={pauseGame}
+                            />
+                        )}
+                        {currentGame === 'gift-toss' && (
+                            <GiftToss
+                                key={gameKey}
+                                onGameOver={endGame}
+                                settings={settings}
+                                isPaused={isPaused}
+                                onPause={pauseGame}
+                            />
+                        )}
+                        {currentGame === 'reindeer-run' && (
+                            <ReindeerRun
+                                key={gameKey}
+                                onGameOver={endGame}
+                                settings={settings}
+                                isPaused={isPaused}
+                                onPause={pauseGame}
+                            />
+                        )}
+                    </Suspense>
 
                     {isPaused && (
                         <Modal isOpen={true} title={<div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>{t('common.pause')} <GameIcon name="timer" size={24} /></div>}>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%', alignItems: 'center' }}>
                                 <Button onClick={resumeGame} style={{ width: '100%' }}>{t('common.continue')}</Button>
-                                <Button variant="secondary" onClick={restartGame} style={{ width: '100%' }}>{t('common.restart')}</Button>
                                 <Button variant="secondary" onClick={quitGame} style={{ width: '100%', border: '2px solid #ff6b6b', color: '#ff6b6b' }}>{t('common.exit')}</Button>
                             </div>
                         </Modal>
@@ -256,18 +271,19 @@ const App: React.FC = () => {
             {gameState === 'gameover' && (
                 <Modal isOpen={true} title={<div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>{t('game.finished')} <GameIcon name="gift" size={24} /></div>}>
                     <div style={{ textAlign: 'center', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
-                        <Leaderboard
-                            scores={highScores}
-                            isLoading={isLoadingScores}
-                            defaultTime={lastPlayedTime}
-                        />
-
                         <Card className="joke-card" style={{ width: '100%' }}>
                             <h2 style={{ fontFamily: 'var(--font-retro)', color: 'var(--primary-color)', margin: '0', fontSize: '1.5rem' }}>{t('game.jokeTitle')}</h2>
                             <p style={{ fontSize: '1rem', fontStyle: 'italic' }}>"{currentJoke}"</p>
                         </Card>
 
-                        <Button onPointerDown={quitGame}>{t('game.toMenu')}</Button>
+                        <Button
+                            onPointerDown={(e) => {
+                                e.stopPropagation();
+                                quitGame();
+                            }}
+                        >
+                            {t('game.toMenu')}
+                        </Button>
                     </div>
                 </Modal>
             )}

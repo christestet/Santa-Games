@@ -16,6 +16,8 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const [showSettings, setShowSettings] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [lastPlayedTime, setLastPlayedTime] = useState(GAME_CONFIG.TIMER);
+    const [isTransitioning, setIsTransitioning] = useState(false);
+    const [gameKey, setGameKey] = useState(0);
 
     const { highScores, isLoading, error, fetchScores, submitScore: apiSubmitScore } = useHighScores();
 
@@ -45,8 +47,17 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const resumeGame = useCallback(() => setIsPaused(false), []);
 
     const quitGame = useCallback(() => {
+        setIsTransitioning(true);
         setIsPaused(false);
-        setGameState('menu');
+
+        // Delay transition to allow touch events to complete
+        setTimeout(() => {
+            setGameState('menu');
+            // Keep transitioning flag for additional 100ms after menu renders
+            setTimeout(() => {
+                setIsTransitioning(false);
+            }, 100);
+        }, 150);
     }, []);
 
     const restartGame = useCallback(() => {
@@ -59,6 +70,7 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
 
         setIsPaused(false);
+        setGameKey(prev => prev + 1);
         startGame(currentGame);
     }, [currentGame, startGame]);
 
@@ -94,6 +106,8 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         scoreError: error,
         isSubmittingScore: isSubmitting,
         lastPlayedTime,
+        isTransitioning,
+        gameKey,
         startGame,
         endGame,
         pauseGame,
