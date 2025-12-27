@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
-import bgMusic from '../assets/pixel-snowfall-carol.mp3';
 
 // --- Music Player ---
 class MusicPlayer {
@@ -8,7 +7,7 @@ class MusicPlayer {
     muted: boolean = false;
 
     constructor() {
-        this.audio = new Audio(bgMusic);
+        this.audio = new Audio('/audio/pixel-snowfall-carol.mp3');
         this.audio.loop = true;
         this.audio.volume = 0.4;
     }

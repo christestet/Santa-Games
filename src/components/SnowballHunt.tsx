@@ -5,66 +5,7 @@ import { HUD } from './ui/HUD'
 import { useLanguage } from './LanguageContext'
 import { useSound } from './SoundContext'
 import GameIcon from './GameIcon'
-
-// --- Audio Manager ---
-class SoundManager {
-    ctx: AudioContext | null = null;
-    muted: boolean = false;
-
-    constructor() {
-        try {
-            // @ts-ignore
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            this.ctx = new AudioContext();
-        } catch (e) {
-            console.error("Web Audio API not supported", e);
-        }
-    }
-
-    playTone(freq: number, type: OscillatorType, duration: number, vol: number = 0.1) {
-        if (!this.ctx || this.muted) return;
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-        osc.type = type;
-        osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-        gain.gain.setValueAtTime(vol, this.ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-        osc.start();
-        osc.stop(this.ctx.currentTime + duration);
-    }
-
-    playThrow() {
-        if (!this.ctx || this.muted) return;
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-        osc.frequency.setValueAtTime(200, this.ctx.currentTime);
-        osc.frequency.linearRampToValueAtTime(600, this.ctx.currentTime + 0.1);
-        gain.gain.setValueAtTime(0.05, this.ctx.currentTime);
-        gain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 0.1);
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-        osc.start();
-        osc.stop(this.ctx.currentTime + 0.1);
-    }
-
-    playHit(type: 'gift' | 'coal' | 'gold' | 'time' | 'ice' | 'parcel') {
-        switch (type) {
-            case 'gift':
-            case 'parcel':
-                this.playTone(600, 'sine', 0.1, 0.1); break;
-            case 'gold': this.playTone(800, 'square', 0.2, 0.1); break;
-            case 'coal': this.playTone(100, 'sawtooth', 0.3, 0.1); break;
-            case 'time': this.playTone(1000, 'sine', 0.1, 0.05); break;
-            case 'ice': this.playTone(1200, 'triangle', 0.3, 0.1); break;
-        }
-    }
-
-    playSplat() {
-        this.playTone(100, 'triangle', 0.1, 0.05);
-    }
-}
+import { SoundManager } from '@/utils/SoundManager'
 
 interface SnowballHuntProps {
     onGameOver: (score: number, joke: string) => void;

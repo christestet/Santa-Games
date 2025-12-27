@@ -16,18 +16,23 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
 
     const t = useCallback((path: string): string => {
         const keys = path.split('.');
-        let current: any = TRANSLATIONS[language];
+        let current: unknown = TRANSLATIONS[language];
 
         for (const key of keys) {
-            if (current && current[key]) {
-                current = current[key];
+            if (current && typeof current === 'object' && key in current) {
+                current = (current as Record<string, unknown>)[key];
             } else {
                 console.warn(`Translation missing for: ${path} in ${language}`);
                 return path;
             }
         }
 
-        return current as string;
+        if (typeof current === 'string') {
+            return current;
+        }
+
+        console.warn(`Translation path ${path} did not resolve to a string in ${language}`);
+        return path;
     }, [language]);
 
     const getJoke = useCallback(() => {

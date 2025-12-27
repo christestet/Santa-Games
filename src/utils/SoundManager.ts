@@ -45,9 +45,28 @@ export class SoundManager {
         osc.stop(this.ctx.currentTime + 0.2);
     }
 
-    // Gift Toss: Hit chimney
-    playHit() {
-        this.playTone(400, 'sine', 0.1, 0.1);
+    // Gift Toss: Hit chimney / Snowball Hunt: Hit targets
+    playHit(type?: 'gift' | 'coal' | 'gold' | 'time' | 'ice' | 'parcel') {
+        if (!type) {
+            // Default for Gift Toss
+            this.playTone(400, 'sine', 0.1, 0.1);
+            return;
+        }
+
+        // Snowball Hunt specific sounds
+        switch (type) {
+            case 'gift':
+            case 'parcel':
+                this.playTone(600, 'sine', 0.1, 0.1); break;
+            case 'gold':
+                this.playTone(800, 'square', 0.2, 0.1); break;
+            case 'coal':
+                this.playTone(100, 'sawtooth', 0.3, 0.1); break;
+            case 'time':
+                this.playTone(1000, 'sine', 0.1, 0.05); break;
+            case 'ice':
+                this.playTone(1200, 'triangle', 0.3, 0.1); break;
+        }
     }
 
     // Gift Toss: Hit obstacle
@@ -120,5 +139,10 @@ export class SoundManager {
      */
     resume() {
         this.ctx?.resume();
+    }
+
+    // Snowball Hunt: Hit different target types
+    playSplat() {
+        this.playTone(100, 'triangle', 0.1, 0.05);
     }
 }

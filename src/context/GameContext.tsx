@@ -12,7 +12,7 @@ export interface GameContextProps {
     isPaused: boolean;
     settings: typeof GAME_CONFIG;
     showSettings: boolean;
-    highScores: { name: string; score: number; time: number; timestamp: number }[];
+    highScores: { name: string; score: number; time?: number; timestamp?: number }[];
     isLoadingScores: boolean;
     scoreError: ScoreError;
     isSubmittingScore: boolean;

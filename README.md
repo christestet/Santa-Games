@@ -493,6 +493,33 @@ santa-games/
 └── README.md                     # This file
 ```
 
+## Troubleshooting
+
+### Audio Playback Issues
+
+If you encounter errors related to audio playback, particularly errors mentioning:
+```
+Uncaught (in promise) Error: A listener indicated an asynchronous response by returning true,
+but the message channel closed before a response was received
+```
+
+**Cause**: This is typically caused by browser extensions (especially ad blockers, privacy extensions, or security extensions) that intercept audio playback or media requests.
+
+**Solution**:
+1. **Disable browser extensions temporarily**: Try disabling all extensions and testing the game
+2. **Use a clean browser profile**: Create a new browser profile without any extensions installed
+3. **Whitelist the application**: Add the game URL to your extension's whitelist/allowlist
+4. **Test in incognito/private mode**: Extensions are often disabled by default in private browsing
+
+**Common culprits**:
+- uBlock Origin, AdBlock Plus (ad blockers)
+- Privacy Badger, Ghostery (privacy extensions)
+- NoScript, ScriptSafe (security extensions)
+
+**Note**: The application's error handling for audio playback is working correctly. The error originates from browser extensions interfering with the Web Audio API and HTMLAudioElement, not from the application code itself.
+
+---
+
 ## Contributing
 
 Contributions are welcome! This project is intended for educational and festive purposes.

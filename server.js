@@ -6,6 +6,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createHash } from "node:crypto";
 import rateLimit from "express-rate-limit";
+import lockfile from "proper-lockfile";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -49,7 +50,7 @@ const invalidateCache = () => {
 // Middleware
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || true,
+    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
     methods: ["GET", "POST"],
     credentials: true,
   })
@@ -201,14 +202,6 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-app.post("/api/toggle-health", (req, res) => {
-  isHealthy = !isHealthy;
-  console.log(
-    `🔧 Health status toggled to: ${isHealthy ? "HEALTHY" : "UNHEALTHY"}`
-  );
-  res.json({ success: true, isHealthy });
-});
-
 app.get("/api/scores", async (req, res) => {
   const showAll = req.query.all === "true";
   console.log(`🎄 Checking Santa's nice list... (all=${showAll})`);
@@ -347,33 +340,56 @@ app.post("/api/scores", scoreLimiter, async (req, res) => {
       }
     }
 
-    // Read existing scores
-    let scores = await readScores();
-
-    // Check for duplicate recent submission
-    const now = Date.now();
-    const isDuplicateRecent = scores.some(
-      (s) =>
-        s.name === name && s.score === score && now - (s.timestamp || 0) < 5000 // within 5 seconds
-    );
-
-    if (isDuplicateRecent) {
-      return res.status(429).json({
-        error: "🎅 You just submitted that! Give the elves a moment!",
+    // Acquire file lock to prevent race conditions
+    let release;
+    try {
+      release = await lockfile.lock(SCORES_FILE, {
+        retries: {
+          retries: 5,
+          minTimeout: 100,
+          maxTimeout: 500
+        },
+        stale: 10000
+      });
+    } catch (lockErr) {
+      console.error("🔒 Couldn't acquire lock on scores file:", lockErr);
+      return res.status(503).json({
+        error: "Santa's elves are busy updating the list! Try again in a moment.",
       });
     }
 
-    // Add new score with timestamp
-    scores.push({ name, score, time, timestamp: now });
+    try {
+      // Read existing scores
+      let scores = await readScores();
 
-    // Keep only top scores
-    const topScores = getTopScoresPerCategory(scores, MAX_SCORES);
+      // Check for duplicate recent submission
+      const now = Date.now();
+      const isDuplicateRecent = scores.some(
+        (s) =>
+          s.name === name && s.score === score && now - (s.timestamp || 0) < 5000 // within 5 seconds
+      );
 
-    // Save to file
-    await writeScores(topScores);
+      if (isDuplicateRecent) {
+        return res.status(429).json({
+          error: "🎅 You just submitted that! Give the elves a moment!",
+        });
+      }
 
-    // Invalidate cache after new score
-    invalidateCache();
+      // Add new score with timestamp
+      scores.push({ name, score, time, timestamp: now });
+
+      // Keep only top scores
+      const topScores = getTopScoresPerCategory(scores, MAX_SCORES);
+
+      // Save to file
+      await writeScores(topScores);
+
+      // Invalidate cache after new score
+      invalidateCache();
+    } finally {
+      // Always release the lock
+      await release();
+    }
 
     console.log(
       `✨ ${name} made it onto Santa's nice list with ${score} points!`
