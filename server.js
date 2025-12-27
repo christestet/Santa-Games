@@ -15,7 +15,7 @@ const PORT = process.env.PORT || 2412;
 const MAX_SCORES = parseInt(process.env.MAX_SCORES) || 50;
 const SCORES_DIR = path.join(__dirname, "data");
 const SCORES_FILE = path.join(SCORES_DIR, "scores.json");
-const GAME_DEADLINE = new Date('2026-01-01T00:00:00+01:00');
+const GAME_DEADLINE = new Date("2026-01-01T00:00:00+01:00");
 
 let isHealthy = true;
 
@@ -81,10 +81,7 @@ if (fs.existsSync(DIST_PATH)) {
       setHeaders: (res, filePath) => {
         if (filePath.includes("/assets/")) {
           // Cache hashed assets (JS, CSS, Images, Fonts) for 1 year
-          res.setHeader(
-            "Cache-Control",
-            "public, max-age=31536000, immutable"
-          );
+          res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
         } else {
           // Don't cache index.html so users always get the latest version
           res.setHeader("Cache-Control", "public, max-age=0, must-revalidate");
@@ -159,6 +156,26 @@ const sanitizeName = (name) => {
     .substring(0, 15); // Max 15 chars
 };
 
+// Helper to get top scores per category
+const getTopScoresPerCategory = (scores, limit) => {
+  const grouped = {};
+  scores.forEach((s) => {
+    // Ensure time is treated consistently as a number to group "60" and 60 together
+    const t =
+      s.time !== undefined && s.time !== null ? Number(s.time) : "unknown";
+    if (!grouped[t]) grouped[t] = [];
+    grouped[t].push(s);
+  });
+
+  let result = [];
+  Object.values(grouped).forEach((group) => {
+    group.sort((a, b) => b.score - a.score);
+    result.push(...group.slice(0, limit));
+  });
+
+  return result.sort((a, b) => b.score - a.score);
+};
+
 // Routes
 app.get("/api/", (req, res) => {
   res.send(
@@ -186,12 +203,14 @@ app.get("/api/health", (req, res) => {
 
 app.post("/api/toggle-health", (req, res) => {
   isHealthy = !isHealthy;
-  console.log(`🔧 Health status toggled to: ${isHealthy ? "HEALTHY" : "UNHEALTHY"}`);
+  console.log(
+    `🔧 Health status toggled to: ${isHealthy ? "HEALTHY" : "UNHEALTHY"}`
+  );
   res.json({ success: true, isHealthy });
 });
 
 app.get("/api/scores", async (req, res) => {
-  const showAll = req.query.all === 'true';
+  const showAll = req.query.all === "true";
   console.log(`🎄 Checking Santa's nice list... (all=${showAll})`);
 
   try {
@@ -208,43 +227,36 @@ app.get("/api/scores", async (req, res) => {
     }
 
     // Use appropriate cache based on request type
-    const cacheKey = showAll ? 'scores' : 'scoresTop10';
-    const etagKey = showAll ? 'etag' : 'etagTop10';
-    const modifiedKey = showAll ? 'lastModified' : 'lastModifiedTop10';
+    const cacheKey = showAll ? "scores" : "scoresTop10";
+    const etagKey = showAll ? "etag" : "etagTop10";
+    const modifiedKey = showAll ? "lastModified" : "lastModifiedTop10";
 
     // Build cache if needed
     if (!cache[cacheKey]) {
       const scores = await readScores();
       const sortedScores = scores.sort((a, b) => b.score - a.score);
 
-      let resultScores;
-      if (showAll) {
-        // After deadline: return all scores
-        resultScores = sortedScores.map(({ name, score, time, timestamp }) => ({ name, score, time, timestamp }));
-      } else {
-        // During gameplay: return top 10 scores PER time duration
-        const timeDurations = [30, 60, 90, 120];
-        const scoresPerTime = {};
+      let resultScores = showAll
+        ? sortedScores
+        : getTopScoresPerCategory(scores, 10);
 
-        // Group scores by time duration
-        timeDurations.forEach(duration => {
-          scoresPerTime[duration] = sortedScores
-            .filter(s => s.time === duration)
-            .slice(0, 10)  // Top 10 per duration
-            .map(({ name, score, time, timestamp }) => ({ name, score, time, timestamp }));
-        });
-
-        // Flatten all scores from all durations
-        resultScores = timeDurations.flatMap(duration => scoresPerTime[duration]);
-      }
+      resultScores = resultScores.map(({ name, score, time, timestamp }) => ({
+        name,
+        score,
+        time,
+        timestamp,
+      }));
 
       cache[cacheKey] = resultScores;
       cache[etagKey] = generateETag(resultScores);
-      cache[modifiedKey] = resultScores.length > 0
-        ? new Date(Math.max(...resultScores.map(s => s.timestamp || 0)))
-        : new Date();
+      cache[modifiedKey] =
+        resultScores.length > 0
+          ? new Date(Math.max(...resultScores.map((s) => s.timestamp || 0)))
+          : new Date();
 
-      console.log(`💾 Cache built for ${cacheKey} (${resultScores.length} scores)`);
+      console.log(
+        `💾 Cache built for ${cacheKey} (${resultScores.length} scores)`
+      );
     }
 
     const resultScores = cache[cacheKey];
@@ -255,7 +267,10 @@ app.get("/api/scores", async (req, res) => {
     const cacheMaxAge = isGamePlayable() ? 30 : 3600; // 30s during game, 1h after
 
     // Set cache headers
-    res.setHeader("Cache-Control", `public, max-age=${cacheMaxAge}, must-revalidate`);
+    res.setHeader(
+      "Cache-Control",
+      `public, max-age=${cacheMaxAge}, must-revalidate`
+    );
     res.setHeader("ETag", etag);
     res.setHeader("Last-Modified", lastModified.toUTCString());
 
@@ -263,12 +278,17 @@ app.get("/api/scores", async (req, res) => {
     const clientETag = req.headers["if-none-match"];
     const clientModified = req.headers["if-modified-since"];
 
-    if (clientETag === etag || (clientModified && new Date(clientModified) >= lastModified)) {
+    if (
+      clientETag === etag ||
+      (clientModified && new Date(clientModified) >= lastModified)
+    ) {
       console.log("✨ 304 Not Modified (client cache hit)");
       return res.status(304).end();
     }
 
-    console.log(`📊 200 OK - returning ${resultScores.length} scores from memory cache`);
+    console.log(
+      `📊 200 OK - returning ${resultScores.length} scores from memory cache`
+    );
     res.json(resultScores);
   } catch (err) {
     console.error("❌ The elves dropped the leaderboard!", err);
@@ -280,16 +300,16 @@ app.get("/api/scores", async (req, res) => {
 
 app.post("/api/scores", scoreLimiter, async (req, res) => {
   let { name, score, time } = req.body;
-  console.log(`🎁 New score delivery attempt: ${name} with ${score} points (Time: ${time}s)`);
+  console.log(
+    `🎁 New score delivery attempt: ${name} with ${score} points (Time: ${time}s)`
+  );
 
   try {
     // Validation
     if (!name || score === undefined) {
-      return res
-        .status(400)
-        .json({
-          error: "No name tag on this present! Name and score required.",
-        });
+      return res.status(400).json({
+        error: "No name tag on this present! Name and score required.",
+      });
     }
 
     // Sanitize name
@@ -304,11 +324,9 @@ app.post("/api/scores", scoreLimiter, async (req, res) => {
     // Check for suspicious patterns
     if (hasSuspiciousPatterns(name)) {
       console.warn(`🚨 Suspicious input detected: ${req.body.name}`);
-      return res
-        .status(400)
-        .json({
-          error: "🚫 Nice try, but Santa's security elves caught that!",
-        });
+      return res.status(400).json({
+        error: "🚫 Nice try, but Santa's security elves caught that!",
+      });
     }
 
     // Validate score
@@ -323,9 +341,9 @@ app.post("/api/scores", scoreLimiter, async (req, res) => {
     if (time !== undefined) {
       time = parseInt(time, 10);
       if (isNaN(time) || time < 0) {
-         // We can treat invalid time as undefined or default, or error out. 
-         // Let's just ignore it if invalid or treat as undefined.
-         time = undefined;
+        // We can treat invalid time as undefined or default, or error out.
+        // Let's just ignore it if invalid or treat as undefined.
+        time = undefined;
       }
     }
 
@@ -336,26 +354,20 @@ app.post("/api/scores", scoreLimiter, async (req, res) => {
     const now = Date.now();
     const isDuplicateRecent = scores.some(
       (s) =>
-        s.name === name &&
-        s.score === score &&
-        now - (s.timestamp || 0) < 5000 // within 5 seconds
+        s.name === name && s.score === score && now - (s.timestamp || 0) < 5000 // within 5 seconds
     );
 
     if (isDuplicateRecent) {
-      return res
-        .status(429)
-        .json({
-          error: "🎅 You just submitted that! Give the elves a moment!",
-        });
+      return res.status(429).json({
+        error: "🎅 You just submitted that! Give the elves a moment!",
+      });
     }
 
     // Add new score with timestamp
     scores.push({ name, score, time, timestamp: now });
 
     // Keep only top scores
-    const topScores = scores
-      .sort((a, b) => b.score - a.score)
-      .slice(0, MAX_SCORES);
+    const topScores = getTopScoresPerCategory(scores, MAX_SCORES);
 
     // Save to file
     await writeScores(topScores);
@@ -377,11 +389,9 @@ app.post("/api/scores", scoreLimiter, async (req, res) => {
 
 // 404 Handler
 app.use((req, res) => {
-  res
-    .status(404)
-    .json({
-      error: "🎄 This route doesn't exist! Did you get lost in the snow?",
-    });
+  res.status(404).json({
+    error: "🎄 This route doesn't exist! Did you get lost in the snow?",
+  });
 });
 
 // Error handling middleware
@@ -431,9 +441,7 @@ const startServer = async () => {
 
     // Force shutdown after 10 seconds
     setTimeout(() => {
-      console.error(
-        "⚠️  Forced shutdown - some elves didn't finish in time!"
-      );
+      console.error("⚠️  Forced shutdown - some elves didn't finish in time!");
       process.exit(1);
     }, 10000);
   };
