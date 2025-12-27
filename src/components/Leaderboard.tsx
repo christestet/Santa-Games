@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useLanguage } from '../components/LanguageContext';
 import { isGamePlayable } from '@constants/gameConstants';
 import { ScoreError } from '@hooks/useHighScores';
@@ -29,9 +29,18 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
     const { t } = useLanguage();
     const gameExpired = !isGamePlayable();
 
+    // Available play time durations
+    const timeOptions = [30, 60, 90, 120];
+
+    // State for selected time filter
+    const [selectedTime, setSelectedTime] = useState<number>(60);
+
+    // Filter scores by selected time duration
+    const filteredScores = scores.filter(s => s.time === selectedTime);
+
     // Show all scores when game has expired, otherwise respect limit
-    const displayLimit = gameExpired ? scores.length : limit;
-    const displayScores = scores.slice(0, displayLimit);
+    const displayLimit = gameExpired ? filteredScores.length : limit;
+    const displayScores = filteredScores.slice(0, displayLimit);
 
     return (
         <div className="leaderboard frost-card">
@@ -43,6 +52,28 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
                     </span>
                 )}
             </h2>
+
+            {/* Time duration tabs */}
+            <div className="flex gap-2 justify-center mb-4 flex-wrap">
+                {timeOptions.map(time => (
+                    <button
+                        key={time}
+                        onClick={() => setSelectedTime(time)}
+                        className={`px-4 py-2 rounded-lg font-bold transition-all ${
+                            selectedTime === time
+                                ? 'bg-[var(--primary-color)] text-white border-2 border-[var(--primary-color)] opacity-100'
+                                : 'bg-transparent border-2 border-[var(--card-border)] opacity-60 hover:opacity-80'
+                        }`}
+                        style={{
+                            fontFamily: 'var(--font-retro)',
+                            fontSize: '0.9rem'
+                        }}
+                    >
+                        {time}s
+                    </button>
+                ))}
+            </div>
+
             {isLoading ? (
                 <div className="p-8 text-center">
                     <div className="spinner">⏳</div>
@@ -57,8 +88,10 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
                         </button>
                     )}
                 </div>
-            ) : scores.length === 0 ? (
-                <p className="p-4 opacity-70">{t('game.noScores')}</p>
+            ) : filteredScores.length === 0 ? (
+                <p className="p-4 opacity-70">
+                    {t('game.noScores')} {selectedTime}s
+                </p>
             ) : (
                 <div className={gameExpired && displayScores.length > 10 ? 'max-h-96 overflow-y-auto' : ''}>
                     {displayScores.map((s, i) => (
