@@ -16,6 +16,7 @@ export interface GameContextProps {
     isLoadingScores: boolean;
     scoreError: ScoreError;
     isSubmittingScore: boolean;
+    lastPlayedTime: number;
 
     // Actions
     startGame: (game: GameType) => void;
