@@ -5,10 +5,11 @@ updates:
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
-      # Wöchentliche Updates am Montag Morgen (UTC)
+      # Wöchentliche Updates am Montag Morgen (Europe/Berlin)
       interval: "weekly"
       day: "monday"
       time: "06:00"
+      timezone: "Europe/Berlin"
     # Öffne max 5 PRs gleichzeitig
     open-pull-requests-limit: 5
     # Gruppiere Minor und Patch Updates zusammen
@@ -45,6 +46,7 @@ updates:
       interval: "weekly"
       day: "monday"
       time: "06:00"
+      timezone: "Europe/Berlin"
     commit-message:
       prefix: "ci"
       include: "scope"
