@@ -12,10 +12,21 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const [currentJoke, setCurrentJoke] = useState("");
     const [playerName, setPlayerName] = useState("");
     const [isPaused, setIsPaused] = useState(false);
-    const [settings, setSettings] = useState(GAME_CONFIG);
+    const [settings, setSettings] = useState(() => {
+        // Try to get timer setting from localStorage
+        const savedTimer = localStorage.getItem('santa-game-timer');
+        const timer = savedTimer ? parseInt(savedTimer, 10) : GAME_CONFIG.TIMER;
+        return {
+            ...GAME_CONFIG,
+            TIMER: timer
+        };
+    });
     const [showSettings, setShowSettings] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [lastPlayedTime, setLastPlayedTime] = useState(GAME_CONFIG.TIMER);
+    const [lastPlayedTime, setLastPlayedTime] = useState(() => {
+        const savedTimer = localStorage.getItem('santa-game-timer');
+        return savedTimer ? parseInt(savedTimer, 10) : GAME_CONFIG.TIMER;
+    });
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [gameKey, setGameKey] = useState(0);
 
@@ -76,6 +87,8 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     const updateSettings = useCallback((newSettings: typeof GAME_CONFIG) => {
         setSettings(newSettings);
+        // Persist timer setting to localStorage
+        localStorage.setItem('santa-game-timer', newSettings.TIMER.toString());
     }, []);
 
     const toggleSettings = useCallback((show: boolean) => {
