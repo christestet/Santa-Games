@@ -20,6 +20,7 @@ interface Gift {
 interface Chimney { id: number; x: number; speed: number; width: number; }
 interface Obstacle { id: number; x: number; y: number; width: number; height: number; speed: number; type: 'cloud' | 'plane'; }
 interface FloatingText { id: number; x: number; y: number; text: string; color: string; expiry: number; }
+interface BottomMessage { text: string; color: string; }
 
 interface GiftTossProps {
     onGameOver: (score: number, joke: string) => void;
@@ -40,6 +41,7 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
     const [obstacles, setObstacles] = useState<Obstacle[]>([])
     const [floatingTexts, setFloatingTexts] = useState<FloatingText[]>([])
     const [santaX, setSantaX] = useState(window.innerWidth / 2)
+    const [bottomMessage, setBottomMessage] = useState<BottomMessage | null>(null)
 
     const santaRef = useRef({ x: window.innerWidth / 2, speed: 3 })
     const soundManager = useRef<SoundManager | null>(null)
@@ -126,9 +128,8 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
     }, [isMuted]);
 
     const addFloatingText = useCallback((x: number, y: number, text: string, color: string = 'white') => {
-        const now = Date.now();
-        const id = nextId.current++
-        setFloatingTexts(prev => [...prev.filter(t => t.expiry > now), { id, x, y, text, color, expiry: now + 2000 }])
+        // Update bottom message instead of floating text
+        setBottomMessage({ text, color });
     }, [])
 
     const spawnChimney = useCallback(() => {
@@ -520,11 +521,16 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
                 </div>
             ))}
 
-            {floatingTexts.map(t => (
-                <div key={t.id} className="floating-text" style={{ left: t.x, top: t.y, color: t.color, fontSize: '2rem' }}>
-                    {t.text}
+            {bottomMessage && (
+                <div
+                    className="bottom-hit-message"
+                    style={{
+                        color: bottomMessage.color,
+                    }}
+                >
+                    {bottomMessage.text}
                 </div>
-            ))}
+            )}
         </div>
     );
 }
