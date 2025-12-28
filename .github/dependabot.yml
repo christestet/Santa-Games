@@ -1,0 +1,55 @@
+version: 2
+
+updates:
+  # npm Dependencies für das Projekt
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      # Wöchentliche Updates am Montag Morgen (Europe/Berlin)
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Berlin"
+    # Öffne max 5 PRs gleichzeitig
+    open-pull-requests-limit: 5
+    # Gruppiere Minor und Patch Updates zusammen
+    groups:
+      # Gruppiere alle Development Dependencies zusammen
+      dev-dependencies:
+        dependency-type: "development"
+        update-types:
+          - "minor"
+          - "patch"
+      # Gruppiere Production Dependencies nach Update-Typ
+      production-dependencies:
+        dependency-type: "production"
+        update-types:
+          - "minor"
+          - "patch"
+    # Commit Message Präfix für bessere Übersicht
+    commit-message:
+      prefix: "deps"
+      prefix-development: "deps-dev"
+      include: "scope"
+    # Labels für automatisches Kategorisieren
+    labels:
+      - "dependencies"
+      - "automated"
+    # Reviewer automatisch hinzufügen (optional - entferne Kommentar und setze deinen GitHub Username)
+    # reviewers:
+    #   - "your-github-username"
+
+  # GitHub Actions Updates
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Berlin"
+    commit-message:
+      prefix: "ci"
+      include: "scope"
+    labels:
+      - "ci"
+      - "automated"
