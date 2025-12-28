@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, useReducer } from 'react'
 import { GAME_CONFIG } from '../constants/gameConfig'
 import { WEIHNACHTS_WITZE, SPRUECHE } from '../constants/gameTexts'
 import { HUD } from './ui/HUD'
@@ -37,33 +37,33 @@ interface Projectile {
 interface Splat { id: number; x: number; y: number; expiry: number; }
 interface FloatingText { id: number; x: number; y: number; text: string; color: string; expiry: number; }
 interface Particle { id: number; x: number; y: number; tx: string; ty: string; type: string; expiry: number; }
+interface TapRipple { id: number; x: number; y: number; expiry: number; }
 interface BottomMessage { text: string; color: string; }
 
 export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }: SnowballHuntProps) {
     const { t, getJoke, getSpruch, getParcelText } = useLanguage();
     const { isMuted } = useSound();
+
+    // UI-critical state only (minimal re-renders)
     const [score, setScore] = useState(0)
     const [timeLeft, setTimeLeft] = useState(settings.TIMER)
-    const [targets, setTargets] = useState<Target[]>([])
-    const [projectiles, setProjectiles] = useState<Projectile[]>([])
-    const [splats, setSplats] = useState<Splat[]>([])
     const [combo, setCombo] = useState(0)
     const [shake, setShake] = useState(false)
-    const [floatingTexts, setFloatingTexts] = useState<FloatingText[]>([])
-    const [particles, setParticles] = useState<Particle[]>([])
     const [targetSize, setTargetSize] = useState(100)
     const [frozen, setFrozen] = useState(false)
-    const [tapRipples, setTapRipples] = useState<Array<{
-        id: number;
-        x: number;
-        y: number;
-        expiry: number;
-    }>>([])
     const [bottomMessage, setBottomMessage] = useState<BottomMessage | null>(null)
 
+    // Force update for rendering animation frames without state updates
+    const [, forceUpdate] = useReducer(x => x + 1, 0)
+
+    // Animation data in refs (no re-renders on updates)
+    const targetsRef = useRef<Target[]>([])
+    const projectilesRef = useRef<Projectile[]>([])
+    const splatsRef = useRef<Splat[]>([])
+    const particlesRef = useRef<Particle[]>([])
+    const tapRipplesRef = useRef<TapRipple[]>([])
+
     const stateRef = useRef({
-        targets: [] as Target[],
-        projectiles: [] as Projectile[],
         score: 0,
         frozen: false,
         timeLeft: settings.TIMER,
@@ -78,6 +78,7 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
     const nextId = useRef(0)
     const requestRef = useRef<number>(0)
     const lastTimeRef = useRef<number>(0)
+    const lastRenderRef = useRef<number>(0)
 
     useEffect(() => {
         soundManager.current = new SoundManager();
@@ -111,14 +112,12 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [onPause]);
 
-    // Sync refs for physics logic and timers
-    useEffect(() => { stateRef.current.score = score }, [score])
-    useEffect(() => { stateRef.current.frozen = frozen }, [frozen])
-    useEffect(() => { stateRef.current.timeLeft = timeLeft }, [timeLeft])
-    useEffect(() => { stateRef.current.targets = targets }, [targets])
-    useEffect(() => { stateRef.current.projectiles = projectiles }, [projectiles])
-    useEffect(() => { stateRef.current.combo = combo }, [combo])
-    useEffect(() => { stateRef.current.isPaused = isPaused }, [isPaused])
+    // Sync critical state to refs (optimized - no separate effects)
+    stateRef.current.score = score
+    stateRef.current.frozen = frozen
+    stateRef.current.timeLeft = timeLeft
+    stateRef.current.combo = combo
+    stateRef.current.isPaused = isPaused
 
     useEffect(() => {
         if (soundManager.current) {
@@ -141,7 +140,8 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
             const ty = `${Math.sin(angle) * dist}px`
             newParticles.push({ id: nextId.current++, x, y, tx, ty, type, expiry: now + 600 })
         }
-        setParticles(prev => [...prev.filter(p => p.expiry > now), ...newParticles])
+        // Update ref directly, no state update
+        particlesRef.current = [...particlesRef.current.filter(p => p.expiry > now), ...newParticles]
     }, [])
 
     const addFloatingText = useCallback((x: number, y: number, text: string, color: string = 'white') => {
@@ -178,7 +178,8 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
             createdAt: Date.now()
         }
 
-        setTargets(prev => [...prev, newTarget])
+        // Update ref directly, no state update
+        targetsRef.current = [...targetsRef.current, newTarget]
     }, [targetSize])
 
     const handleHitSuccess = useCallback((id: number, type: 'gift' | 'coal' | 'gold' | 'time' | 'ice' | 'parcel', x: number, y: number) => {
@@ -186,7 +187,10 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
         processedHits.current.add(id);
 
         soundManager.current?.playHit(type);
-        setTargets(prev => prev.filter(t => t.id !== id));
+
+        // Update ref directly, no state update
+        targetsRef.current = targetsRef.current.filter(t => t.id !== id);
+
         // Use gift particles for parcel too? Or generic? Let's stick to particle-gift for consistency or type
         spawnParticles(x, y, `particle-${type === 'parcel' ? 'gift' : type}`);
 
@@ -238,19 +242,20 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
 
         if (points !== 0) setScore(s => Math.max(0, s + points));
         addFloatingText(x, y, text, color);
-    }, [settings.POINTS, spawnParticles, addFloatingText, getSpruch, t]);
+    }, [settings.POINTS, settings.SNOWBALL_HUNT.FREEZE_DURATION, spawnParticles, addFloatingText, getSpruch, getParcelText, t]);
 
     const handleHitMiss = useCallback((x: number, y: number) => {
         soundManager.current?.playSplat();
         const now = Date.now();
         const splatId = nextId.current++;
-        setSplats(prev => [...prev.filter(s => s.expiry > now), { id: splatId, x, y, expiry: now + 1000 }]);
+        // Update ref directly, no state update
+        splatsRef.current = [...splatsRef.current.filter(s => s.expiry > now), { id: splatId, x, y, expiry: now + 1000 }];
     }, []);
 
     const handleProjectileImpact = useCallback((p: Projectile) => {
         const { targetX, targetY } = p;
         const hitRadius = window.innerWidth < 768 ? targetSize / 1.5 : targetSize / 2;
-        const currentTargets = stateRef.current.targets;
+        const currentTargets = targetsRef.current;
 
         let hitId = -1;
         let hitType: any = null;
@@ -273,7 +278,6 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
 
     const animate = useCallback((time: number) => {
         if (!lastTimeRef.current) lastTimeRef.current = time;
-        // Don't update lastTimeRef if paused to prevent huge dt jumps
 
         if (stateRef.current.isPaused) {
             lastTimeRef.current = time; // Keep updating time to avoid jumps on resume
@@ -285,69 +289,77 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
 
         if (!stateRef.current.isPlaying) return;
 
-        // Update Projectiles
-        setProjectiles(prev => {
-            const nextProjs: Projectile[] = [];
-            prev.forEach(p => {
-                const newProgress = p.progress + settings.PHYSICS.PROJECTILE_SPEED;
-                if (newProgress >= 1) handleProjectileImpact(p);
-                else nextProjs.push({ ...p, progress: newProgress });
-            });
-            return nextProjs;
+        // Update Projectiles (in ref, no state update)
+        const nextProjs: Projectile[] = [];
+        projectilesRef.current.forEach(p => {
+            const newProgress = p.progress + settings.PHYSICS.PROJECTILE_SPEED;
+            if (newProgress >= 1) handleProjectileImpact(p);
+            else nextProjs.push({ ...p, progress: newProgress });
         });
+        projectilesRef.current = nextProjs;
 
-        // Update Targets
-        setTargets(prev => {
-            const now = Date.now();
-            const difficultyMod = Math.min(settings.SNOWBALL_HUNT.TARGET_MAX_AGE_BASE - settings.SNOWBALL_HUNT.TARGET_MAX_AGE_MIN, stateRef.current.score * 5);
-            const maxAge = Math.max(settings.SNOWBALL_HUNT.TARGET_MAX_AGE_MIN, settings.SNOWBALL_HUNT.TARGET_MAX_AGE_BASE - difficultyMod);
-
-            return prev.filter(t => {
-                const age = now - t.createdAt;
-                if (age > maxAge) {
-                    processedHits.current.delete(t.id); // Cleanup
-                    return false;
-                }
-                t.x += t.vx;
-                t.y += t.vy;
-                if (t.x < 0 || t.x > window.innerWidth - targetSize) t.vx *= -1;
-                if (t.y < 0 || t.y > window.innerHeight - targetSize) t.vy *= -1;
-                return true;
-            });
-        });
-
-        // Cleanup expired UI elements (floating text, particles, splats, ripples)
+        // Update Targets (in ref, no state update)
         const now = Date.now();
-        setFloatingTexts(prev => prev.some(t => t.expiry <= now) ? prev.filter(t => t.expiry > now) : prev);
-        setParticles(prev => prev.some(p => p.expiry <= now) ? prev.filter(p => p.expiry > now) : prev);
-        setSplats(prev => prev.some(s => s.expiry <= now) ? prev.filter(s => s.expiry > now) : prev);
-        setTapRipples(prev => prev.some(r => r.expiry <= now) ? prev.filter(r => r.expiry > now) : prev);
+        const difficultyMod = Math.min(settings.SNOWBALL_HUNT.TARGET_MAX_AGE_BASE - settings.SNOWBALL_HUNT.TARGET_MAX_AGE_MIN, stateRef.current.score * 5);
+        const maxAge = Math.max(settings.SNOWBALL_HUNT.TARGET_MAX_AGE_MIN, settings.SNOWBALL_HUNT.TARGET_MAX_AGE_BASE - difficultyMod);
+
+        targetsRef.current = targetsRef.current.filter(t => {
+            const age = now - t.createdAt;
+            if (age > maxAge) {
+                processedHits.current.delete(t.id); // Cleanup
+                return false;
+            }
+            t.x += t.vx;
+            t.y += t.vy;
+            if (t.x < 0 || t.x > window.innerWidth - targetSize) t.vx *= -1;
+            if (t.y < 0 || t.y > window.innerHeight - targetSize) t.vy *= -1;
+            return true;
+        });
+
+        // Cleanup expired UI elements (in refs, no state updates)
+        particlesRef.current = particlesRef.current.some(p => p.expiry <= now)
+            ? particlesRef.current.filter(p => p.expiry > now)
+            : particlesRef.current;
+        splatsRef.current = splatsRef.current.some(s => s.expiry <= now)
+            ? splatsRef.current.filter(s => s.expiry > now)
+            : splatsRef.current;
+        tapRipplesRef.current = tapRipplesRef.current.some(r => r.expiry <= now)
+            ? tapRipplesRef.current.filter(r => r.expiry > now)
+            : tapRipplesRef.current;
+
+        // Throttled re-render for smooth animation (max ~30fps for rendering)
+        if (time - lastRenderRef.current > 33) {
+            lastRenderRef.current = time;
+            forceUpdate();
+        }
 
         requestRef.current = requestAnimationFrame(animate);
-    }, [targetSize, handleProjectileImpact, settings.PHYSICS.PROJECTILE_SPEED, settings.SNOWBALL_HUNT.TARGET_MAX_AGE_BASE, settings.SNOWBALL_HUNT.TARGET_MAX_AGE_MIN]);
+    }, [targetSize, handleProjectileImpact, settings.PHYSICS.PROJECTILE_SPEED, settings.SNOWBALL_HUNT.TARGET_MAX_AGE_BASE, settings.SNOWBALL_HUNT.TARGET_MAX_AGE_MIN, forceUpdate]);
 
     const handlePointerDown = (e: React.PointerEvent) => {
         if (!stateRef.current.isPlaying || stateRef.current.isPaused) return;
 
-        // Add tap ripple feedback
+        // Add tap ripple feedback (in ref, no state update)
         const now = Date.now();
         const rippleId = nextId.current++;
-        setTapRipples(prev => [
-            ...prev.filter(r => r.expiry > now),
+        tapRipplesRef.current = [
+            ...tapRipplesRef.current.filter(r => r.expiry > now),
             { id: rippleId, x: e.clientX, y: e.clientY, expiry: now + 500 }
-        ]);
+        ];
 
         soundManager.current?.playThrow();
         const startX = window.innerWidth / 2;
         const startY = window.innerHeight;
-        setProjectiles(prev => [...prev, {
+
+        // Update ref directly, no state update
+        projectilesRef.current = [...projectilesRef.current, {
             id: nextId.current++,
             x: startX,
             y: startY,
             targetX: e.clientX,
             targetY: e.clientY,
             progress: 0
-        }]);
+        }];
     };
 
     useEffect(() => {
@@ -390,11 +402,11 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
         <div className={`game-area cursor-crosshair ${shake ? 'shake' : ''}`} onPointerDown={handlePointerDown}>
             {frozen && <div className="frozen-overlay"></div>}
 
-            {splats.map(s => (
+            {splatsRef.current.map(s => (
                 <div key={s.id} className="splat" style={{ left: s.x - 20, top: s.y - 20 }}></div>
             ))}
 
-            {tapRipples.map(r => (
+            {tapRipplesRef.current.map(r => (
                 <div
                     key={r.id}
                     className="tap-ripple"
@@ -413,7 +425,7 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
                 />
             ))}
 
-            {particles.map(p => (
+            {particlesRef.current.map(p => (
                 <div
                     key={p.id}
                     className={`particle ${p.type}`}
@@ -434,7 +446,7 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
 
             <HUD score={score} timeLeft={timeLeft} frozen={frozen} combo={combo} onPause={onPause} />
 
-            {targets.map(target => (
+            {targetsRef.current.map(target => (
                 <div
                     key={target.id}
                     className={`target target-moving target-${target.type}`}
@@ -457,7 +469,7 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
                 </div>
             ))}
 
-            {projectiles.map(p => {
+            {projectilesRef.current.map(p => {
                 const cx = p.x + (p.targetX - p.x) * p.progress;
                 const cy = p.y + (p.targetY - p.y) * p.progress;
                 const scale = 0.5 + Math.sin(p.progress * Math.PI) * 0.5;
