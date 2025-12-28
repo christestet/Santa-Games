@@ -37,6 +37,7 @@ interface Projectile {
 interface Splat { id: number; x: number; y: number; expiry: number; }
 interface FloatingText { id: number; x: number; y: number; text: string; color: string; expiry: number; }
 interface Particle { id: number; x: number; y: number; tx: string; ty: string; type: string; expiry: number; }
+interface BottomMessage { text: string; color: string; }
 
 export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }: SnowballHuntProps) {
     const { t, getJoke, getSpruch, getParcelText } = useLanguage();
@@ -58,6 +59,7 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
         y: number;
         expiry: number;
     }>>([])
+    const [bottomMessage, setBottomMessage] = useState<BottomMessage | null>(null)
 
     const stateRef = useRef({
         targets: [] as Target[],
@@ -143,9 +145,8 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
     }, [])
 
     const addFloatingText = useCallback((x: number, y: number, text: string, color: string = 'white') => {
-        const now = Date.now();
-        const id = nextId.current++
-        setFloatingTexts(prev => [...prev.filter(t => t.expiry > now), { id, x, y, text, color, expiry: now + 2000 }])
+        // Update bottom message instead of floating text
+        setBottomMessage({ text, color });
     }, [])
 
     const spawnTarget = useCallback(() => {
@@ -420,15 +421,16 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
                 ></div>
             ))}
 
-            {floatingTexts.map(t => (
+            {bottomMessage && (
                 <div
-                    key={t.id}
-                    className="floating-text"
-                    style={{ left: t.x, top: t.y, color: t.color, fontSize: window.innerWidth < 768 ? '1.5rem' : '3rem' }}
+                    className="bottom-hit-message"
+                    style={{
+                        color: bottomMessage.color,
+                    }}
                 >
-                    {t.text}
+                    {bottomMessage.text}
                 </div>
-            ))}
+            )}
 
             <HUD score={score} timeLeft={timeLeft} frozen={frozen} combo={combo} onPause={onPause} />
 
