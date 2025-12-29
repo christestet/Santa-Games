@@ -54,7 +54,8 @@ const App: React.FC = () => {
 
     return (
         <div className="game-container">
-            <Snow />
+            {/* Snow animation only in menu for festive effect, removed during gameplay for performance */}
+            {gameState === 'menu' && <Snow />}
 
             {gameState === 'menu' && (
                 <div className="menu-container">
