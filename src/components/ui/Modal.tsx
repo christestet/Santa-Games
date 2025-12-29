@@ -14,9 +14,7 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, 
 
     return (
         <div
-            className={`fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm ${
-                window.innerWidth <= 375 ? 'p-4' : 'p-6'
-            }`}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 md:p-6"
             style={style}
             onClick={(e) => {
                 if (e.target === e.currentTarget && onClose) {

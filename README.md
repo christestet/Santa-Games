@@ -2,7 +2,7 @@
 
 > A festive arcade game collection featuring bilingual support, dual themes, and competitive leaderboards
 
-![Version](https://img.shields.io/badge/version-4.1.0-blue.svg)
+![Version](https://img.shields.io/badge/version-4.1.1-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D22.x-brightgreen.svg)
 ![React](https://img.shields.io/badge/react-19.2.0-61dafb.svg?logo=react)
@@ -271,14 +271,14 @@ The project uses a two-stage Dockerfile optimized for production:
 
 ```bash
 # Build image
-docker build -t santa-games:4.1.0 .
+docker build -t santa-games:4.1.1 .
 
 # Run container
 docker run -d \
   -p 2412:2412 \
   -v $(pwd)/data:/app/data \
   --name santa-games \
-  santa-games:4.1.0
+  santa-games:4.1.1
 ```
 
 #### Environment Variables
