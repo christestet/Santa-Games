@@ -343,6 +343,7 @@ app.post("/api/scores", scoreLimiter, async (req, res) => {
 
     // Acquire file lock to prevent race conditions
     let release;
+    let resultScores;
     try {
       release = await lockfile.lock(SCORES_FILE, {
         retries: {
@@ -388,6 +389,10 @@ app.post("/api/scores", scoreLimiter, async (req, res) => {
 
       // Invalidate cache after new score
       invalidateCache();
+
+      // Read updated scores to return to client
+      const updatedScores = await readScores();
+      resultScores = getTopScoresPerCategory(updatedScores, 10);
     } finally {
       // Always release the lock
       await release();
@@ -396,7 +401,11 @@ app.post("/api/scores", scoreLimiter, async (req, res) => {
     console.log(
       `✨ ${name} made it onto Santa's nice list with ${score} points!`
     );
-    res.json({ success: true, message: "Score saved to Santa's list! 🎄" });
+    res.json({
+      success: true,
+      message: "Score saved to Santa's list! 🎄",
+      scores: resultScores
+    });
   } catch (err) {
     console.error("❌ The elves couldn't wrap this score:", err);
     res
