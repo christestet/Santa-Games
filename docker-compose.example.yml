@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  santa-app:
+    build: .
+    container_name: santa-app
+    environment:
+      - NODE_ENV=production
+      - PORT=2412
+    networks:
+      - traefik-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.santa.rule=Host(`santa-games.yourdomain.com`)"
+      - "traefik.http.services.santa.loadbalancer.server.port=2412"
+
+      # WICHTIG: Forward Cloudflare Headers
+      - "traefik.http.middlewares.cf-headers.headers.customrequestheaders.X-Forwarded-For="
+      - "traefik.http.middlewares.cf-headers.headers.customrequestheaders.X-Real-IP="
+      # CF-Connecting-IP wird automatisch weitergeleitet
+
+      - "traefik.http.routers.santa.middlewares=cf-headers@docker"
+
+  traefik:
+    image: traefik:v3.2
+    container_name: traefik
+    command:
+      - "--api.dashboard=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - traefik-network
+
+  # Cloudflared tunnel verbindet zu Traefik
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    command: tunnel run
+    environment:
+      - TUNNEL_TOKEN=${CF_TUNNEL_TOKEN}
+    networks:
+      - traefik-network
+
+networks:
+  traefik-network:
+    name: traefik-network

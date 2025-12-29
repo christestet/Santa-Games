@@ -12,6 +12,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+
+// Trust proxy headers from Cloudflare Tunnel + Traefik
+// This allows rate limiting to work correctly with real client IPs
+app.set('trust proxy', true);
+
 const PORT = process.env.PORT || 2412;
 const MAX_SCORES = parseInt(process.env.MAX_SCORES) || 50;
 const SCORES_DIR = path.join(__dirname, "data");
@@ -58,19 +63,27 @@ app.use(
 );
 app.use(express.json({ limit: "10kb" }));
 
-// Rate limiters
+// Rate limiters with Cloudflare support
 const generalLimiter = rateLimit({
   windowMs: 60 * 1000, // 1 minute
   max: 100,
   message: { error: "🎅 Whoa there! Even Santa's elves need a break!" },
+  // Use CF-Connecting-IP header (Cloudflare's real client IP) if available
+  keyGenerator: (req) => req.headers['cf-connecting-ip'] || req.ip,
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 
 const scoreLimiter = rateLimit({
   windowMs: 60 * 1000, // 1 minute
-  max: 5,
+  max: 10,
   message: {
     error: "🎅 Slow down! You're submitting faster than Rudolph can fly!",
   },
+  // Use CF-Connecting-IP header (Cloudflare's real client IP) if available
+  keyGenerator: (req) => req.headers['cf-connecting-ip'] || req.ip,
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 
 app.use("/api/", generalLimiter);
@@ -343,6 +356,7 @@ app.post("/api/scores", scoreLimiter, async (req, res) => {
 
     // Acquire file lock to prevent race conditions
     let release;
+    let resultScores;
     try {
       release = await lockfile.lock(SCORES_FILE, {
         retries: {
@@ -388,6 +402,10 @@ app.post("/api/scores", scoreLimiter, async (req, res) => {
 
       // Invalidate cache after new score
       invalidateCache();
+
+      // Read updated scores to return to client
+      const updatedScores = await readScores();
+      resultScores = getTopScoresPerCategory(updatedScores, 10);
     } finally {
       // Always release the lock
       await release();
@@ -396,7 +414,11 @@ app.post("/api/scores", scoreLimiter, async (req, res) => {
     console.log(
       `✨ ${name} made it onto Santa's nice list with ${score} points!`
     );
-    res.json({ success: true, message: "Score saved to Santa's list! 🎄" });
+    res.json({
+      success: true,
+      message: "Score saved to Santa's list! 🎄",
+      scores: resultScores
+    });
   } catch (err) {
     console.error("❌ The elves couldn't wrap this score:", err);
     res

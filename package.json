@@ -1,7 +1,7 @@
 {
   "name": "santa-games",
   "private": true,
-  "version": "3.3.0",
+  "version": "3.4.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,7 +9,10 @@
     "dev:full": "concurrently \"npm run dev\" \"npm run server\"",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "version:patch": "npm version patch && node -e \"const pkg=require('./package.json'); const fs=require('fs'); const readme=fs.readFileSync('README.md','utf8'); fs.writeFileSync('README.md', readme.replace(/version-\\d+\\.\\d+\\.\\d+-blue/g, 'version-'+pkg.version+'-blue').replace(/santa-games:\\d+\\.\\d+\\.\\d+/g, 'santa-games:'+pkg.version))\"",
+    "version:minor": "npm version minor && node -e \"const pkg=require('./package.json'); const fs=require('fs'); const readme=fs.readFileSync('README.md','utf8'); fs.writeFileSync('README.md', readme.replace(/version-\\d+\\.\\d+\\.\\d+-blue/g, 'version-'+pkg.version+'-blue').replace(/santa-games:\\d+\\.\\d+\\.\\d+/g, 'santa-games:'+pkg.version))\"",
+    "version:major": "npm version major && node -e \"const pkg=require('./package.json'); const fs=require('fs'); const readme=fs.readFileSync('README.md','utf8'); fs.writeFileSync('README.md', readme.replace(/version-\\d+\\.\\d+\\.\\d+-blue/g, 'version-'+pkg.version+'-blue').replace(/santa-games:\\d+\\.\\d+\\.\\d+/g, 'santa-games:'+pkg.version))\""
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.18",
