@@ -1,5 +1,4 @@
 import { lazy, Suspense } from 'react'
-import Snow from '@components/Snow'
 import GameCard from '@components/GameCard'
 import Countdown from '@components/Countdown'
 import { Button } from '@components/ui/Button'
@@ -54,8 +53,6 @@ const App: React.FC = () => {
 
     return (
         <div className="game-container">
-            <Snow />
-
             {gameState === 'menu' && (
                 <div className="menu-container">
                     <div className="top-bar">
