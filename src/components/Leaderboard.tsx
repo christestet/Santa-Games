@@ -60,18 +60,22 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
             <div className="flex gap-2 justify-center mb-4 flex-wrap px-2">
                 {timeOptions.map(time => {
                     const scoreCount = scores.filter(s => s.time === time).length;
+                    const isActive = selectedTime === time;
                     return (
                         <button
                             key={time}
                             onClick={() => setSelectedTime(time)}
-                            className={`flex-1 min-w-[70px] max-w-[100px] px-3 py-2 rounded-lg font-bold transition-all ${
-                                selectedTime === time
-                                    ? 'bg-[var(--primary-color)] text-white border-2 border-[var(--primary-color)] opacity-100'
-                                    : 'bg-transparent border-2 border-[var(--card-border)] opacity-60 hover:opacity-80'
+                            className={`flex-1 min-w-[70px] max-w-[100px] px-3 py-2 font-bold uppercase transition-all ${
+                                isActive
+                                    ? 'bg-[var(--primary-color)] text-white opacity-100'
+                                    : 'bg-transparent opacity-60 hover:opacity-80'
                             }`}
                             style={{
                                 fontFamily: 'var(--font-retro)',
-                                fontSize: 'clamp(0.75rem, 3vw, 0.9rem)'
+                                fontSize: 'clamp(0.75rem, 3vw, 0.9rem)',
+                                border: 'var(--border-width) solid var(--card-border)',
+                                boxShadow: isActive ? '4px 4px 0 rgba(0,0,0,1)' : '4px 4px 0 rgba(0,0,0,0.5)',
+                                position: 'relative'
                             }}
                         >
                             <div className="flex flex-col items-center">
