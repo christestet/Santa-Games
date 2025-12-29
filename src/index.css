@@ -12,6 +12,18 @@
   --font-family-retro: 'JetBrains Mono', monospace;
 }
 
+/* Dynamic Theme Colors - Tailwind will generate utilities for these */
+@theme inline {
+  --color-primary: var(--primary-color);
+  --color-secondary: var(--secondary-color);
+  --color-accent: var(--accent-color);
+  --color-card-bg: var(--card-bg);
+  --color-card-border: var(--card-border);
+  --color-text-main: var(--text-main);
+  --color-bg: var(--bg-color);
+  --color-bg-pattern: var(--bg-pattern);
+}
+
 /* Custom Retro Utilities */
 @utility shadow-retro {
   box-shadow: 4px 4px 0 rgba(0, 0, 0, 1);

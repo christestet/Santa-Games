@@ -46,7 +46,7 @@ const GameCard: React.FC<GameCardProps> = ({ title, icon, instructions, onPlay, 
                             {disabled ? t('menu.expired') : t('menu.play')}
                         </button>
                         <button
-                            className="btn-small bg-transparent border-[length:var(--border-width)] border-[var(--card-border)] text-[var(--card-border)]"
+                            className="btn-small bg-transparent border-4 border-card-border text-card-border"
                             onClick={handleFlip}
                             disabled={isTransitioning}
                         >
