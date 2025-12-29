@@ -6,6 +6,7 @@ import { useLanguage } from './LanguageContext'
 import { useSound } from './SoundContext'
 import GameIcon from './GameIcon'
 import { SoundManager } from '@/utils/SoundManager'
+import { getGameBoundaries, type GameBoundaries } from '@/utils/gameBoundaries'
 
 interface SnowballHuntProps {
     onGameOver: (score: number, joke: string) => void;
@@ -75,6 +76,7 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
     const processedHits = useRef(new Set<number>()); // Track hit IDs to prevent double-processing
 
     const soundManager = useRef<SoundManager | null>(null)
+    const boundariesRef = useRef<GameBoundaries>(getGameBoundaries())
     const nextId = useRef(0)
     const requestRef = useRef<number>(0)
     const lastTimeRef = useRef<number>(0)
@@ -82,7 +84,10 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
 
     useEffect(() => {
         soundManager.current = new SoundManager();
-        const updateSize = () => setTargetSize(window.innerWidth < 768 ? 70 : 100);
+        const updateSize = () => {
+            setTargetSize(window.innerWidth < 768 ? 70 : 100);
+            boundariesRef.current = getGameBoundaries(); // Update boundaries on resize
+        };
         updateSize();
         window.addEventListener('resize', updateSize);
 
@@ -152,9 +157,17 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
     const spawnTarget = useCallback(() => {
         if (!stateRef.current.isPlaying || stateRef.current.isPaused) return;
 
-        const padding = 50
-        const x = Math.random() * (window.innerWidth - targetSize - padding * 2) + padding
-        const y = Math.random() * (window.innerHeight - targetSize - padding * 2) + padding
+        const boundaries = boundariesRef.current;
+        const padding = 20; // Reduced padding, boundaries already account for HUD
+
+        // Spawn within safe boundaries (excludes HUD, score, timer, bottom message areas)
+        const minX = boundaries.left + padding;
+        const maxX = boundaries.right - targetSize - padding;
+        const minY = boundaries.top + padding;
+        const maxY = boundaries.bottom - targetSize - padding;
+
+        const x = minX + Math.random() * (maxX - minX);
+        const y = minY + Math.random() * (maxY - minY);
 
         const rand = Math.random()
         let type: 'gift' | 'coal' | 'gold' | 'time' | 'ice' | 'parcel' = 'gift'
@@ -303,6 +316,7 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
         const difficultyMod = Math.min(settings.SNOWBALL_HUNT.TARGET_MAX_AGE_BASE - settings.SNOWBALL_HUNT.TARGET_MAX_AGE_MIN, stateRef.current.score * 5);
         const maxAge = Math.max(settings.SNOWBALL_HUNT.TARGET_MAX_AGE_MIN, settings.SNOWBALL_HUNT.TARGET_MAX_AGE_BASE - difficultyMod);
 
+        const boundaries = boundariesRef.current;
         targetsRef.current = targetsRef.current.filter(t => {
             const age = now - t.createdAt;
             if (age > maxAge) {
@@ -311,8 +325,16 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
             }
             t.x += t.vx;
             t.y += t.vy;
-            if (t.x < 0 || t.x > window.innerWidth - targetSize) t.vx *= -1;
-            if (t.y < 0 || t.y > window.innerHeight - targetSize) t.vy *= -1;
+
+            // Bounce off safe boundaries (keep targets within playable area, away from HUD)
+            if (t.x < boundaries.left || t.x > boundaries.right - targetSize) {
+                t.vx *= -1;
+                t.x = Math.max(boundaries.left, Math.min(t.x, boundaries.right - targetSize));
+            }
+            if (t.y < boundaries.top || t.y > boundaries.bottom - targetSize) {
+                t.vy *= -1;
+                t.y = Math.max(boundaries.top, Math.min(t.y, boundaries.bottom - targetSize));
+            }
             return true;
         });
 
