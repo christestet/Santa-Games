@@ -2,7 +2,7 @@
 
 > A festive arcade game collection featuring bilingual support, dual themes, and competitive leaderboards
 
-![Version](https://img.shields.io/badge/version-4.1.1-blue.svg)
+![Version](https://img.shields.io/badge/version-4.2.0-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D22.x-brightgreen.svg)
 ![React](https://img.shields.io/badge/react-19.2.0-61dafb.svg?logo=react)
@@ -48,6 +48,10 @@ The project demonstrates advanced React patterns with a multi-context architectu
 ### 🎮 Games
 - **Snowball Hunt**: Click-based target elimination with progressive difficulty
 - **Gift Toss**: Physics-based projectile game with gravity mechanics
+- **Smart Game Boundaries**: Responsive safe zones prevent object spawning behind HUD elements
+  - Dynamic boundary calculations for all viewport sizes (iPhone SE to Desktop)
+  - Objects never overlap with score display, timer, or message areas
+  - React 19.2 optimized with useRef for high-performance boundary checks
 - Configurable game mechanics via centralized config system
 
 ### 🌍 Internationalization
@@ -271,14 +275,14 @@ The project uses a two-stage Dockerfile optimized for production:
 
 ```bash
 # Build image
-docker build -t santa-games:4.1.1 .
+docker build -t santa-games:4.2.0 .
 
 # Run container
 docker run -d \
   -p 2412:2412 \
   -v $(pwd)/data:/app/data \
   --name santa-games \
-  santa-games:4.1.1
+  santa-games:4.2.0
 ```
 
 #### Environment Variables
@@ -728,6 +732,10 @@ santa-games/
 │   │   └── gameTexts.ts          # Translation strings
 │   ├── hooks/
 │   │   └── useHighScores.ts      # API integration with auto-retry
+│   ├── utils/
+│   │   ├── gameBoundaries.ts     # Responsive game boundary calculations
+│   │   ├── collision.ts          # Collision detection utilities
+│   │   └── SoundManager.ts       # Audio management
 │   ├── types/                    # TypeScript type definitions
 │   ├── config.ts                 # Environment configuration
 │   ├── main.tsx                  # App entry point with providers
