@@ -13,9 +13,21 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
-// Trust proxy headers from Cloudflare Tunnel + Traefik
-// This allows rate limiting to work correctly with real client IPs
-app.set('trust proxy', true);
+// Configurable proxy settings
+// TRUST_PROXY: Set to 'true' when behind a reverse proxy (Cloudflare, nginx, Traefik, etc.)
+// REAL_IP_HEADER: The header name used by your proxy to pass the real client IP
+//   - Cloudflare: 'cf-connecting-ip'
+//   - nginx/Apache: 'x-real-ip' or 'x-forwarded-for'
+//   - No proxy: leave empty or set to 'none'
+const TRUST_PROXY = process.env.TRUST_PROXY === 'true';
+const REAL_IP_HEADER = process.env.REAL_IP_HEADER || 'none';
+
+if (TRUST_PROXY) {
+  app.set('trust proxy', true);
+  console.log(`🔒 Trust proxy enabled. Using header: ${REAL_IP_HEADER}`);
+} else {
+  console.log('🔒 Trust proxy disabled (direct connection mode)');
+}
 
 const PORT = process.env.PORT || 2412;
 const MAX_SCORES = parseInt(process.env.MAX_SCORES) || 50;
@@ -63,13 +75,20 @@ app.use(
 );
 app.use(express.json({ limit: "10kb" }));
 
-// Rate limiters with Cloudflare support
+// Helper function to get real client IP based on proxy configuration
+const getClientIP = (req) => {
+  if (!TRUST_PROXY || REAL_IP_HEADER === 'none' || !REAL_IP_HEADER) {
+    return req.ip;
+  }
+  return req.headers[REAL_IP_HEADER.toLowerCase()] || req.ip;
+};
+
+// Rate limiters with configurable proxy support
 const generalLimiter = rateLimit({
   windowMs: 60 * 1000, // 1 minute
   max: 100,
   message: { error: "🎅 Whoa there! Even Santa's elves need a break!" },
-  // Use CF-Connecting-IP header (Cloudflare's real client IP) if available
-  keyGenerator: (req) => req.headers['cf-connecting-ip'] || req.ip,
+  keyGenerator: getClientIP,
   standardHeaders: true,
   legacyHeaders: false,
 });
@@ -80,8 +99,7 @@ const scoreLimiter = rateLimit({
   message: {
     error: "🎅 Slow down! You're submitting faster than Rudolph can fly!",
   },
-  // Use CF-Connecting-IP header (Cloudflare's real client IP) if available
-  keyGenerator: (req) => req.headers['cf-connecting-ip'] || req.ip,
+  keyGenerator: getClientIP,
   standardHeaders: true,
   legacyHeaders: false,
 });

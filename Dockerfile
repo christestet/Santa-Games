@@ -20,6 +20,10 @@ ENV NODE_ENV=production \
     PORT=2412 \
     TZ=Europe/Berlin
 
+# Proxy configuration (uncomment and set via docker-compose or docker run)
+# ENV TRUST_PROXY=true
+# ENV REAL_IP_HEADER=cf-connecting-ip
+
 # Create non-root user (Debian syntax for slim image)
 RUN groupadd -r santa && useradd -r -g santa santa
 
