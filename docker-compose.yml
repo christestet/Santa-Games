@@ -7,6 +7,10 @@ services:
       - "${PORT:-2412}:${PORT:-2412}"
     env_file:
       - .env
+    # Optional: Add proxy configuration if running behind reverse proxy
+    # environment:
+    #   - TRUST_PROXY=true
+    #   - REAL_IP_HEADER=cf-connecting-ip  # or x-real-ip, x-forwarded-for
     volumes:
       - santa_data:/app/data
     restart: unless-stopped

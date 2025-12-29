@@ -7,6 +7,9 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=2412
+      # Proxy configuration for Cloudflare Tunnel
+      - TRUST_PROXY=true
+      - REAL_IP_HEADER=cf-connecting-ip
     networks:
       - traefik-network
     labels:

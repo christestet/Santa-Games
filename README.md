@@ -2,7 +2,7 @@
 
 > A festive arcade game collection featuring bilingual support, dual themes, and competitive leaderboards
 
-![Version](https://img.shields.io/badge/version-3.4.0-blue.svg)
+![Version](https://img.shields.io/badge/version-4.0.0-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D22.x-brightgreen.svg)
 ![React](https://img.shields.io/badge/react-19.2.0-61dafb.svg?logo=react)
@@ -71,7 +71,7 @@ The project demonstrates advanced React patterns with a multi-context architectu
 - Top 10 or full leaderboard views
 - Input sanitization and suspicious pattern detection
 - File locking prevents data corruption under concurrent load
-- Cloudflare Tunnel + Traefik proxy support with real client IP detection
+- Configurable reverse proxy support (Cloudflare, nginx, Traefik, Apache, etc.) with real client IP detection
 
 ### ⚙️ Game Settings
 - Adjustable timer (30s/60s/90s/120s)
@@ -157,10 +157,10 @@ GameContext consolidates all game-related state and actions:
 ┌──────────────────────────────────────────────┐
 │           Express Server (Port 2412)         │
 ├──────────────────────────────────────────────┤
-│  Proxy Support                                │
-│  - Cloudflare CF-Connecting-IP detection     │
-│  - Traefik X-Forwarded-For support           │
-│  - Trust proxy: enabled                      │
+│  Configurable Proxy Support                   │
+│  - Direct connection mode (default)          │
+│  - Cloudflare: cf-connecting-ip              │
+│  - nginx/Apache: x-real-ip, x-forwarded-for  │
 ├──────────────────────────────────────────────┤
 │  Static File Serving (/dist)                 │
 │  - Hashed assets: 1 year cache               │
@@ -271,14 +271,14 @@ The project uses a two-stage Dockerfile optimized for production:
 
 ```bash
 # Build image
-docker build -t santa-games:3.4.0 .
+docker build -t santa-games:4.0.0 .
 
 # Run container
 docker run -d \
   -p 2412:2412 \
   -v $(pwd)/data:/app/data \
   --name santa-games \
-  santa-games:3.4.0
+  santa-games:4.0.0
 ```
 
 #### Environment Variables
@@ -291,6 +291,8 @@ docker run -d \
 | `MAX_SCORES` | `50` | Maximum scores to persist per category |
 | `FRONTEND_URL` | `http://localhost:5173` | CORS allowed origin |
 | `LOCK_DIR` | `/tmp` | Directory for file lock files |
+| `TRUST_PROXY` | `false` | Enable proxy support (`true`/`false`) |
+| `REAL_IP_HEADER` | `none` | Header for real client IP (see [Proxy Setup](#reverse-proxy-configuration)) |
 
 #### Docker Features
 
@@ -312,59 +314,133 @@ curl http://localhost:2412/api/health
 
 ---
 
-### Cloudflare Tunnel + Proxy Setup
+### Reverse Proxy Configuration
 
-If you're deploying behind **Cloudflare Access + Cloudflare Tunnel + Traefik**, the server is configured to detect real client IPs for accurate rate limiting.
+**By default**, Santa Games runs in **direct connection mode** (no proxy) for maximum security. If you deploy behind a reverse proxy (Cloudflare, nginx, Traefik, Apache, etc.), you need to configure proxy support.
 
-#### Infrastructure Stack
+#### Why Configure Proxies?
 
+Rate limiting uses client IP addresses. Without proper configuration:
+- ❌ All users share the same rate limit (proxy IP is used)
+- ✅ With correct setup: Each user gets their own rate limit
+
+#### Configuration by Deployment Type
+
+##### 1. Direct Connection (Default - No Proxy)
+
+**No configuration needed!** The app works out-of-the-box.
+
+```bash
+# .env - leave proxy settings commented out
+# TRUST_PROXY=true
+# REAL_IP_HEADER=cf-connecting-ip
 ```
-User → CF Access (Auth) → CF Tunnel → [Optional: Traefik] → Docker Container
+
+Server logs show:
+```
+🔒 Trust proxy disabled (direct connection mode)
 ```
 
-#### Configuration
+---
 
-The server is already configured to:
-1. **Trust proxy headers** (`app.set('trust proxy', true)`)
-2. **Detect real client IP** from:
-   - `CF-Connecting-IP` (Cloudflare's real client IP) - **Primary**
-   - `X-Forwarded-For` (from Traefik)
-   - `req.ip` (fallback for local dev)
+##### 2. Cloudflare Tunnel / Cloudflare Access
 
-#### Docker Compose Example (Simple Setup)
+**Infrastructure**: User → CF Access → CF Tunnel → Docker Container
 
+**Configuration**:
+```env
+# .env
+TRUST_PROXY=true
+REAL_IP_HEADER=cf-connecting-ip
+```
+
+**Docker Compose Example**:
 ```yaml
-version: '3.8'
-
 services:
   santa-app:
     build: .
-    container_name: santa-app
-    ports:
-      - "2412:2412"
     environment:
-      - NODE_ENV=production
-      - PORT=2412
+      - TRUST_PROXY=true
+      - REAL_IP_HEADER=cf-connecting-ip
     volumes:
       - ./data:/app/data
     restart: unless-stopped
 
   cloudflared:
     image: cloudflare/cloudflared:latest
-    container_name: cloudflared
     command: tunnel run
     environment:
       - TUNNEL_TOKEN=${CF_TUNNEL_TOKEN}
     depends_on:
       - santa-app
+```
+
+Server logs show:
+```
+🔒 Trust proxy enabled. Using header: cf-connecting-ip
+```
+
+---
+
+##### 3. nginx or Apache Reverse Proxy
+
+**Infrastructure**: User → nginx/Apache → Docker Container
+
+**nginx configuration** (add to your server block):
+```nginx
+location / {
+    proxy_pass http://santa-app:2412;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+}
+```
+
+**Application configuration**:
+```env
+# .env
+TRUST_PROXY=true
+REAL_IP_HEADER=x-real-ip
+```
+
+Alternatively, use `x-forwarded-for` if your nginx doesn't set `x-real-ip`.
+
+---
+
+##### 4. Traefik Reverse Proxy
+
+**Infrastructure**: User → Traefik → Docker Container
+
+**Docker Compose Example**:
+```yaml
+services:
+  santa-app:
+    build: .
+    environment:
+      - TRUST_PROXY=true
+      - REAL_IP_HEADER=x-forwarded-for
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.santa.rule=Host(`santa.example.com`)"
     restart: unless-stopped
 ```
 
-#### Docker Compose Example (With Traefik)
+See `docker-compose.example.yml` for complete multi-service setup.
 
-See `docker-compose.example.yml` for multi-service setup with Traefik labels for header forwarding.
+---
 
-#### Rate Limiting with Proxies
+##### 5. Cloudflare + Traefik (Multi-Proxy Stack)
+
+**Infrastructure**: User → CF → CF Tunnel → Traefik → Docker
+
+Use Cloudflare's header as it's closest to the client:
+```env
+TRUST_PROXY=true
+REAL_IP_HEADER=cf-connecting-ip
+```
+
+---
+
+#### Rate Limiting Behavior
 
 Rate limits are applied **per real client IP**, not per proxy IP:
 
@@ -374,13 +450,17 @@ Rate limits are applied **per real client IP**, not per proxy IP:
 | 20 users, same IP (NAT) | ⚠️ Share 10 submissions/min pool |
 | Auto-retry enabled | ✅ Retries up to 3x with backoff |
 
-#### Testing in Production
+#### Testing Your Setup
 
 ```bash
-# Check service health
+# 1. Check service health
 curl https://your-domain.com/api/health
 
-# Test rate limiting (should limit after 10 requests)
+# 2. Verify proxy configuration in logs
+docker logs santa-app | grep "Trust proxy"
+# Expected: "🔒 Trust proxy enabled. Using header: cf-connecting-ip"
+
+# 3. Test rate limiting (should limit after 10 requests)
 for i in {1..15}; do
   curl -X POST https://your-domain.com/api/scores \
     -H "Content-Type: application/json" \
@@ -388,23 +468,42 @@ for i in {1..15}; do
 done
 ```
 
-Expected: First 10 succeed, next 5 get rate limited.
+Expected: First 10 succeed, next 5 get rate limited (`429 Too Many Requests`).
 
-#### Troubleshooting Proxy Setup
+#### Troubleshooting
 
 **Issue**: All users share same rate limit
 
-**Solution**:
-1. Check server logs for incoming requests - they should show different IPs
-2. Verify Traefik is forwarding headers (see `docker-compose.example.yml`)
-3. Ensure CF Tunnel is passing `CF-Connecting-IP` header
-4. Confirm `app.set('trust proxy', true)` is enabled in server.js:18
+**Solutions**:
+1. **Check server startup logs**:
+   ```bash
+   docker logs santa-app | head -20
+   ```
+   Should show: `🔒 Trust proxy enabled. Using header: <your-header>`
+
+2. **Verify environment variables**:
+   ```bash
+   docker exec santa-app env | grep TRUST_PROXY
+   docker exec santa-app env | grep REAL_IP_HEADER
+   ```
+
+3. **Check proxy headers** (from inside container):
+   ```bash
+   # Add temporary logging to server.js:
+   console.log('Headers:', req.headers);
+   ```
+   Look for your configured header (`cf-connecting-ip`, `x-real-ip`, etc.)
+
+4. **Common mistakes**:
+   - ❌ `TRUST_PROXY=false` but `REAL_IP_HEADER` is set → Won't work
+   - ❌ Wrong header name → Falls back to proxy IP
+   - ❌ Proxy doesn't forward headers → Configure nginx/Traefik correctly
 
 **Debugging via logs**:
 ```bash
 docker logs -f santa-app
 # Look for: "🎁 New score delivery attempt: ..."
-# Different users should show different IPs in logs
+# Different users should show different IPs
 ```
 
 ---
@@ -523,10 +622,10 @@ Health check endpoint for monitoring and Docker healthcheck.
 | `/api/*` (general) | 100 requests | 1 minute | Real client IP |
 | `POST /api/scores` | 10 requests | 1 minute | Real client IP |
 
-**Real IP Detection Priority**:
-1. `CF-Connecting-IP` (Cloudflare)
-2. `X-Forwarded-For` (Traefik/Proxy)
-3. `req.ip` (Direct connection)
+**Real IP Detection** (configurable via `TRUST_PROXY` and `REAL_IP_HEADER`):
+- **Direct mode** (default): Uses `req.ip`
+- **Proxy mode**: Uses configured header (`cf-connecting-ip`, `x-real-ip`, `x-forwarded-for`, etc.)
+- See [Reverse Proxy Configuration](#reverse-proxy-configuration) for setup details
 
 ### Caching Strategy
 
@@ -687,13 +786,14 @@ but the message channel closed before a response was received
 
 **Issue**: Multiple users from different locations share a rate limit
 
-**Cause**: Proxy headers not forwarded correctly
+**Cause**: Proxy configuration not set up correctly
 
-**Solution**:
-1. Check server logs: `docker logs -f santa-app`
-2. Verify requests show different IPs (not all the same proxy IP)
-3. If using Traefik, ensure header forwarding is configured (see `docker-compose.example.yml`)
-4. Confirm `app.set('trust proxy', true)` is enabled in server.js:18
+**Solution**: See the comprehensive [Reverse Proxy Configuration](#reverse-proxy-configuration) section, particularly the [Troubleshooting](#troubleshooting) subsection.
+
+**Quick checks**:
+1. Verify `TRUST_PROXY=true` and `REAL_IP_HEADER` are set in your `.env` file
+2. Check server startup logs: `docker logs santa-app | grep "Trust proxy"`
+3. Ensure your reverse proxy (nginx, Traefik, etc.) forwards the correct headers
 
 ---
 
