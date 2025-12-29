@@ -76,7 +76,7 @@ const generalLimiter = rateLimit({
 
 const scoreLimiter = rateLimit({
   windowMs: 60 * 1000, // 1 minute
-  max: 5,
+  max: 10,
   message: {
     error: "🎅 Slow down! You're submitting faster than Rudolph can fly!",
   },
