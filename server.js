@@ -216,24 +216,6 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-// Debug endpoint to check proxy headers (useful for production debugging)
-app.get("/api/debug/headers", (req, res) => {
-  const relevantHeaders = {
-    'cf-connecting-ip': req.headers['cf-connecting-ip'],
-    'x-forwarded-for': req.headers['x-forwarded-for'],
-    'x-real-ip': req.headers['x-real-ip'],
-    'cf-access-authenticated-user-email': req.headers['cf-access-authenticated-user-email'],
-    'req.ip': req.ip,
-  };
-
-  res.json({
-    message: "🔍 Header Debug Info",
-    rateLimitKey: req.headers['cf-connecting-ip'] || req.ip,
-    headers: relevantHeaders,
-    hint: "This shows which IP will be used for rate limiting",
-  });
-});
-
 app.get("/api/scores", async (req, res) => {
   const showAll = req.query.all === "true";
   console.log(`🎄 Checking Santa's nice list... (all=${showAll})`);

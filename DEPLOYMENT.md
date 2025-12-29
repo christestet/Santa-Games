@@ -122,28 +122,7 @@ keyGenerator: (req) => req.headers['cf-connecting-ip'] || req.ip
 
 ## Testing in Production
 
-### 1. Check Headers
-```bash
-curl https://santa-games.yourdomain.com/api/debug/headers
-```
-
-**Expected Response:**
-```json
-{
-  "message": "🔍 Header Debug Info",
-  "rateLimitKey": "1.2.3.4",
-  "headers": {
-    "cf-connecting-ip": "1.2.3.4",
-    "x-forwarded-for": "1.2.3.4",
-    "x-real-ip": "1.2.3.4",
-    "cf-access-authenticated-user-email": null,
-    "req.ip": "1.2.3.4"
-  },
-  "hint": "This shows which IP will be used for rate limiting"
-}
-```
-
-### 2. Test Rate Limiting
+### 1. Test Rate Limiting
 ```bash
 # Send 15 requests quickly (should rate limit after 10)
 for i in {1..15}; do
@@ -242,9 +221,10 @@ docker logs -f santa-app
 **Cause:** Headers not forwarded correctly
 
 **Fix:**
-1. Check headers: `GET /api/debug/headers`
-2. If `cf-connecting-ip` is null, check Traefik config
-3. Ensure `app.set('trust proxy', true)` is enabled
+1. Check server logs for incoming requests - they should show different IPs
+2. If all requests show same IP, check Traefik config for header forwarding
+3. Ensure `app.set('trust proxy', true)` is enabled in server.js:18
+4. Verify CF Tunnel is forwarding `CF-Connecting-IP` header
 
 ### Issue: 503 errors under load
 
@@ -307,11 +287,27 @@ curl https://santa-games.yourdomain.com/api/health
 
 ---
 
-## Questions?
+## Debugging Proxy Setup
 
-Check the debug endpoint to see your current setup:
+To verify that rate limiting works correctly with real client IPs:
+
+### Check Server Logs
 ```bash
-curl https://santa-games.yourdomain.com/api/debug/headers
+docker logs -f santa-app
 ```
 
-This will show you which IP is being used for rate limiting and confirm your proxy setup works correctly.
+Look for score submission logs - they should show different IPs for different users:
+```
+🎁 New score delivery attempt: User1 with 500 points (Time: 60s)
+✨ User1 made it onto Santa's nice list with 500 points!
+```
+
+### Test from Different Locations
+- Submit scores from different networks/devices
+- Each should get their own rate limit (10 submissions/min)
+- Server logs should reflect different source IPs
+
+### Verify Headers in Code
+The server uses this priority for IP detection (server.js:67, 79):
+1. `CF-Connecting-IP` (Cloudflare's real client IP)
+2. `req.ip` (Express IP with proxy trust enabled)
