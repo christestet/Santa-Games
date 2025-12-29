@@ -613,7 +613,25 @@ input[type=range]::-moz-range-thumb {
   */
 }
 
-/* Snow overlay and snowflake styles removed - using static backgrounds for better performance */
+/* Snow overlay - only shown in menu for festive effect */
+.snow-overlay {
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* Retro square snowflakes */
+.snowflake {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: white;
+  border-radius: 0; /* Square snow for retro feel */
+  color: white;
+  user-select: none;
+  pointer-events: none;
+  animation: fall linear infinite;
+  z-index: 1000;
+}
 
 /* =========================================
    MEDIA QUERIES
@@ -1568,7 +1586,11 @@ input[type=range]::-moz-range-thumb {
    ANIMATIONS (CONSOLIDATED)
    ========================================= */
 
-/* Snowfall animation removed - using static backgrounds for better performance */
+/* Snowfall animation - only active in menu */
+@keyframes fall {
+  0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+}
 
 /* Target pulse animation */
 @keyframes target-pulse {
