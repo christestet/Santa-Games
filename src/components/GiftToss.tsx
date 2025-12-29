@@ -5,6 +5,7 @@ import { useLanguage } from './LanguageContext';
 import { useSound } from './SoundContext';
 import GameIcon from './GameIcon';
 import { SoundManager } from '@/utils/SoundManager';
+import { getGameBoundaries, type GameBoundaries } from '@/utils/gameBoundaries';
 
 interface Gift {
     id: number;
@@ -44,6 +45,7 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
     const [bottomMessage, setBottomMessage] = useState<BottomMessage | null>(null)
 
     const santaRef = useRef({ x: window.innerWidth / 2, speed: 3 })
+    const boundariesRef = useRef<GameBoundaries>(getGameBoundaries())
     const soundManager = useRef<SoundManager | null>(null)
     const nextId = useRef(0)
     const requestRef = useRef<number>(0)
@@ -118,7 +120,17 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
             window.removeEventListener('pointerdown', resumeAudio);
         }
         window.addEventListener('pointerdown', resumeAudio);
-        return () => window.removeEventListener('pointerdown', resumeAudio);
+
+        // Update boundaries on resize
+        const handleResize = () => {
+            boundariesRef.current = getGameBoundaries();
+        };
+        window.addEventListener('resize', handleResize);
+
+        return () => {
+            window.removeEventListener('pointerdown', resumeAudio);
+            window.removeEventListener('resize', handleResize);
+        };
     }, []);
 
     useEffect(() => {
@@ -142,11 +154,17 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
 
     const spawnObstacle = useCallback(() => {
         if (!stateRef.current.isPlaying || stateRef.current.isPaused) return;
+        const boundaries = boundariesRef.current;
         const id = nextId.current++
         const type = Math.random() > 0.7 ? 'plane' : 'cloud'
         const width = type === 'cloud' ? 120 : 60
         const height = type === 'cloud' ? 60 : 30
-        const y = 150 + Math.random() * (window.innerHeight - 350)
+
+        // Spawn obstacles within safe vertical boundaries (exclude HUD areas)
+        const minY = boundaries.top + 50; // Below HUD
+        const maxY = boundaries.bottom - height - 100; // Above chimney/bottom area
+        const y = minY + Math.random() * (maxY - minY);
+
         const fromLeft = Math.random() > 0.5;
         const x = fromLeft ? -width : window.innerWidth;
         const speed = (1 + Math.random() * 2) * (fromLeft ? 1 : -1);
@@ -166,8 +184,10 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
 
         // 1. Update Santa Movement (Manual)
         const s = santaRef.current;
+        const boundaries = boundariesRef.current;
         // Increase speed for manual control to make it feel responsive
         const manualSpeed = 8;
+        const santaWidth = 60; // Santa icon width
 
         if (keysPressed.current['ArrowLeft'] || keysPressed.current['KeyA']) {
             s.x -= manualSpeed;
@@ -176,9 +196,11 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
             s.x += manualSpeed;
         }
 
-        // Clamp position
-        if (s.x < 20) s.x = 20;
-        if (s.x > window.innerWidth - 60) s.x = window.innerWidth - 60;
+        // Clamp position to safe boundaries (exclude HUD areas)
+        const minX = boundaries.left + 20;
+        const maxX = boundaries.right - santaWidth;
+        if (s.x < minX) s.x = minX;
+        if (s.x > maxX) s.x = maxX;
 
         setSantaX(s.x);
 
@@ -377,10 +399,14 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
         // Reset velocity after throw
         velocityTracker.current.velocityX = 0;
 
+        // Start gift below HUD area
+        const boundaries = boundariesRef.current;
+        const giftStartY = boundaries.top + 10; // Just below HUD
+
         const newGift: Gift = {
             id: nextId.current++,
             x: santaRef.current.x,
-            y: 80,
+            y: giftStartY,
             vx: momentum,
             vy: settings.PHYSICS.THROW_VELOCITY,
             type,
@@ -425,7 +451,12 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
             velocityTracker.current.lastTime = now;
 
             // Update ref AND state (state update batched by React 19.2)
-            santaRef.current.x = Math.max(20, Math.min(e.clientX, window.innerWidth - 60));
+            // Clamp to safe boundaries (exclude HUD areas)
+            const boundaries = boundariesRef.current;
+            const santaWidth = 60;
+            const minX = boundaries.left + 20;
+            const maxX = boundaries.right - santaWidth;
+            santaRef.current.x = Math.max(minX, Math.min(e.clientX, maxX));
             setSantaX(santaRef.current.x);
 
             rafThrottle.current = 0;
@@ -457,7 +488,7 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
             tabIndex={0}
         >
             <HUD score={score} timeLeft={timeLeft} onPause={onPause} />
-            <div className="santa-hand-top" style={{ left: santaX }}>
+            <div className="santa-hand-top" style={{ left: santaX, top: boundariesRef.current.top + 5 }}>
                 <GameIcon name="santa" size={40} />
             </div>
             {/* Drop zone indicator - shows approximate landing zone */}
