@@ -5,7 +5,7 @@ import { promises as fsPromises } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createHash } from "node:crypto";
-import rateLimit from "express-rate-limit";
+import rateLimit, { ipKeyGenerator } from "express-rate-limit";
 import lockfile from "proper-lockfile";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -77,10 +77,11 @@ app.use(express.json({ limit: "10kb" }));
 
 // Helper function to get real client IP based on proxy configuration
 const getClientIP = (req) => {
-  if (!TRUST_PROXY || REAL_IP_HEADER === 'none' || !REAL_IP_HEADER) {
-    return req.ip;
-  }
-  return req.headers[REAL_IP_HEADER.toLowerCase()] || req.ip;
+  const ip = (!TRUST_PROXY || REAL_IP_HEADER === 'none' || !REAL_IP_HEADER)
+    ? req.ip
+    : req.headers[REAL_IP_HEADER.toLowerCase()] || req.ip;
+
+  return ipKeyGenerator(ip);
 };
 
 // Rate limiters with configurable proxy support
