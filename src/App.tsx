@@ -118,14 +118,14 @@ const App: React.FC = () => {
                     <div className="game-selection">
                         <GameCard
                             title={t('menu.snowballTitle')}
-                            icon={<GameIcon name="snowflake" size={64} />}
+                            icon={<GameIcon name={gamesPlayable ? "snowflake" : "melting_snowflake"} size={64} />}
                             instructions={t('menu.snowballDesc')}
                             onPlay={() => startGame('snowball')}
                             disabled={!gamesPlayable}
                         />
                         <GameCard
                             title={t('menu.giftTitle')}
-                            icon={<GameIcon name="gift" size={64} />}
+                            icon={<GameIcon name={gamesPlayable ? "gift" : "return_parcel"} size={64} />}
                             instructions={t('menu.giftDesc')}
                             onPlay={() => startGame('gift-toss')}
                             disabled={!gamesPlayable}
