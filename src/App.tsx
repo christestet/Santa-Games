@@ -52,6 +52,12 @@ const App: React.FC = () => {
 
     const gamesPlayable = isGamePlayable()
 
+    // Check if we're in endgame phase (less than 2 days remaining)
+    const now = new Date().getTime()
+    const deadline = GAME_DEADLINE.getTime()
+    const daysRemaining = Math.floor((deadline - now) / (1000 * 60 * 60 * 24))
+    const isEndgame = daysRemaining < 2 && gamesPlayable
+
     return (
         <div className="game-container">
             {/* Snow animation only in menu for festive effect, removed during gameplay for performance */}
@@ -81,12 +87,17 @@ const App: React.FC = () => {
                     </div>
 
                     <div className="w-full flex justify-center">
-                        <h1 className="text-center">
+                        <h1 className="text-center relative inline-block">
                             {theme === 'grinch' ? (
                                 <>
                                     {t('menu.grinchTitle')}
                                 </>
                             ) : t('menu.title')}
+                            {isEndgame && (
+                                <span className="finale-badge">
+                                    {language === 'de' ? 'FINALE' : 'FINALE'}
+                                </span>
+                            )}
                         </h1>
                     </div>
 

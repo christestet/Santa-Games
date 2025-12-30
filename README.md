@@ -2,7 +2,7 @@
 
 > A festive arcade game collection featuring bilingual support, dual themes, and competitive leaderboards
 
-![Version](https://img.shields.io/badge/version-4.3.0-blue.svg)
+![Version](https://img.shields.io/badge/version-4.4.0-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D22.x-brightgreen.svg)
 ![React](https://img.shields.io/badge/react-19.2.0-61dafb.svg?logo=react)
@@ -81,6 +81,15 @@ The project demonstrates advanced React patterns with a multi-context architectu
 - Adjustable timer (30s/60s/90s/120s)
 - Sound effects toggle
 - Settings persistence via GameContext
+
+### 🎆 Endgame Effects (New in v4.4.0)
+- **Countdown Transformation**: Red pulsing animation when < 2 days remain until game expiration
+- **Particle System Switch**: Confetti (Light mode) or Matrix code (Dark mode) replaces snow
+- **"FINALE" Badge**: Animated badge appears on main logo during endgame phase
+- **Eternal Glory Message**: Golden shimmer banner added to leaderboard
+- **Frozen GameCards**: Pixel icicles with drip animation on card edges
+- **Pulsing Cards**: Gentle breathing animation on game selection cards
+- All effects activate automatically in final 48 hours before Jan 1, 2026
 
 ### 🔊 Audio
 - Background music (Suno AI generated Christmas carol)
@@ -275,14 +284,14 @@ The project uses a two-stage Dockerfile optimized for production:
 
 ```bash
 # Build image
-docker build -t santa-games:4.3.0 .
+docker build -t santa-games:4.4.0 .
 
 # Run container
 docker run -d \
   -p 2412:2412 \
   -v $(pwd)/data:/app/data \
   --name santa-games \
-  santa-games:4.3.0
+  santa-games:4.4.0
 ```
 
 #### Environment Variables

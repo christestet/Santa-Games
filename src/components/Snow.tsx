@@ -1,9 +1,15 @@
 import { memo, useMemo } from 'react'
+import { useTheme } from './ThemeContext'
+import { GAME_DEADLINE } from '@constants/gameConstants'
 
-// Generate snowflakes once outside component to avoid recalculation
+// Generate particles once outside component to avoid recalculation
 // This leverages React 19.2's improved rendering performance
-const generateSnowflakes = () =>
-    Array.from({ length: 30 }, (_, i) => ({
+const generateParticles = (isEndgame: boolean, isGrinch: boolean) => {
+    const colors = isGrinch
+        ? ['#33ff33', '#00ff00', '#00cc00', '#00aa00']
+        : ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff']
+
+    return Array.from({ length: 30 }, (_, i) => ({
         id: i,
         left: `${Math.random() * 100}%`,
         // Use negative delay to start the animation at a random point in its cycle
@@ -11,28 +17,41 @@ const generateSnowflakes = () =>
         duration: `${Math.random() * 3 + 4}s`,
         size: `${Math.random() * 1 + 0.5}rem`,
         opacity: Math.random(),
+        color: isEndgame ? colors[Math.floor(Math.random() * colors.length)] : undefined,
+        char: isEndgame && isGrinch ? String.fromCharCode(33 + Math.floor(Math.random() * 94)) : undefined,
     }))
+}
 
 const Snow = memo(() => {
-    // Memoize snowflakes array - only calculate once per component instance
+    const { theme } = useTheme()
+    const isGrinch = theme === 'grinch'
+
+    // Check if we're in endgame phase (less than 2 days remaining)
+    const now = new Date().getTime()
+    const deadline = GAME_DEADLINE.getTime()
+    const daysRemaining = Math.floor((deadline - now) / (1000 * 60 * 60 * 24))
+    const isEndgame = daysRemaining < 2
+
+    // Memoize particles array - recalculate when theme or endgame status changes
     // React 19.2's improved memoization handles this efficiently
-    const snowflakes = useMemo(() => generateSnowflakes(), [])
+    const particles = useMemo(() => generateParticles(isEndgame, isGrinch), [isEndgame, isGrinch])
 
     return (
         <div className="snow-overlay">
-            {snowflakes.map((flake) => (
+            {particles.map((particle) => (
                 <div
-                    key={flake.id}
+                    key={particle.id}
                     className="snowflake"
                     style={{
-                        left: flake.left,
-                        animationDelay: flake.delay,
-                        animationDuration: flake.duration,
-                        fontSize: flake.size,
-                        opacity: flake.opacity,
+                        left: particle.left,
+                        animationDelay: particle.delay,
+                        animationDuration: particle.duration,
+                        fontSize: particle.size,
+                        opacity: particle.opacity,
+                        color: particle.color,
                     }}
                 >
-                    ❄
+                    {isEndgame ? (isGrinch ? particle.char : '🎉') : '❄'}
                 </div>
             ))}
         </div>
