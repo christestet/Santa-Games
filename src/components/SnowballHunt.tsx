@@ -14,6 +14,7 @@ interface SnowballHuntProps {
     settings: typeof GAME_CONFIG;
     isPaused: boolean;
     onPause: () => void;
+    isEndgame?: boolean;
 }
 
 interface Target {
@@ -41,7 +42,7 @@ interface Particle { id: number; x: number; y: number; tx: string; ty: string; t
 interface TapRipple { id: number; x: number; y: number; expiry: number; }
 interface BottomMessage { text: string; color: string; }
 
-export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }: SnowballHuntProps) {
+export default function SnowballHunt({ onGameOver, settings, isPaused, onPause, isEndgame = false }: SnowballHuntProps) {
     const { t, getJoke, getSpruch, getParcelText } = useLanguage();
     const { isMuted } = useSound();
 
@@ -267,7 +268,9 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
 
     const handleProjectileImpact = useCallback((p: Projectile) => {
         const { targetX, targetY } = p;
-        const hitRadius = window.innerWidth < 768 ? targetSize / 1.5 : targetSize / 2;
+        // Endgame: Increase hit radius by 30% to make it easier
+        const baseHitRadius = window.innerWidth < 768 ? targetSize / 1.5 : targetSize / 2;
+        const hitRadius = isEndgame ? baseHitRadius * 1.3 : baseHitRadius;
         const currentTargets = targetsRef.current;
 
         let hitId = -1;
@@ -287,7 +290,7 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
 
         if (hitId !== -1) handleHitSuccess(hitId, hitType, targetX, targetY);
         else handleHitMiss(targetX, targetY);
-    }, [targetSize, handleHitSuccess, handleHitMiss]);
+    }, [targetSize, handleHitSuccess, handleHitMiss, isEndgame]);
 
     const animate = useCallback((time: number) => {
         if (!lastTimeRef.current) lastTimeRef.current = time;
@@ -314,7 +317,9 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
         // Update Targets (in ref, no state update)
         const now = Date.now();
         const difficultyMod = Math.min(settings.SNOWBALL_HUNT.TARGET_MAX_AGE_BASE - settings.SNOWBALL_HUNT.TARGET_MAX_AGE_MIN, stateRef.current.score * 5);
-        const maxAge = Math.max(settings.SNOWBALL_HUNT.TARGET_MAX_AGE_MIN, settings.SNOWBALL_HUNT.TARGET_MAX_AGE_BASE - difficultyMod);
+        // Endgame: Increase target lifetime by 50% to make it easier
+        const baseMaxAge = Math.max(settings.SNOWBALL_HUNT.TARGET_MAX_AGE_MIN, settings.SNOWBALL_HUNT.TARGET_MAX_AGE_BASE - difficultyMod);
+        const maxAge = isEndgame ? baseMaxAge * 1.5 : baseMaxAge;
 
         const boundaries = boundariesRef.current;
         targetsRef.current = targetsRef.current.filter(t => {
@@ -356,7 +361,7 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
         }
 
         requestRef.current = requestAnimationFrame(animate);
-    }, [targetSize, handleProjectileImpact, settings.PHYSICS.PROJECTILE_SPEED, settings.SNOWBALL_HUNT.TARGET_MAX_AGE_BASE, settings.SNOWBALL_HUNT.TARGET_MAX_AGE_MIN, forceUpdate]);
+    }, [targetSize, handleProjectileImpact, settings.PHYSICS.PROJECTILE_SPEED, settings.SNOWBALL_HUNT.TARGET_MAX_AGE_BASE, settings.SNOWBALL_HUNT.TARGET_MAX_AGE_MIN, forceUpdate, isEndgame]);
 
     const handlePointerDown = (e: React.PointerEvent) => {
         if (!stateRef.current.isPlaying || stateRef.current.isPaused) return;
@@ -387,10 +392,12 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
     useEffect(() => {
         // ... (spawn interval logic) ...
         const difficultyMod = Math.min(settings.SNOWBALL_HUNT.SPAWN_RATE_BASE - settings.SNOWBALL_HUNT.SPAWN_RATE_MIN, Math.floor(score / 5));
-        const spawnRate = Math.max(settings.SNOWBALL_HUNT.SPAWN_RATE_MIN, settings.SNOWBALL_HUNT.SPAWN_RATE_BASE - difficultyMod);
+        const baseSpawnRate = Math.max(settings.SNOWBALL_HUNT.SPAWN_RATE_MIN, settings.SNOWBALL_HUNT.SPAWN_RATE_BASE - difficultyMod);
+        // Endgame: Slow down spawn rate by 40% (increase interval) to make it easier
+        const spawnRate = isEndgame ? baseSpawnRate * 1.4 : baseSpawnRate;
         const spawnInterval = setInterval(spawnTarget, spawnRate);
         return () => clearInterval(spawnInterval);
-    }, [spawnTarget, score, settings.SNOWBALL_HUNT.SPAWN_RATE_BASE, settings.SNOWBALL_HUNT.SPAWN_RATE_MIN]);
+    }, [spawnTarget, score, settings.SNOWBALL_HUNT.SPAWN_RATE_BASE, settings.SNOWBALL_HUNT.SPAWN_RATE_MIN, isEndgame]);
 
     // Trigger game over when time runs out
     useEffect(() => {

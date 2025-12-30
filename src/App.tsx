@@ -229,6 +229,7 @@ const App: React.FC = () => {
                                 settings={settings}
                                 isPaused={isPaused}
                                 onPause={pauseGame}
+                                isEndgame={isEndgame}
                             />
                         )}
                         {currentGame === 'gift-toss' && (
@@ -238,6 +239,7 @@ const App: React.FC = () => {
                                 settings={settings}
                                 isPaused={isPaused}
                                 onPause={pauseGame}
+                                isEndgame={isEndgame}
                             />
                         )}
                         {currentGame === 'reindeer-run' && (
