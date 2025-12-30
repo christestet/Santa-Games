@@ -60,8 +60,8 @@ export const TRANSLATIONS = {
             miss: "Daneben",
             playableUntil: "Spielbar bis 01.01.2026",
             gameEnded: "Spiel beendet",
-            gameEndedTitle: "Die Santa Games sind vorbei!",
-            gameEndedMessage: "Vielen Dank an alle Spieler für eure Teilnahme! Es hat uns riesig Spaß gemacht, die Santa Games mit euch zu feiern. Bis zum nächsten Jahr! 🎅🎄",
+            gameEndedTitle: "Ho ho ho... und Tschüss!",
+            gameEndedMessage: "Die Santa Games sind offiziell vorbei! Danke an alle mutigen Spieler, die Santas Geschenke gerettet haben. Die Rentiere sind erschöpft, die Elfen im Urlaub und der Schlitten in der Werkstatt. Ob wir nächstes Jahr wieder zurückkommen? Wer weiß... vielleicht, wenn ihr brav wart! 🎅✨",
             player: "Spieler",
             players: "Spieler",
             runner: {
@@ -133,8 +133,8 @@ export const TRANSLATIONS = {
             miss: "Miss",
             playableUntil: "Playable until 01.01.2026",
             gameEnded: "Game ended",
-            gameEndedTitle: "The Santa Games have ended!",
-            gameEndedMessage: "Thank you to all players for participating! We had a blast celebrating the Santa Games with you. See you next year! 🎅🎄",
+            gameEndedTitle: "Ho ho ho... and that's a wrap!",
+            gameEndedMessage: "The Santa Games are officially over! Thanks to all brave players who saved Santa's presents. The reindeer are exhausted, the elves are on vacation, and the sleigh's in the shop. Will we be back next year? Who knows... maybe if you've been good! 🎅✨",
             player: "player",
             players: "players",
             runner: {
