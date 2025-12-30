@@ -110,19 +110,60 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
                     {t('game.noScores')} {selectedTime}s
                 </p>
             ) : (
-                <div className={gameExpired && displayScores.length > 10 ? 'max-h-96 overflow-y-auto' : ''}>
+                <div
+                    className={gameExpired && displayScores.length > 10 ? 'overflow-y-auto' : ''}
+                    style={{
+                        maxHeight: gameExpired && displayScores.length > 10 ? 'min(60vh, 500px)' : 'auto',
+                        overscrollBehavior: 'contain',
+                        WebkitOverflowScrolling: 'touch'
+                    }}
+                >
                     {displayScores.map((s, i) => {
                         // Scale down font size for longer names
                         const nameLength = s.name.length;
                         const fontSize = nameLength > 12 ? '0.85em' : nameLength > 8 ? '0.95em' : '1em';
 
                         return (
-                            <div key={i} className="score-row">
-                                <span style={{ fontSize }}>{i + 1}. {s.name}</span>
-                                <span className="text-[var(--accent-color)]">
+                            <div
+                                key={i}
+                                className="score-row"
+                                style={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    padding: 'clamp(0.5rem, 2vw, 0.75rem)',
+                                    gap: 'clamp(0.5rem, 2vw, 1rem)',
+                                    flexWrap: 'nowrap'
+                                }}
+                            >
+                                <span
+                                    style={{
+                                        fontSize,
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        whiteSpace: 'nowrap',
+                                        flex: '1 1 auto',
+                                        minWidth: 0
+                                    }}
+                                >
+                                    {i + 1}. {s.name}
+                                </span>
+                                <span
+                                    className="text-[var(--accent-color)]"
+                                    style={{
+                                        flex: '0 0 auto',
+                                        textAlign: 'right',
+                                        whiteSpace: 'nowrap'
+                                    }}
+                                >
                                     {s.score}
                                     {s.timestamp && (
-                                        <span className="text-[0.8em] opacity-80 ml-2">
+                                        <span
+                                            className="text-[0.8em] opacity-80 ml-2"
+                                            style={{
+                                                display: window.innerWidth < 375 ? 'none' : 'inline'
+                                            }}
+                                        >
                                             ({new Date(s.timestamp).toLocaleDateString('en-GB', {
                                                 year: '2-digit',
                                                 month: '2-digit',

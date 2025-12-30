@@ -331,6 +331,15 @@ app.post("/api/scores", scoreLimiter, async (req, res) => {
   );
 
   try {
+    // Check if game is still playable
+    if (!isGamePlayable()) {
+      console.log(`🎄 Score submission rejected: Game has ended`);
+      return res.status(403).json({
+        error: "🎅 The Santa Games have ended! Thanks for playing!",
+        gameEnded: true
+      });
+    }
+
     // Validation
     if (!name || score === undefined) {
       return res.status(400).json({
