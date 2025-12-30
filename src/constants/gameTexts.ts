@@ -19,6 +19,7 @@ export const TRANSLATIONS = {
         menu: {
             title: "Fröhliche Spiele",
             grinchTitle: "Grummelige Spiele",
+            finaleBadge: "FINALE",
             settings: "EINSTELLUNGEN",
             play: "SPIELEN",
             info: "INFO",
@@ -92,6 +93,7 @@ export const TRANSLATIONS = {
         menu: {
             title: "Merry Games",
             grinchTitle: "Grumpy Games",
+            finaleBadge: "FINALE",
             settings: "SETTINGS",
             play: "PLAY",
             info: "INFO",

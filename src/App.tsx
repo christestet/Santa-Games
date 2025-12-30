@@ -95,7 +95,7 @@ const App: React.FC = () => {
                             ) : t('menu.title')}
                             {isEndgame && (
                                 <span className="finale-badge">
-                                    {language === 'de' ? 'FINALE' : 'FINALE'}
+                                    {t('menu.finaleBadge')}
                                 </span>
                             )}
                         </h1>
