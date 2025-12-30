@@ -1947,23 +1947,57 @@ input[type=range]::-moz-range-thumb {
   }
 }
 
-/* Mobile adjustments for badge */
+/* Tablet adjustments for badge (iPad) */
 @media (max-width: 768px) {
   .finale-badge {
-    font-size: 0.6rem;
-    padding: 0.2rem 0.4rem;
-    right: -60px;
-    top: -8px;
+    font-size: 0.7rem;
+    padding: 0.25rem 0.45rem;
+    right: -70px;
+    top: -10px;
   }
 }
 
+/* iPhone 12 Pro and similar (390px - 428px) */
 @media (max-width: 428px) {
   .finale-badge {
-    font-size: 0.5rem;
-    padding: 0.15rem 0.3rem;
-    right: -50px;
-    top: -6px;
+    /* Position above the title for better visibility */
+    top: -35px;
+    right: 50%;
+    transform: translateX(50%) rotate(-5deg);
+    font-size: 0.65rem;
+    padding: 0.25rem 0.5rem;
     border: 2px solid var(--card-border);
+  }
+
+  @keyframes badge-pulse {
+    0%, 100% {
+      transform: translateX(50%) rotate(-5deg) scale(1);
+    }
+    50% {
+      transform: translateX(50%) rotate(-5deg) scale(1.1);
+    }
+  }
+}
+
+/* iPhone SE and smaller (< 390px) */
+@media (max-width: 389px) {
+  .finale-badge {
+    /* Position above the title, centered */
+    top: -32px;
+    right: 50%;
+    transform: translateX(50%) rotate(-5deg);
+    font-size: 0.6rem;
+    padding: 0.2rem 0.4rem;
+    border: 2px solid var(--card-border);
+  }
+
+  @keyframes badge-pulse {
+    0%, 100% {
+      transform: translateX(50%) rotate(-5deg) scale(1);
+    }
+    50% {
+      transform: translateX(50%) rotate(-5deg) scale(1.1);
+    }
   }
 }
 
