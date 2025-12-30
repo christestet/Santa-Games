@@ -53,10 +53,13 @@ const Countdown: React.FC<CountdownProps> = ({ targetDate }) => {
 
     const pad = (num: number) => String(num).padStart(2, '0')
 
+    // Check if we're in endgame phase (less than 2 days remaining)
+    const isEndgame = timeRemaining.days < 2
+
     return (
-        <div className="flex flex-col gap-1 text-center text-xs opacity-70">
+        <div className={`flex flex-col gap-1 text-center text-xs ${isEndgame ? 'opacity-100' : 'opacity-70'}`}>
             <div>{t('game.playableUntil')}</div>
-            <div className="font-mono text-sm tracking-wider">
+            <div className={`font-mono text-sm tracking-wider ${isEndgame ? 'text-[#ff0000] countdown-pulse' : ''}`}>
                 {timeRemaining.days}d {pad(timeRemaining.hours)}h {pad(timeRemaining.minutes)}m {pad(timeRemaining.seconds)}s
             </div>
         </div>

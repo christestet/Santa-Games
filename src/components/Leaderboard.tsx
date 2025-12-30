@@ -31,6 +31,12 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
     const { t } = useLanguage();
     const gameExpired = !isGamePlayable();
 
+    // Check if we're in endgame phase (less than 2 days remaining)
+    const now = new Date().getTime()
+    const deadline = new Date('2026-01-01T00:00:00+01:00').getTime()
+    const daysRemaining = Math.floor((deadline - now) / (1000 * 60 * 60 * 24))
+    const isEndgame = daysRemaining < 2 && !gameExpired
+
     // Available play time durations
     const timeOptions = [30, 60, 90, 120];
 
@@ -55,6 +61,14 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
                     </span>
                 )}
             </h2>
+
+            {isEndgame && (
+                <div className="eternal-glory-hint">
+                    <span className="eternal-glory-text">
+                        ⭐ {t('game.language') === 'de' ? 'Ewiger Ruhm erwartet die Champions!' : 'Eternal Glory awaits the Champions!'} ⭐
+                    </span>
+                </div>
+            )}
 
             {/* Time duration tabs - Mobile optimized */}
             <div className="flex gap-2 justify-center mb-4 flex-wrap px-2">
