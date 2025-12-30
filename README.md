@@ -2,7 +2,7 @@
 
 > A festive arcade game collection featuring bilingual support, dual themes, and competitive leaderboards
 
-![Version](https://img.shields.io/badge/version-4.4.0-blue.svg)
+![Version](https://img.shields.io/badge/version-4.5.0-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D22.x-brightgreen.svg)
 ![React](https://img.shields.io/badge/react-19.2.0-61dafb.svg?logo=react)

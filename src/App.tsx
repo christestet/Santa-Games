@@ -95,7 +95,7 @@ const App: React.FC = () => {
                             ) : t('menu.title')}
                             {isEndgame && (
                                 <span className="finale-badge">
-                                    {language === 'de' ? 'FINALE' : 'FINALE'}
+                                    {t('menu.finaleBadge')}
                                 </span>
                             )}
                         </h1>
@@ -229,6 +229,7 @@ const App: React.FC = () => {
                                 settings={settings}
                                 isPaused={isPaused}
                                 onPause={pauseGame}
+                                isEndgame={isEndgame}
                             />
                         )}
                         {currentGame === 'gift-toss' && (
@@ -238,6 +239,7 @@ const App: React.FC = () => {
                                 settings={settings}
                                 isPaused={isPaused}
                                 onPause={pauseGame}
+                                isEndgame={isEndgame}
                             />
                         )}
                         {currentGame === 'reindeer-run' && (

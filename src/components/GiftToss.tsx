@@ -28,9 +28,10 @@ interface GiftTossProps {
     settings: typeof GAME_CONFIG;
     isPaused: boolean;
     onPause: () => void;
+    isEndgame?: boolean;
 }
 
-export default function GiftToss({ onGameOver, settings, isPaused, onPause }: GiftTossProps) {
+export default function GiftToss({ onGameOver, settings, isPaused, onPause, isEndgame = false }: GiftTossProps) {
     const { t, getJoke, getSpruch, getParcelText } = useLanguage();
 
 
@@ -147,10 +148,14 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
     const spawnChimney = useCallback(() => {
         if (!stateRef.current.isPlaying || stateRef.current.isPaused) return;
         const id = nextId.current++
-        const width = 80 + Math.random() * 40
-        const speed = -1.5 - Math.random() * 1.5;
+        // Endgame: Make chimneys 50% wider for easier targeting
+        const baseWidth = 80 + Math.random() * 40
+        const width = isEndgame ? baseWidth * 1.5 : baseWidth
+        // Endgame: Slow down chimney movement by 30%
+        const baseSpeed = -1.5 - Math.random() * 1.5;
+        const speed = isEndgame ? baseSpeed * 0.7 : baseSpeed;
         setChimneys(prev => [...prev, { id, x: window.innerWidth, speed, width }])
-    }, [])
+    }, [isEndgame])
 
     const spawnObstacle = useCallback(() => {
         if (!stateRef.current.isPlaying || stateRef.current.isPaused) return;
@@ -167,9 +172,11 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
 
         const fromLeft = Math.random() > 0.5;
         const x = fromLeft ? -width : window.innerWidth;
-        const speed = (1 + Math.random() * 2) * (fromLeft ? 1 : -1);
+        // Endgame: Slow down obstacles by 40% to make it easier
+        const baseSpeed = (1 + Math.random() * 2) * (fromLeft ? 1 : -1);
+        const speed = isEndgame ? baseSpeed * 0.6 : baseSpeed;
         setObstacles(prev => [...prev, { id, x, y, width, height, speed, type }])
-    }, [])
+    }, [isEndgame])
 
     const update = useCallback((time: number) => {
         if (!stateRef.current.isPlaying) return;
@@ -342,8 +349,14 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
 
     useEffect(() => {
         requestRef.current = requestAnimationFrame(update);
-        const chimneyInterval = setInterval(spawnChimney, settings.GIFT_TOSS.SPAWN_RATE_CHIMNEY);
-        const obstacleInterval = setInterval(spawnObstacle, settings.GIFT_TOSS.SPAWN_RATE_OBSTACLE);
+        // Endgame: Reduce obstacle spawn frequency by 60% (increase interval by 2.5x)
+        const chimneySpawnRate = settings.GIFT_TOSS.SPAWN_RATE_CHIMNEY;
+        const obstacleSpawnRate = isEndgame
+            ? settings.GIFT_TOSS.SPAWN_RATE_OBSTACLE * 2.5
+            : settings.GIFT_TOSS.SPAWN_RATE_OBSTACLE;
+
+        const chimneyInterval = setInterval(spawnChimney, chimneySpawnRate);
+        const obstacleInterval = setInterval(spawnObstacle, obstacleSpawnRate);
         const timerInterval = setInterval(() => {
             if (!stateRef.current.isPaused && stateRef.current.isPlaying) {
                 setTimeLeft(t => {
@@ -365,7 +378,7 @@ export default function GiftToss({ onGameOver, settings, isPaused, onPause }: Gi
             clearInterval(obstacleInterval);
             clearInterval(timerInterval);
         }
-    }, [update, spawnChimney, spawnObstacle]);
+    }, [update, spawnChimney, spawnObstacle, settings.GIFT_TOSS.SPAWN_RATE_CHIMNEY, settings.GIFT_TOSS.SPAWN_RATE_OBSTACLE, isEndgame]);
 
 
 

@@ -14,6 +14,7 @@ interface SnowballHuntProps {
     settings: typeof GAME_CONFIG;
     isPaused: boolean;
     onPause: () => void;
+    isEndgame?: boolean;
 }
 
 interface Target {
@@ -41,7 +42,7 @@ interface Particle { id: number; x: number; y: number; tx: string; ty: string; t
 interface TapRipple { id: number; x: number; y: number; expiry: number; }
 interface BottomMessage { text: string; color: string; }
 
-export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }: SnowballHuntProps) {
+export default function SnowballHunt({ onGameOver, settings, isPaused, onPause, isEndgame = false }: SnowballHuntProps) {
     const { t, getJoke, getSpruch, getParcelText } = useLanguage();
     const { isMuted } = useSound();
 
@@ -314,7 +315,9 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
         // Update Targets (in ref, no state update)
         const now = Date.now();
         const difficultyMod = Math.min(settings.SNOWBALL_HUNT.TARGET_MAX_AGE_BASE - settings.SNOWBALL_HUNT.TARGET_MAX_AGE_MIN, stateRef.current.score * 5);
-        const maxAge = Math.max(settings.SNOWBALL_HUNT.TARGET_MAX_AGE_MIN, settings.SNOWBALL_HUNT.TARGET_MAX_AGE_BASE - difficultyMod);
+        // Endgame: Increase target lifetime by 50% to make it easier
+        const baseMaxAge = Math.max(settings.SNOWBALL_HUNT.TARGET_MAX_AGE_MIN, settings.SNOWBALL_HUNT.TARGET_MAX_AGE_BASE - difficultyMod);
+        const maxAge = isEndgame ? baseMaxAge * 1.5 : baseMaxAge;
 
         const boundaries = boundariesRef.current;
         targetsRef.current = targetsRef.current.filter(t => {
@@ -356,7 +359,7 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause }
         }
 
         requestRef.current = requestAnimationFrame(animate);
-    }, [targetSize, handleProjectileImpact, settings.PHYSICS.PROJECTILE_SPEED, settings.SNOWBALL_HUNT.TARGET_MAX_AGE_BASE, settings.SNOWBALL_HUNT.TARGET_MAX_AGE_MIN, forceUpdate]);
+    }, [targetSize, handleProjectileImpact, settings.PHYSICS.PROJECTILE_SPEED, settings.SNOWBALL_HUNT.TARGET_MAX_AGE_BASE, settings.SNOWBALL_HUNT.TARGET_MAX_AGE_MIN, forceUpdate, isEndgame]);
 
     const handlePointerDown = (e: React.PointerEvent) => {
         if (!stateRef.current.isPlaying || stateRef.current.isPaused) return;
