@@ -268,9 +268,7 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause, 
 
     const handleProjectileImpact = useCallback((p: Projectile) => {
         const { targetX, targetY } = p;
-        // Endgame: Increase hit radius by 30% to make it easier
-        const baseHitRadius = window.innerWidth < 768 ? targetSize / 1.5 : targetSize / 2;
-        const hitRadius = isEndgame ? baseHitRadius * 1.3 : baseHitRadius;
+        const hitRadius = window.innerWidth < 768 ? targetSize / 1.5 : targetSize / 2;
         const currentTargets = targetsRef.current;
 
         let hitId = -1;
@@ -290,7 +288,7 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause, 
 
         if (hitId !== -1) handleHitSuccess(hitId, hitType, targetX, targetY);
         else handleHitMiss(targetX, targetY);
-    }, [targetSize, handleHitSuccess, handleHitMiss, isEndgame]);
+    }, [targetSize, handleHitSuccess, handleHitMiss]);
 
     const animate = useCallback((time: number) => {
         if (!lastTimeRef.current) lastTimeRef.current = time;
@@ -392,12 +390,10 @@ export default function SnowballHunt({ onGameOver, settings, isPaused, onPause, 
     useEffect(() => {
         // ... (spawn interval logic) ...
         const difficultyMod = Math.min(settings.SNOWBALL_HUNT.SPAWN_RATE_BASE - settings.SNOWBALL_HUNT.SPAWN_RATE_MIN, Math.floor(score / 5));
-        const baseSpawnRate = Math.max(settings.SNOWBALL_HUNT.SPAWN_RATE_MIN, settings.SNOWBALL_HUNT.SPAWN_RATE_BASE - difficultyMod);
-        // Endgame: Slow down spawn rate by 40% (increase interval) to make it easier
-        const spawnRate = isEndgame ? baseSpawnRate * 1.4 : baseSpawnRate;
+        const spawnRate = Math.max(settings.SNOWBALL_HUNT.SPAWN_RATE_MIN, settings.SNOWBALL_HUNT.SPAWN_RATE_BASE - difficultyMod);
         const spawnInterval = setInterval(spawnTarget, spawnRate);
         return () => clearInterval(spawnInterval);
-    }, [spawnTarget, score, settings.SNOWBALL_HUNT.SPAWN_RATE_BASE, settings.SNOWBALL_HUNT.SPAWN_RATE_MIN, isEndgame]);
+    }, [spawnTarget, score, settings.SNOWBALL_HUNT.SPAWN_RATE_BASE, settings.SNOWBALL_HUNT.SPAWN_RATE_MIN]);
 
     // Trigger game over when time runs out
     useEffect(() => {
