@@ -60,6 +60,8 @@ export const TRANSLATIONS = {
             miss: "Daneben",
             playableUntil: "Spielbar bis 01.01.2026",
             gameEnded: "Spiel beendet",
+            gameEndedTitle: "Die Santa Games sind vorbei!",
+            gameEndedMessage: "Vielen Dank an alle Spieler für eure Teilnahme! Es hat uns riesig Spaß gemacht, die Santa Games mit euch zu feiern. Bis zum nächsten Jahr! 🎅🎄",
             player: "Spieler",
             players: "Spieler",
             runner: {
@@ -131,6 +133,8 @@ export const TRANSLATIONS = {
             miss: "Miss",
             playableUntil: "Playable until 01.01.2026",
             gameEnded: "Game ended",
+            gameEndedTitle: "The Santa Games have ended!",
+            gameEndedMessage: "Thank you to all players for participating! We had a blast celebrating the Santa Games with you. See you next year! 🎅🎄",
             player: "player",
             players: "players",
             runner: {

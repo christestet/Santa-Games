@@ -90,6 +90,31 @@ const App: React.FC = () => {
                         </h1>
                     </div>
 
+                    {!gamesPlayable && (
+                        <Card className="frost-card" style={{
+                            maxWidth: '600px',
+                            margin: '0 auto 2rem',
+                            textAlign: 'center',
+                            padding: '1.5rem'
+                        }}>
+                            <h2 style={{
+                                fontFamily: 'var(--font-retro)',
+                                color: 'var(--primary-color)',
+                                marginBottom: '1rem',
+                                fontSize: 'clamp(1.2rem, 4vw, 1.8rem)'
+                            }}>
+                                {t('game.gameEndedTitle')}
+                            </h2>
+                            <p style={{
+                                fontSize: 'clamp(0.9rem, 3vw, 1.1rem)',
+                                lineHeight: '1.6',
+                                opacity: 0.9
+                            }}>
+                                {t('game.gameEndedMessage')}
+                            </p>
+                        </Card>
+                    )}
+
                     <div className="game-selection">
                         <GameCard
                             title={t('menu.snowballTitle')}
