@@ -102,7 +102,10 @@ const App: React.FC = () => {
                     </div>
 
                     {gamesPlayable && (
-                        <div style={{ marginTop: '1.5rem', marginBottom: '1rem' }}>
+                        <div style={{
+                            marginTop: 'clamp(0.75rem, 2vw, 1rem)',
+                            marginBottom: 'clamp(0.5rem, 1.5vw, 0.75rem)'
+                        }}>
                             <Countdown targetDate={GAME_DEADLINE} />
                         </div>
                     )}

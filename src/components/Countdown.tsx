@@ -46,9 +46,9 @@ const Countdown: React.FC<CountdownProps> = ({ targetDate }) => {
     if (timeRemaining.total <= 0) {
         return (
             <div className="text-center" style={{
-                fontSize: 'clamp(1rem, 3vw, 1.2rem)',
-                opacity: 0.8,
-                fontWeight: 'bold'
+                fontSize: 'clamp(0.8rem, 2.5vw, 0.95rem)',
+                opacity: 0.7,
+                fontWeight: '600'
             }}>
                 {t('game.gameEnded')}
             </div>
@@ -61,27 +61,28 @@ const Countdown: React.FC<CountdownProps> = ({ targetDate }) => {
     const isEndgame = timeRemaining.days < 2
 
     return (
-        <div className={`flex flex-col gap-2 text-center ${isEndgame ? 'opacity-100' : 'opacity-90'}`} style={{
-            padding: 'clamp(0.75rem, 2vw, 1rem)',
-            borderRadius: '8px',
-            background: isEndgame ? 'rgba(255, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.05)',
-            border: isEndgame ? '2px solid rgba(255, 0, 0, 0.3)' : '2px solid rgba(255, 255, 255, 0.1)',
-            maxWidth: '500px',
+        <div className={`flex flex-col gap-1 text-center ${isEndgame ? 'opacity-100' : 'opacity-80'}`} style={{
+            padding: 'clamp(0.5rem, 1.5vw, 0.75rem)',
+            borderRadius: '6px',
+            background: isEndgame ? 'rgba(255, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.03)',
+            border: isEndgame ? '1px solid rgba(255, 0, 0, 0.2)' : '1px solid rgba(255, 255, 255, 0.08)',
+            maxWidth: 'min(90vw, 400px)',
             margin: '0 auto'
         }}>
             <div style={{
-                fontSize: 'clamp(1rem, 3vw, 1.3rem)',
-                fontWeight: 'bold',
+                fontSize: 'clamp(0.8rem, 2.5vw, 0.95rem)',
+                fontWeight: '600',
                 fontFamily: 'var(--font-retro)',
-                color: isEndgame ? '#ff0000' : 'var(--text-main)'
+                color: isEndgame ? '#ff0000' : 'var(--text-main)',
+                letterSpacing: '0.02em'
             }}>
                 {t('game.playableUntil')}
             </div>
-            <div className={`font-mono tracking-wider ${isEndgame ? 'countdown-pulse' : ''}`} style={{
-                fontSize: 'clamp(1.2rem, 4vw, 1.8rem)',
-                fontWeight: 'bold',
+            <div className={`font-mono ${isEndgame ? 'countdown-pulse' : ''}`} style={{
+                fontSize: 'clamp(0.95rem, 3vw, 1.2rem)',
+                fontWeight: '700',
                 color: isEndgame ? '#ff0000' : 'var(--accent-color)',
-                letterSpacing: '0.1em'
+                letterSpacing: '0.05em'
             }}>
                 {timeRemaining.days}d {pad(timeRemaining.hours)}h {pad(timeRemaining.minutes)}m {pad(timeRemaining.seconds)}s
             </div>
