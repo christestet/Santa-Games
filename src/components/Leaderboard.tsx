@@ -86,7 +86,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
                             }`}
                             style={{
                                 fontFamily: 'var(--font-retro)',
-                                fontSize: 'clamp(0.75rem, 3vw, 0.9rem)',
+                                fontSize: 'var(--text-small)',
                                 border: 'var(--border-width) solid var(--card-border)',
                                 boxShadow: isActive ? '4px 4px 0 rgba(0,0,0,1)' : '4px 4px 0 rgba(0,0,0,0.5)',
                                 position: 'relative'

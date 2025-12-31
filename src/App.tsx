@@ -121,12 +121,12 @@ const App: React.FC = () => {
                                 fontFamily: 'var(--font-retro)',
                                 color: 'var(--primary-color)',
                                 marginBottom: '1rem',
-                                fontSize: 'clamp(1.2rem, 4vw, 1.8rem)'
+                                fontSize: 'var(--text-heading-lg)'
                             }}>
                                 {t('game.gameEndedTitle')}
                             </h2>
                             <p style={{
-                                fontSize: 'clamp(0.9rem, 3vw, 1.1rem)',
+                                fontSize: 'var(--text-body)',
                                 lineHeight: '1.6',
                                 opacity: 0.9
                             }}>
@@ -188,8 +188,8 @@ const App: React.FC = () => {
                     </div>
 
                     <div className="flex flex-col gap-4 items-center mt-8 mb-4">
-                        <span style={{ fontSize: '0.875rem' }}>{t('menu.githubHelp')}</span>
-                        <span style={{ fontSize: '0.875rem' }}>{t('menu.githubVisit')}</span>
+                        <span style={{ fontSize: 'var(--text-small)' }}>{t('menu.githubHelp')}</span>
+                        <span style={{ fontSize: 'var(--text-small)' }}>{t('menu.githubVisit')}</span>
                         <div className="version-tag" style={{
                             display: 'flex',
                             alignItems: 'center',
@@ -275,7 +275,7 @@ const App: React.FC = () => {
             {gameState === 'name-entry' && (
                 <Modal isOpen={true} title={<div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>{t('game.newHighScore')} <GameIcon name="trophy" size={24} /></div>}>
                     <div style={{ textAlign: 'center', width: '100%' }}>
-                        <p style={{ fontSize: '1.5rem', margin: '1rem 0' }}>{t('game.yourScore')}: {score}</p>
+                        <p style={{ fontSize: 'var(--text-heading-md)', margin: '1rem 0' }}>{t('game.yourScore')}: {score}</p>
                         {scoreError && (
                             <div style={{
                                 background: 'rgba(255, 107, 107, 0.2)',
@@ -300,7 +300,7 @@ const App: React.FC = () => {
                             autoFocus
                             disabled={isSubmittingScore}
                             style={{
-                                fontSize: '2rem'
+                                fontSize: 'var(--text-heading-lg)'
                             }}
                         />
                         <br />
@@ -319,8 +319,8 @@ const App: React.FC = () => {
                 <Modal isOpen={true} title={<div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>{t('game.finished')} <GameIcon name="gift" size={24} /></div>}>
                     <div style={{ textAlign: 'center', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
                         <Card className="joke-card" style={{ width: '100%' }}>
-                            <h2 style={{ fontFamily: 'var(--font-retro)', color: 'var(--primary-color)', margin: '0', fontSize: '1.5rem' }}>{t('game.jokeTitle')}</h2>
-                            <p style={{ fontSize: '1rem', fontStyle: 'italic' }}>"{currentJoke}"</p>
+                            <h2 style={{ fontFamily: 'var(--font-retro)', color: 'var(--primary-color)', margin: '0', fontSize: 'var(--text-heading-md)' }}>{t('game.jokeTitle')}</h2>
+                            <p style={{ fontSize: 'var(--text-body-lg)', fontStyle: 'italic' }}>"{currentJoke}"</p>
                         </Card>
 
                         <Button
