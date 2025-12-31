@@ -45,6 +45,34 @@
   text-shadow: 4px 4px 0 rgba(0, 0, 0, 1);
 }
 
+/* iOS Touch Target Utilities (44x44px minimum for accessibility) */
+@utility touch-target-ios {
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* PWA Safe Area Utilities (Tailwind v4 custom utilities) */
+@utility safe-inset-top {
+  top: max(0.5rem, env(safe-area-inset-top));
+}
+
+@utility safe-inset-right {
+  right: max(0.5rem, env(safe-area-inset-right));
+}
+
+@utility safe-inset-bottom {
+  bottom: max(0.5rem, env(safe-area-inset-bottom));
+}
+
+@utility safe-inset-left {
+  left: max(0.5rem, env(safe-area-inset-left));
+}
+
 @font-face {
   font-family: 'JetBrains Mono';
   src: url('./assets/JetBrainsMono-Regular.woff2') format('woff2');
