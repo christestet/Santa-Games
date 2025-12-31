@@ -15,14 +15,14 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, 
     return (
         <div
             className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 md:p-6"
-            style={style}
+            style={{ ...style, touchAction: 'auto' }}
             onClick={(e) => {
                 if (e.target === e.currentTarget && onClose) {
                     onClose();
                 }
             }}
         >
-            <div className="modal-scroll-wrapper">
+            <div className="modal-scroll-wrapper" style={{ touchAction: 'auto' }}>
                 <Card title={title} className="modal-content">
                     {children}
                 </Card>

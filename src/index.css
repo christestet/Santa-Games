@@ -686,10 +686,23 @@ input[type=range]::-moz-range-thumb {
 .settings-label {
     font-size: var(--text-body-lg);
     font-weight: bold;
+    flex-shrink: 0;
 }
 
 .settings-btn-group {
     min-width: 100px;
+    flex-shrink: 0;
+}
+
+/* Ensure settings buttons are accessible on iOS */
+.settings-row button {
+    min-height: 44px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
 }
 
 /* =========================================
@@ -868,6 +881,17 @@ input[type=range]::-moz-range-thumb {
     scrollbar-width: thin;
     scrollbar-color: var(--primary-color) rgba(0, 0, 0, 0.2);
     padding: 1rem 0;
+    /* Allow touch events in modal */
+    touch-action: auto;
+  }
+
+  /* Ensure modal and its children can receive touch events */
+  .modal-content {
+    touch-action: auto;
+  }
+
+  .modal-content * {
+    touch-action: auto;
   }
 
   /* Custom scrollbar styling */
@@ -905,26 +929,34 @@ input[type=range]::-moz-range-thumb {
   /* Fixed top bar for scrolling */
   .top-bar {
     position: fixed;
-    top: 0.5rem;
-    right: 0.5rem;
+    top: max(0.5rem, env(safe-area-inset-top));
+    right: max(0.5rem, env(safe-area-inset-right));
     gap: 0.5rem;
     z-index: 100;
     background: rgba(0, 0, 0, 0.3);
     backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     padding: 0.5rem;
     border-radius: 8px;
     display: flex;
   }
-  
-  .top-bar button { 
-      min-width: 36px; 
-      min-height: 36px; 
-      padding: 0.4rem; 
+
+  /* iOS requires 44x44px minimum touch targets */
+  .top-bar button {
+      min-width: 44px;
+      min-height: 44px;
+      padding: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
   }
-  
+
   .top-bar svg {
-      width: 20px;
-      height: 20px;
+      width: 22px;
+      height: 22px;
+      pointer-events: none;
   }
 
   .santa-hand-top { font-size: 2.5rem; top: 50px; }
@@ -1090,16 +1122,47 @@ input[type=range]::-moz-range-thumb {
     flex-wrap: wrap;
   }
 
+  /* Stack settings rows vertically on mobile for better accessibility */
+  .settings-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .settings-label {
+    text-align: center;
+    font-size: var(--text-body);
+  }
+
+  .settings-btn-group {
+    width: 100%;
+    min-width: unset;
+  }
+
+  .settings-row button {
+    width: 100%;
+    min-height: 48px;
+    padding: 0.75rem 1rem;
+    font-size: var(--text-body);
+  }
+
   /* Fixed top bar for consistency */
   .top-bar {
     position: fixed;
-    top: 0.5rem;
-    right: 0.5rem;
+    top: max(0.5rem, env(safe-area-inset-top));
+    right: max(0.5rem, env(safe-area-inset-right));
     z-index: 100;
     background: rgba(0, 0, 0, 0.3);
     backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     padding: 0.25rem;
     border-radius: 8px;
+  }
+
+  .top-bar button {
+    min-width: 44px;
+    min-height: 44px;
   }
 
   .version-tag {
@@ -1174,9 +1237,30 @@ input[type=range]::-moz-range-thumb {
   }
 
   .top-bar {
-    top: 0.5rem;
-    right: 0.5rem;
+    top: max(0.5rem, env(safe-area-inset-top));
+    right: max(0.5rem, env(safe-area-inset-right));
     gap: 0.25rem;
+    padding: 0.25rem;
+  }
+
+  .top-bar button {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0.5rem;
+  }
+
+  /* Settings accessibility on small devices */
+  .settings-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+    padding: 0.75rem 0.5rem;
+  }
+
+  .settings-row button {
+    width: 100%;
+    min-height: 48px;
+    font-size: var(--text-body);
   }
 
   .version-tag {
@@ -1790,6 +1874,13 @@ input[type=range]::-moz-range-thumb {
   flex-wrap: wrap;
   width: 100%;
   margin: 0.5rem 0;
+}
+
+/* Ensure preset buttons are accessible on iOS */
+.preset-container button {
+  min-height: 44px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* =========================================
