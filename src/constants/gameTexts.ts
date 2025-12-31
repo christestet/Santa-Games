@@ -65,6 +65,7 @@ export const TRANSLATIONS = {
             gameEndedMessage: "Die Santa Games sind offiziell vorbei! Danke an alle mutigen Spieler, die Santas Geschenke gerettet haben. Die Rentiere sind erschöpft, die Elfen im Urlaub und der Schlitten in der Werkstatt. Ob wir nächstes Jahr wieder zurückkommen? Wer weiß... vielleicht, wenn ihr brav wart! 🎅✨",
             player: "Spieler",
             players: "Spieler",
+            eternalGlory: "Ewiger Ruhm erwartet die Champions!",
             runner: {
                 tapToJump: "TIPPE ZUM SPRINGEN",
                 swipeDown: "WISCH NACH UNTEN ZUM DUCKEN",
@@ -93,7 +94,7 @@ export const TRANSLATIONS = {
         menu: {
             title: "Merry Games",
             grinchTitle: "Grumpy Games",
-            finaleBadge: "FINALE",
+            finaleBadge: "FINALS",
             settings: "SETTINGS",
             play: "PLAY",
             info: "INFO",
@@ -139,6 +140,7 @@ export const TRANSLATIONS = {
             gameEndedMessage: "The Santa Games are officially over! Thanks to all brave players who saved Santa's presents. The reindeer are exhausted, the elves are on vacation, and the sleigh's in the shop. Will we be back next year? Who knows... maybe if you've been good! 🎅✨",
             player: "player",
             players: "players",
+            eternalGlory: "Eternal Glory awaits the Champions!",
             runner: {
                 tapToJump: "TAP TO JUMP",
                 swipeDown: "SWIPE DOWN TO DUCK",

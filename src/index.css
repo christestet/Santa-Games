@@ -54,11 +54,20 @@
 
 :root {
   --font-retro: 'JetBrains Mono', monospace;
-  
+
   /* Retro Pixel Spacing/Sizing */
   --border-width: 4px;
   --pixel-size: 4px;
-  
+
+  /* Unified Typography System - Responsive & Mobile-Optimized */
+  --text-display: clamp(2rem, 5vw, 3.5rem);           /* H1: Main titles */
+  --text-heading-lg: clamp(1.2rem, 3.5vw, 1.8rem);    /* H2: Large headings */
+  --text-heading-md: clamp(1rem, 3vw, 1.5rem);        /* H3: Medium headings, buttons */
+  --text-body-lg: clamp(0.95rem, 2.5vw, 1.2rem);      /* Large body text, important info */
+  --text-body: clamp(0.85rem, 2.2vw, 1rem);           /* Standard body text */
+  --text-small: clamp(0.75rem, 2vw, 0.875rem);        /* Small text, helper text */
+  --text-caption: clamp(0.7rem, 1.8vw, 0.8rem);       /* Captions, minimal text */
+
   transition: background-color 0s, color 0s; /* Retro snaps, no smooth fades for theme */
 }
 
@@ -343,10 +352,20 @@ h1, h2, h3 {
 }
 
 h1 {
-  font-size: clamp(2rem, 5vw, 4rem);
+  font-size: var(--text-display);
   text-shadow: 4px 4px 0 rgba(0,0,0,1); /* Retro Hard Shadow */
   color: var(--primary-color);
   font-weight: bold;
+}
+
+h2 {
+  font-size: var(--text-heading-lg);
+  font-weight: bold;
+}
+
+h3 {
+  font-size: var(--text-heading-md);
+  font-weight: 600;
 }
 
 /* =========================================
@@ -370,14 +389,14 @@ h1 {
   background-color: var(--btn-primary-bg);
   color: var(--btn-primary-text);
   padding: 1rem 2rem;
-  font-size: 1.5rem;
+  font-size: var(--text-heading-md);
 }
 
 .btn-small {
   background-color: var(--btn-secondary-bg);
   color: var(--btn-secondary-text);
   padding: 0.5rem 1rem;
-  font-size: 1rem;
+  font-size: var(--text-body-lg);
   min-width: 44px;
   min-height: 44px;
 }
@@ -399,7 +418,7 @@ h1 {
   border: var(--border-width) solid var(--input-border);
   color: var(--input-text);
   font-family: var(--font-retro);
-  font-size: 2rem;
+  font-size: var(--text-heading-lg);
   padding: 0.5rem;
   text-align: center;
   width: 90%;
@@ -594,7 +613,7 @@ input[type=range]::-moz-range-thumb {
 }
 
 .instruction-text {
-    font-size: 1rem;
+    font-size: var(--text-body);
     line-height: 1.4;
     text-align: center;
 }
@@ -612,7 +631,7 @@ input[type=range]::-moz-range-thumb {
   -webkit-backdrop-filter: blur(8px);
   border: var(--border-width) solid rgba(255, 255, 255, 0.3);
   color: #ffffff;
-  font-size: 1.5rem;
+  font-size: var(--text-body-lg);
   font-weight: 600;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   z-index: 20;
@@ -632,7 +651,7 @@ input[type=range]::-moz-range-thumb {
 
 .hud-btn {
     padding: 0.6rem 0.8rem;
-    font-size: 1.2rem;
+    font-size: var(--text-body-lg);
     min-height: 44px;
     min-width: 44px;
     background: rgba(255,255,255,0.1);
@@ -665,7 +684,7 @@ input[type=range]::-moz-range-thumb {
 }
 
 .settings-label {
-    font-size: 1.2rem;
+    font-size: var(--text-body-lg);
     font-weight: bold;
 }
 
@@ -723,22 +742,20 @@ input[type=range]::-moz-range-thumb {
   }
 
   h1 {
-    font-size: 1.8rem;
     -webkit-text-stroke: 1px var(--card-border);
     margin: 0 0 0.5rem 0;
     padding: 0 0.5rem; /* Prevent edge touching */
     text-align: center;
     line-height: 1.2;
   }
-  
+
   .frost-card, .leaderboard, .game-card-front, .game-card-back { padding: 0.75rem; }
-  .arcade-input { font-size: 1.5rem; padding: 0.4rem; }
-  
+  .arcade-input { padding: 0.4rem; }
+
   /* HUD Compact */
-  .score-display, .timer-display { 
-      font-size: 1rem; 
-      padding: 0.4rem 0.6rem; 
-      top: 0.5rem; 
+  .score-display, .timer-display {
+      padding: 0.4rem 0.6rem;
+      top: 0.5rem;
       gap: 0.5rem;
   }
   .score-display { right: 0.25rem; }
@@ -766,9 +783,9 @@ input[type=range]::-moz-range-thumb {
     padding: 0 0.5rem;
   }
   .game-card-container { width: 100%; height: 180px; min-width: unset; }
-  .game-card-front h3, .game-card-back h3 { font-size: 1.2rem; margin: 0.25rem 0; }
+  .game-card-front h3, .game-card-back h3 { margin: 0.25rem 0; }
   .game-icon { font-size: 2.5rem; }
-  .instruction-text { font-size: 0.85rem; line-height: 1.3; }
+  .instruction-text { line-height: 1.3; }
 
   /* Compact leaderboard */
   .leaderboard {
@@ -786,7 +803,6 @@ input[type=range]::-moz-range-thumb {
   }
 
   .leaderboard h2 {
-      font-size: 1.3rem;
       margin-bottom: 0.5rem;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -794,7 +810,6 @@ input[type=range]::-moz-range-thumb {
 
   .score-row {
       padding: 0.4rem 0.5rem;
-      font-size: 0.85rem;
       gap: 0.5rem;
       flex-wrap: wrap;
   }
@@ -820,7 +835,6 @@ input[type=range]::-moz-range-thumb {
   }
   
   .settings-label {
-      font-size: 1rem;
       width: 100%;
   }
   
@@ -913,7 +927,6 @@ input[type=range]::-moz-range-thumb {
       height: 20px;
   }
 
-  .floating-text { font-size: 1.2rem !important; }
   .santa-hand-top { font-size: 2.5rem; top: 50px; }
   .gift-item { font-size: 1.8rem; }
   
@@ -1012,10 +1025,10 @@ input[type=range]::-moz-range-thumb {
     padding: 4.5rem 0 8rem 0; /* Increased bottom padding for scrollability */
   }
 
-  h1 { font-size: 2.2rem; -webkit-text-stroke: 1px var(--card-border); margin: 0 0 0.5rem 0; }
+  h1 { -webkit-text-stroke: 1px var(--card-border); margin: 0 0 0.5rem 0; }
   .frost-card, .leaderboard, .game-card-front, .game-card-back { padding: 1.25rem; }
-  .arcade-input { font-size: 1.75rem; padding: 0.45rem; }
-  .score-display, .timer-display { font-size: 1.1rem; padding: 0.4rem 0.6rem; top: 0.5rem; }
+  .arcade-input { padding: 0.45rem; }
+  .score-display, .timer-display { padding: 0.4rem 0.6rem; top: 0.5rem; }
   .score-display { right: 0.4rem; }
   .timer-display { left: 0.4rem; flex-direction: column; align-items: flex-start; }
 
@@ -1050,13 +1063,11 @@ input[type=range]::-moz-range-thumb {
     padding: 0 1rem;
   }
   .game-card-container { width: 100%; height: 240px; min-width: unset; }
-  .floating-text { font-size: 1.4rem !important; }
   .santa-hand-top { font-size: 3.2rem; top: 55px; }
   .gift-item { font-size: 2.2rem; }
 
   .bottom-hit-message {
     bottom: 60px;
-    font-size: 1.3rem;
     padding: 0.4rem 0.8rem;
     max-width: 95%;
   }
@@ -1074,7 +1085,6 @@ input[type=range]::-moz-range-thumb {
   }
 
   .score-row {
-    font-size: 1rem;
     padding: 0.5rem;
     gap: 0.5rem;
     flex-wrap: wrap;
@@ -1112,27 +1122,25 @@ input[type=range]::-moz-range-thumb {
   .score-display { top: 0.25rem; right: auto; left: 0.25rem; }
   .timer-display { top: 0.25rem; left: auto; right: 0.25rem; flex-direction: row-reverse; }
   .timer-display > div { flex-direction: row; gap: 0.25rem; }
-  h1 { font-size: 1.8rem; margin-bottom: 0.5rem; }
+  h1 { margin-bottom: 0.5rem; }
   .frost-card { padding: 0.75rem; }
   .game-selection { flex-direction: row; gap: 1rem; }
   .game-card-container { width: 200px; height: 180px; }
-  .arcade-input { font-size: 1.3rem; }
-  .combo-display { font-size: 1.5rem; top: 30%; }
+  .combo-display { top: 30%; }
   .santa-hand-top { font-size: 2.5rem; top: 20px; }
   .gift-toss .santa-hand-top { font-size: 2.8rem; top: 55px; }
   .gift-item { font-size: 1.8rem; }
-  .floating-text { font-size: 1.2rem !important; }
 }
 
 @media (max-width: 768px) {
-  h1 { font-size: 2.5rem; -webkit-text-stroke: 1px var(--card-border); }
+  h1 { -webkit-text-stroke: 1px var(--card-border); }
   .game-selection {
     grid-template-columns: 1fr; /* Single column on mobile */
     padding: 0 1rem;
     max-width: 500px;
   }
   .game-card-container { width: 100%; height: 250px; min-width: unset; }
-  .score-display, .timer-display { font-size: 1.2rem; top: 0.5rem; }
+  .score-display, .timer-display { top: 0.5rem; }
 
   /* Game elements mobile adjustments */
   .santa-hand-top {
@@ -1149,17 +1157,11 @@ input[type=range]::-moz-range-thumb {
   }
 
   .combo-display {
-    font-size: 2rem;
     letter-spacing: 2px;
-  }
-
-  .floating-text {
-    font-size: 1.5rem !important;
   }
 
   .bottom-hit-message {
     bottom: 70px;
-    font-size: 1.5rem;
     padding: 0.5rem 1rem;
   }
 
@@ -1168,12 +1170,7 @@ input[type=range]::-moz-range-thumb {
   }
 
   .score-row {
-    font-size: 1rem;
     padding: 0.5rem;
-  }
-
-  .score-row:first-child {
-    font-size: 1.1rem;
   }
 
   .top-bar {
@@ -1590,6 +1587,7 @@ input[type=range]::-moz-range-thumb {
   -webkit-text-stroke: 2px var(--card-border);
   animation: float-up 2s linear forwards;
   white-space: nowrap;
+  font-size: var(--text-heading-md);
 }
 
 /* =========================================
@@ -1629,7 +1627,7 @@ input[type=range]::-moz-range-thumb {
   left: 50%;
   transform: translate(-50%, -50%);
   font-family: var(--font-retro);
-  font-size: clamp(2rem, 5vw, 4rem);
+  font-size: var(--text-display);
   font-weight: bold;
   text-transform: uppercase;
   color: var(--accent-color);
@@ -1662,7 +1660,7 @@ input[type=range]::-moz-range-thumb {
   border: 2px solid var(--card-border);
   box-shadow: 2px 2px 0 rgba(0,0,0,0.3);
   font-family: var(--font-retro);
-  font-size: 1.2rem;
+  font-size: var(--text-body-lg);
   letter-spacing: 1px;
   transition: transform 0.1s, box-shadow 0.1s;
   overflow: hidden; /* Prevent overflow */
@@ -1693,7 +1691,7 @@ input[type=range]::-moz-range-thumb {
 .score-row:first-child {
   border-color: var(--accent-color);
   border-width: 4px;
-  font-size: 1.4rem;
+  font-size: var(--text-heading-md);
   background: rgba(251, 192, 45, 0.1);
 }
 
