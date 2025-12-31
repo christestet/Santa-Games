@@ -45,7 +45,11 @@ const Countdown: React.FC<CountdownProps> = ({ targetDate }) => {
 
     if (timeRemaining.total <= 0) {
         return (
-            <div className="text-center text-xs opacity-70">
+            <div className="text-center" style={{
+                fontSize: 'clamp(1rem, 3vw, 1.2rem)',
+                opacity: 0.8,
+                fontWeight: 'bold'
+            }}>
                 {t('game.gameEnded')}
             </div>
         )
@@ -57,9 +61,28 @@ const Countdown: React.FC<CountdownProps> = ({ targetDate }) => {
     const isEndgame = timeRemaining.days < 2
 
     return (
-        <div className={`flex flex-col gap-1 text-center text-xs ${isEndgame ? 'opacity-100' : 'opacity-70'}`}>
-            <div>{t('game.playableUntil')}</div>
-            <div className={`font-mono text-sm tracking-wider ${isEndgame ? 'text-[#ff0000] countdown-pulse' : ''}`}>
+        <div className={`flex flex-col gap-2 text-center ${isEndgame ? 'opacity-100' : 'opacity-90'}`} style={{
+            padding: 'clamp(0.75rem, 2vw, 1rem)',
+            borderRadius: '8px',
+            background: isEndgame ? 'rgba(255, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.05)',
+            border: isEndgame ? '2px solid rgba(255, 0, 0, 0.3)' : '2px solid rgba(255, 255, 255, 0.1)',
+            maxWidth: '500px',
+            margin: '0 auto'
+        }}>
+            <div style={{
+                fontSize: 'clamp(1rem, 3vw, 1.3rem)',
+                fontWeight: 'bold',
+                fontFamily: 'var(--font-retro)',
+                color: isEndgame ? '#ff0000' : 'var(--text-main)'
+            }}>
+                {t('game.playableUntil')}
+            </div>
+            <div className={`font-mono tracking-wider ${isEndgame ? 'countdown-pulse' : ''}`} style={{
+                fontSize: 'clamp(1.2rem, 4vw, 1.8rem)',
+                fontWeight: 'bold',
+                color: isEndgame ? '#ff0000' : 'var(--accent-color)',
+                letterSpacing: '0.1em'
+            }}>
                 {timeRemaining.days}d {pad(timeRemaining.hours)}h {pad(timeRemaining.minutes)}m {pad(timeRemaining.seconds)}s
             </div>
         </div>

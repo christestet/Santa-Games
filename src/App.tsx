@@ -101,6 +101,12 @@ const App: React.FC = () => {
                         </h1>
                     </div>
 
+                    {gamesPlayable && (
+                        <div style={{ marginTop: '1.5rem', marginBottom: '1rem' }}>
+                            <Countdown targetDate={GAME_DEADLINE} />
+                        </div>
+                    )}
+
                     {!gamesPlayable && (
                         <Card className="frost-card" style={{
                             maxWidth: '600px',
@@ -213,7 +219,6 @@ const App: React.FC = () => {
                                 <GameIcon name="github" size={16} />
                             </a>
                         </div>
-                        <Countdown targetDate={GAME_DEADLINE} />
                     </div>
                 </div>
             )}
