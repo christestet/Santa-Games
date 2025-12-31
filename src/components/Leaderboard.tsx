@@ -65,7 +65,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
             {isEndgame && (
                 <div className="eternal-glory-hint">
                     <span className="eternal-glory-text">
-                        ⭐ {t('game.language') === 'de' ? 'Ewiger Ruhm erwartet die Champions!' : 'Eternal Glory awaits the Champions!'} ⭐
+                        <GameIcon name="star" size={16} /> {t('game.eternalGlory')} <GameIcon name="star" size={16} />
                     </span>
                 </div>
             )}
