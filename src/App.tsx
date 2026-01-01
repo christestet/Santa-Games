@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import Snow from '@components/Snow'
 import GameCard from '@components/GameCard'
 import Countdown from '@components/Countdown'
@@ -18,6 +18,7 @@ const GiftToss = lazy(() => import('@components/GiftToss'))
 const ReindeerRun = lazy(() => import('@components/ReindeerRun'))
 const GameSettings = lazy(() => import('@components/GameSettings'))
 const Leaderboard = lazy(() => import('@components/Leaderboard'))
+const Statistics = lazy(() => import('@components/Statistics'))
 
 const App: React.FC = () => {
     const { t, language, setLanguage } = useLanguage()
@@ -51,6 +52,7 @@ const App: React.FC = () => {
     } = useGame()
 
     const gamesPlayable = isGamePlayable()
+    const [showStatistics, setShowStatistics] = useState(false)
 
     // Check if we're in endgame phase (less than 2 days remaining)
     const now = new Date().getTime()
@@ -83,6 +85,12 @@ const App: React.FC = () => {
                             onClick={toggleTheme}
                         >
                             {theme === 'classic' ? <GameIcon name="santa" size={24} /> : <GameIcon name="grinch" size={24} />}
+                        </Button>
+                        <Button
+                            variant="icon"
+                            onClick={() => setShowStatistics(true)}
+                        >
+                            <GameIcon name="chart" size={24} />
                         </Button>
                     </div>
 
@@ -168,6 +176,15 @@ const App: React.FC = () => {
                                 settings={settings}
                                 onUpdate={updateSettings}
                                 onClose={() => toggleSettings(false)}
+                            />
+                        </Suspense>
+                    )}
+
+                    {showStatistics && (
+                        <Suspense fallback={<div className="loading-statistics">{t('common.loading') || 'Loading...'}</div>}>
+                            <Statistics
+                                scores={highScores}
+                                onClose={() => setShowStatistics(false)}
                             />
                         </Suspense>
                     )}

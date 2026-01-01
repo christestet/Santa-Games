@@ -74,6 +74,62 @@ export const TRANSLATIONS = {
         hooks: {
             fetchError: "Bestenliste konnte nicht geladen werden - die Elfen haben Mittagspause",
             submitError: "Score konnte nicht gespeichert werden. Hast du am Kabel gewackelt?",
+        },
+        stats: {
+            title: "Santa's Statistiken",
+
+            // Hall of Fame
+            hallOfFame: "Hall of Fame",
+            mostActive: "Fleißigster Elf",
+            topScorer: "Nordpol-Champion",
+            games: "Spiele",
+            points: "Punkte",
+
+            // Interessante Zahlen
+            interestingNumbers: "Interessante Zahlen",
+            totalGames: "Spiele insgesamt",
+            uniquePlayers: "Tapfere Helfer",
+            averageScore: "Durchschnitt",
+            highestScore: "Rekord",
+
+            // Umrechnungen
+            conversions: "In anderen Worten...",
+            chimneysClimbed: "Schornsteine erklommen",
+            giftsDelivered: "Geschenke verteilt",
+            cookiesEaten: "Kekse vernichtet",
+            milkGlasses: "Gläser Milch getrunken",
+            reindeerMiles: "Rentier-Meilen geflogen",
+
+            // Spielgewohnheiten
+            playHabits: "Spielgewohnheiten",
+            favoriteTime: "Beliebteste Zeit",
+            favoriteTimeText: "Die Welt liebt",
+            busiestDay: "Aktivster Tag",
+            firstPlayer: "Erster Spieler",
+            latestPlayer: "Neuester Spieler",
+
+            // Zeitformate
+            seconds: "Sekunden",
+            monday: "Montag",
+            tuesday: "Dienstag",
+            wednesday: "Mittwoch",
+            thursday: "Donnerstag",
+            friday: "Freitag",
+            saturday: "Samstag",
+            sunday: "Sonntag",
+
+            // Witze/Kommentare
+            veryImpressive: "Wow! Das ist beeindruckend!",
+            santaIsProud: "Santa wäre stolz!",
+            kidsAreHappy: "Alle Kinder glücklich gemacht!",
+            timeForBreak: "Rudolf braucht eine Pause!",
+            thanksForHelp: "Danke für die Hilfe!",
+            playMore: "Mehr spielen = mehr Spaß!",
+
+            // Edge Cases
+            noDataYet: "Noch keine Daten - sei der Erste!",
+            calculating: "Die Elfen rechnen...",
+            notEnoughData: "Noch nicht genug Daten für diese Statistik"
         }
     },
     en: {
@@ -149,6 +205,62 @@ export const TRANSLATIONS = {
         hooks: {
             fetchError: "Failed to load leaderboard - the elves are on lunch break",
             submitError: "Score couldn't be saved. Did you wiggle the cable?",
+        },
+        stats: {
+            title: "Santa's Statistics",
+
+            // Hall of Fame
+            hallOfFame: "Hall of Fame",
+            mostActive: "Hardest Working Elf",
+            topScorer: "North Pole Champion",
+            games: "games",
+            points: "points",
+
+            // Interesting Numbers
+            interestingNumbers: "Interesting Numbers",
+            totalGames: "Total Games",
+            uniquePlayers: "Brave Helpers",
+            averageScore: "Average",
+            highestScore: "Record",
+
+            // Conversions
+            conversions: "In Other Words...",
+            chimneysClimbed: "Chimneys climbed",
+            giftsDelivered: "Gifts delivered",
+            cookiesEaten: "Cookies eaten",
+            milkGlasses: "Glasses of milk consumed",
+            reindeerMiles: "Reindeer miles flown",
+
+            // Play Habits
+            playHabits: "Play Habits",
+            favoriteTime: "Favorite Time",
+            favoriteTimeText: "The world loves",
+            busiestDay: "Busiest Day",
+            firstPlayer: "First Player",
+            latestPlayer: "Latest Player",
+
+            // Time formats
+            seconds: "seconds",
+            monday: "Monday",
+            tuesday: "Tuesday",
+            wednesday: "Wednesday",
+            thursday: "Thursday",
+            friday: "Friday",
+            saturday: "Saturday",
+            sunday: "Sunday",
+
+            // Jokes/Comments
+            veryImpressive: "Wow! That's impressive!",
+            santaIsProud: "Santa would be proud!",
+            kidsAreHappy: "All the kids are happy!",
+            timeForBreak: "Rudolf needs a break!",
+            thanksForHelp: "Thanks for the help!",
+            playMore: "More playing = more fun!",
+
+            // Edge Cases
+            noDataYet: "No data yet - be the first!",
+            calculating: "The elves are calculating...",
+            notEnoughData: "Not enough data for this statistic yet"
         }
     }
 };

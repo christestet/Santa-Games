@@ -27,7 +27,8 @@ export type GameIconName =
     | 'snowman'
     | 'rock'
     | 'branch'
-    | 'github';
+    | 'github'
+    | 'chart';
 
 interface GameIconProps {
     name: GameIconName;
@@ -576,6 +577,18 @@ const SPRITES: Record<GameIconName, SpriteDefinition> = {
                 {/* Tentakel unten angedeutet */}
                 <rect x="4" y="18" width="2" height="4" style={{ fill: 'var(--text-main)' }} />
                 <rect x="18" y="18" width="2" height="4" style={{ fill: 'var(--text-main)' }} />
+            </>
+        )
+    },
+    chart: {
+        content: (
+            <>
+                {/* Simple Bar Chart mit 3 Balken unterschiedlicher Höhe */}
+                <rect x="4" y="14" width="4" height="8" fill="#4CAF50" />
+                <rect x="10" y="8" width="4" height="14" fill="#2196F3" />
+                <rect x="16" y="11" width="4" height="11" fill="#FFC107" />
+                {/* Baseline */}
+                <rect x="2" y="22" width="20" height="1" fill="#757575" />
             </>
         )
     }
