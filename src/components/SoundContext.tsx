@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef, useCallback, useMemo } from 'react';
 
 // --- Music Player ---
 class MusicPlayer {
@@ -65,10 +65,19 @@ export const SoundProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         player.current?.setMuted(isMuted);
     }, [isMuted]);
 
-    const toggleMute = () => setIsMuted(prev => !prev);
+    // ✅ Memoize callback - prevents unnecessary re-renders
+    const toggleMute = useCallback(() => {
+        setIsMuted(prev => !prev);
+    }, []);
+
+    // ✅ Memoize context value - CRITICAL for performance
+    const value = useMemo(
+        () => ({ isMuted, toggleMute }),
+        [isMuted, toggleMute]
+    );
 
     return (
-        <SoundContext.Provider value={{ isMuted, toggleMute }}>
+        <SoundContext.Provider value={value}>
             {children}
         </SoundContext.Provider>
     );

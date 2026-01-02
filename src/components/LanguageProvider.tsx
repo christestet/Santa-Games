@@ -1,4 +1,4 @@
-import React, { useState, useCallback, ReactNode } from 'react';
+import React, { useState, useCallback, useMemo, ReactNode } from 'react';
 import { Language, TRANSLATIONS, WEIHNACHTS_WITZE, SPRUECHE, PARCEL_TEXTS } from '../constants/gameTexts';
 import { LanguageContext } from './LanguageContext';
 
@@ -50,8 +50,14 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
         return texts[Math.floor(Math.random() * texts.length)];
     }, [language]);
 
+    // ✅ Memoize context value - CRITICAL for performance
+    const value = useMemo(
+        () => ({ language, setLanguage, t, getJoke, getSpruch, getParcelText }),
+        [language, setLanguage, t, getJoke, getSpruch, getParcelText]
+    );
+
     return (
-        <LanguageContext.Provider value={{ language, setLanguage, t, getJoke, getSpruch, getParcelText }}>
+        <LanguageContext.Provider value={value}>
             {children}
         </LanguageContext.Provider>
     );

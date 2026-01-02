@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 
 type Theme = 'classic' | 'grinch';
 
@@ -23,11 +23,23 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         document.body.classList.add(`${theme}-theme`);
     }, [theme]);
 
-    const setTheme = (newTheme: Theme) => setThemeState(newTheme);
-    const toggleTheme = () => setThemeState(prev => (prev === 'classic' ? 'grinch' : 'classic'));
+    // ✅ Memoize callbacks - prevents unnecessary re-renders
+    const setTheme = useCallback((newTheme: Theme) => {
+        setThemeState(newTheme);
+    }, []);
+
+    const toggleTheme = useCallback(() => {
+        setThemeState(prev => (prev === 'classic' ? 'grinch' : 'classic'));
+    }, []);
+
+    // ✅ Memoize context value - CRITICAL for performance
+    const value = useMemo(
+        () => ({ theme, setTheme, toggleTheme }),
+        [theme, setTheme, toggleTheme]
+    );
 
     return (
-        <ThemeContext.Provider value={{ theme, setTheme, toggleTheme }}>
+        <ThemeContext.Provider value={value}>
             {children}
         </ThemeContext.Provider>
     );

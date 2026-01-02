@@ -1,4 +1,4 @@
-import React, { useState, useCallback, ReactNode } from 'react';
+import React, { useState, useCallback, useMemo, ReactNode } from 'react';
 import { GAME_CONFIG } from '@constants/gameConfig';
 import { isGamePlayable } from '@constants/gameConstants';
 import { useHighScores } from '@hooks/useHighScores';
@@ -105,34 +105,67 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setIsSubmitting(false);
     }, [playerName, score, isSubmitting, apiSubmitScore, settings.TIMER]);
 
-    const value = {
-        gameState,
-        currentGame,
-        score,
-        currentJoke,
-        playerName,
-        isPaused,
-        settings,
-        showSettings,
-        highScores,
-        isLoadingScores: isLoading,
-        scoreError: error,
-        isSubmittingScore: isSubmitting,
-        lastPlayedTime,
-        isTransitioning,
-        gameKey,
-        startGame,
-        endGame,
-        pauseGame,
-        resumeGame,
-        restartGame,
-        quitGame,
-        updateSettings,
-        toggleSettings,
-        setPlayerName,
-        submitScore,
-        fetchScores
-    };
+    // ✅ Memoize context value - CRITICAL for performance!
+    // This is the MOST IMPORTANT memoization in the app
+    // Without this, ALL game components re-render on EVERY state change
+    const value = useMemo(
+        () => ({
+            gameState,
+            currentGame,
+            score,
+            currentJoke,
+            playerName,
+            isPaused,
+            settings,
+            showSettings,
+            highScores,
+            isLoadingScores: isLoading,
+            scoreError: error,
+            isSubmittingScore: isSubmitting,
+            lastPlayedTime,
+            isTransitioning,
+            gameKey,
+            startGame,
+            endGame,
+            pauseGame,
+            resumeGame,
+            restartGame,
+            quitGame,
+            updateSettings,
+            toggleSettings,
+            setPlayerName,
+            submitScore,
+            fetchScores
+        }),
+        [
+            gameState,
+            currentGame,
+            score,
+            currentJoke,
+            playerName,
+            isPaused,
+            settings,
+            showSettings,
+            highScores,
+            isLoading,
+            error,
+            isSubmitting,
+            lastPlayedTime,
+            isTransitioning,
+            gameKey,
+            startGame,
+            endGame,
+            pauseGame,
+            resumeGame,
+            restartGame,
+            quitGame,
+            updateSettings,
+            toggleSettings,
+            setPlayerName,
+            submitScore,
+            fetchScores
+        ]
+    );
 
     return (
         <GameContext.Provider value={value}>
